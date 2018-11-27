@@ -20,7 +20,13 @@ struct face_map_pair
 	int y;
 };
 
+typedef double hit_properties;
 
+struct block_hit
+{
+	glm::vec3 loc;
+	hit_properties props;
+}
 
 class TGLChunkSpawn : public TGLActor
 {
@@ -37,7 +43,7 @@ class TGLChunkSpawn : public TGLActor
 	std::vector <TGLMesh*> meshes;
 	std::vector <chunk_coord> chunks_to_load;
 	
-	std::deque <glm::vec3> posted_hits;
+	std::deque <block_hit> posted_hits;
 	static const unsigned int hits_to_break = 1;
 	std::deque <block_def> posted_placements;
 
@@ -66,7 +72,7 @@ public:
 	
 	void get_chunk_of_point(glm::vec3 in_point, int& out_chunk_x, int& out_chunk_y);
 	
-	void post_hit(glm::vec3 in_hit);
+	void post_hit(block_hit in_hit);
 	
 	void post_placement(glm::vec3 in_loc, e_block_type in_type);
 	

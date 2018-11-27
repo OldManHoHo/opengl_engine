@@ -34,6 +34,10 @@ bool TGLInventoryItem::operator!= (const TGLInventoryItem& item_b)
 	return item_b.type != type || item_b.quantity != quantity;
 }
 
+hit_properties TGLInventoryItem::get_hit_properties()
+{
+	return 1.0;
+}
 
 TGLInventoryItem TGLInventory::no_item(none);
 

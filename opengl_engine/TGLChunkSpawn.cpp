@@ -291,7 +291,7 @@ glm::vec3 ray_cast_block_finder(glm::vec3 in_position, glm::vec3 in_ray, glm::ve
 	return intersected_block;
 }
 
-glm::vec3 TGLChunkSpawn::get_block_pointed_at(glm::vec3 origin, glm::vec3 pointing_vector, double max_distance, e_block_type& out_block_type)
+glm::vec3 TGLChunkSpawn::get_block_pointed_at(glm::vec3 origin, glm::vec3 pointing_vector, double max_distance, e_block_type& out_block_type, glm::vec3& out_prev_block)
 {
 		glm::vec3 next_ray_crosshair = pointing_vector*0.01f;
 		e_block_type block_type_crosshair = bt_air;
@@ -304,8 +304,11 @@ glm::vec3 TGLChunkSpawn::get_block_pointed_at(glm::vec3 origin, glm::vec3 pointi
 			block_type_crosshair = block_generator->get_point(next_block_crosshair.x, next_block_crosshair.z, next_block_crosshair.y);
 		}
 		out_block_type = block_type_crosshair;
+		out_prev_block = prev_block_crosshair;
 		return next_block;
 }
+
+
 
 void TGLChunkSpawn::tick(double time_delta)
 {
@@ -334,13 +337,66 @@ void TGLChunkSpawn::tick(double time_delta)
 		// Process hits
 		for (hit : posted_hits)
 		{
+			int chunk_x;
+			int chunk_y;
+			get_chunk_of_point(hit.loc, chunk_x, chunk_y)
 			
+			//std::cout << "REMOVING " << block_type << " FROM " << hit.loc.x - chunk_x * 16 << ", " << hit.loc.y << ", " << hit.loc.z - chunk_y * 16 << "\n";
+			//std::cout << "from chunk " << chunk_x << ", " << chunk_y << "\n";
+			glm::vec3 to_remove((unsigned int)(hit.loc.x - chunk_x * 16), (unsigned int)(hit.loc.y), (unsigned int)(hit.loc.z - chunk_y * 16));
+
+			bool was_deleted = chunks[chunk_coord(chunk_x, chunk_y)]->remove_instance(block_type, to_remove);
+			if (was_deleted)
+			{
+				block_generator->set_point(bt_air, hit.loc.x, hit.loc.z, hit.loc.y);
+			}
+
+			glm::vec3 to_add(to_remove.x + 1, to_remove.y, to_remove.z);
+			int new_block_type = block_generator->get_point(hit.loc.x + 1, hit.loc.z, hit.loc.y);
+			if (new_block_type != 0)
+			{
+				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+			}
+			to_add = glm::vec3(to_remove.x - 1, to_remove.y, to_remove.z);
+			new_block_type = block_generator->get_point(hit.loc.x - 1, hit.loc.z, hit.loc.y);
+			if (new_block_type != 0)
+			{
+				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+			}
+			to_add = glm::vec3(to_remove.x, to_remove.y + 1, to_remove.z);
+			new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z, hit.loc.y + 1);
+			if (new_block_type != 0)
+			{
+				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+			}
+			to_add = glm::vec3(to_remove.x, to_remove.y - 1, to_remove.z);
+			new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z, hit.loc.y - 1);
+			if (new_block_type != 0)
+			{
+				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+			}
+			to_add = glm::vec3(to_remove.x, to_remove.y, to_remove.z + 1);
+			new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z + 1, hit.loc.y);
+			if (new_block_type != 0)
+			{
+				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+			}
+			to_add = glm::vec3(to_remove.x, to_remove.y, to_remove.z - 1);
+			new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z - 1, hit.loc.y);
+			if (new_block_type != 0)
+			{
+				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+			}
 		}
 		
 		// Process placements
 		for (placement : posted_placements)
 		{
-			
+			get_chunk_of_point(placement.loc, chunk_x, chunk_y);
+
+			glm::vec3 to_create((unsigned int)(placement.loc.x - chunk_x * 16), (unsigned int)(placement.loc.y), (unsigned int)(placement.loc.z - chunk_y * 16));
+			chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(placement.type, to_create);
+			block_generator->set_point(placement.type, placement.loc.x, placement.loc.z, placement.loc.y);
 		}
 		
 		if (hitting.y < 256)
@@ -419,7 +475,7 @@ void TGLChunkSpawn::tick(double time_delta)
 				}
 				else
 				{
-					get_chunk_of_point(chunk_x, chunk_y)
+					get_chunk_of_point(prev_block, chunk_x, chunk_y);
 
 					glm::vec3 to_create((unsigned int)(prev_block.x - chunk_x * 16), (unsigned int)(prev_block.y), (unsigned int)(prev_block.z - chunk_y * 16));
 					e_block_type add_type = item_id_to_block_type(equipped.type);

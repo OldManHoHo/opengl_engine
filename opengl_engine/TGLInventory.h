@@ -43,6 +43,8 @@ public:
 
 	bool operator== (const TGLInventoryItem& item_b);
 	bool operator!= (const TGLInventoryItem& item_b);
+	
+	hit_properties get_hit_properties();
 };
 
 

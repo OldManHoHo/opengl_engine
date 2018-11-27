@@ -277,8 +277,8 @@ void TGLMesh::remove_instance(int index)
 	
 	//vbo_mem = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	GLfloat * temp_buf = new GLfloat[instance_count * 3 * sizeof(GLfloat) - index * 3 * sizeof(GLfloat)];
-	glGetBufferSubData(GL_ARRAY_BUFFER, (index+1) * 3 * sizeof(GLfloat), instance_count * 3 * sizeof(GLfloat) - index * 3 * sizeof(GLfloat), temp_buf);
-	glBufferSubData(GL_ARRAY_BUFFER, (index) * 3 * sizeof(GLfloat), instance_count * 3 * sizeof(GLfloat) - index * 3 * sizeof(GLfloat), temp_buf);
+	glGetBufferSubData(GL_ARRAY_BUFFER, (index+1) * 3 * sizeof(GLfloat), (instance_count-1) * 3 * sizeof(GLfloat) - (index) * 3 * sizeof(GLfloat), temp_buf);
+	glBufferSubData(GL_ARRAY_BUFFER, (index) * 3 * sizeof(GLfloat), (instance_count-1) * 3 * sizeof(GLfloat) - (index) * 3 * sizeof(GLfloat), temp_buf);
 	//memmove(&vbo_mem[index * 3], &vbo_mem[(index + 1) * 3], instance_count * 3 * sizeof(GLfloat) - index * 3 * sizeof(GLfloat));
 	//glUnmapBuffer(GL_ARRAY_BUFFER);
 	refresh_instances();

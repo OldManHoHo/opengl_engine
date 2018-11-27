@@ -6,7 +6,7 @@
 
 #include "TGLBase.h"
 #include "TGLCamera.h"
-#include "TGLPlayer.h"
+#include "TMCPlayer.h"
 #include "TGLChunkSpawn.h"
 #include "useful_structures.h"
 
@@ -95,8 +95,11 @@ int main()
 	TGLChunkSpawn chunk_spawn;
 	gl_base.set_world_actor((TGLActor*)&chunk_spawn);
 
-	TGLPlayer main_cam;
+	//TGLPlayer main_cam;
+	TMCPlayer main_cam;
 	main_cam.add_hud(&inventory);
+	main_cam.set_chunk_spawn(&chunk_spawn);
+	
 	gl_base.add_camera(&main_cam);
 	gl_base.add_actor(&main_cam);
 	gl_base.add_actor(&chunk_spawn);

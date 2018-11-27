@@ -49,7 +49,9 @@ std::vector <GLfloat> vertex_data_block_small = {
 
 
 
-TGLChunkSpawn::TGLChunkSpawn():block_type_count(7),test_chunk(false)
+TGLChunkSpawn::TGLChunkSpawn():
+	block_type_count(7),
+	test_chunk(false)
 {
 	block_generator = new BlockGenerator(test_chunk);
 
@@ -194,218 +196,8 @@ TGLChunkSpawn::TGLChunkSpawn():block_type_count(7),test_chunk(false)
 	
 }
 
-enum dir
-{
-	dir_x,
-	dir_y,
-	dir_z,
-	dir_neg_x,
-	dir_neg_y,
-	dir_neg_z
-};
-
-glm::vec3 get_closest_boundary(glm::vec3 in_vec, glm::vec3 origin, dir& out_dir)
-{
-	glm::vec3 x_next, y_next, z_next;
-	if (in_vec.x == 0)
-	{
-		x_next = glm::vec3(300, 300, 300);
-	}
-	else if (in_vec.x > 0)
-	{
-		x_next = in_vec*float((ceil(in_vec.x + origin.x)-origin.x) / in_vec.x)*1.01f;
-	}
-	else
-	{
-		x_next = in_vec*float((floor(in_vec.x + origin.x) - origin.x) / in_vec.x)*0.99f;
-	}
-	if (in_vec.y == 0)
-	{
-		y_next = glm::vec3(300, 300, 300);
-	}
-	else if (in_vec.y > 0)
-	{
-		y_next = in_vec*float((ceil(in_vec.y + origin.y) - origin.y) / in_vec.y)*1.01f;
-	}
-	else
-	{
-		y_next = in_vec*float((floor(in_vec.y + origin.y) - origin.y) / in_vec.y)*0.99f;
-	}
-	if (in_vec.z == 0)
-	{
-		z_next = glm::vec3(300, 300, 300);
-	}
-	else if (in_vec.z > 0)
-	{
-		z_next = in_vec*float((ceil(in_vec.z + origin.z) - origin.z) / in_vec.z)*1.01f;
-	}
-	else
-	{
-		z_next = in_vec*float((floor(in_vec.z + origin.z) - origin.z) / in_vec.z)*0.99f;
-	}
-	if (glm::length(y_next) < glm::length(x_next))
-	{
-		if (glm::length(z_next) < glm::length(y_next))
-		{
-			if (z_next.z < 0)
-			{
-				out_dir = dir_neg_z;
-			}
-			else
-			{
-				out_dir = dir_z;
-			}
-			return origin + z_next;
-		}
-
-		if (y_next.y < 0)
-		{
-			out_dir = dir_neg_y;
-		}
-		else
-		{
-			out_dir = dir_y;
-		}
-		return origin + y_next;
-	}
-	if (x_next.x < 0)
-	{
-		out_dir = dir_neg_x;
-	}
-	else
-	{
-		out_dir = dir_x;
-	}
-	return origin + x_next;
-}
-
 
 extern TGLActor debug_actor;
-glm::vec3 get_forward_blocks(glm::vec3 origin, glm::vec3 forward, BlockGenerator * generator, dir& out_dir)
-{
-	float max_distance = 5.0;
-	float distance = 0.5;
-	glm::vec3 point = get_closest_boundary(distance*forward, origin, out_dir);
-	if (abs(round(point.x) - point.x) < abs(round(point.y) - point.y))
-	{
-		if (abs(round(point.x) - point.x) < abs(round(point.z) - point.z))
-		{
-			if (forward.x < 0)
-			{
-				out_dir = dir_neg_x;
-			}
-			else
-			{
-				out_dir = dir_x;
-			}
-		}
-		else
-		{
-			if (forward.z < 0)
-			{
-				out_dir = dir_neg_z;
-			}
-			else
-			{
-				out_dir = dir_z;
-			}
-		}
-	}
-	else
-	{
-		if (abs(round(point.y) - point.y) < abs(round(point.z) - point.z))
-		{
-			if (forward.y < 0)
-			{
-				out_dir = dir_neg_y;
-			}
-			else
-			{
-				out_dir = dir_y;
-			}
-		}
-		else
-		{
-			if (forward.z < 0)
-			{
-				out_dir = dir_neg_z;
-			}
-			else
-			{
-				out_dir = dir_z;
-			}
-		}
-	}
-	while (1)
-	{
-
-		if (generator->get_point(round(point.x), round(point.z), round(point.y)) != 0 && glm::length(forward) < max_distance)
-		{
-			debug_actor.set_pos(point);
-			return glm::vec3(round(point.x), round(point.y), round(point.z));
-		}
-		distance = glm::length(point - origin);
-		distance += 0.1;
-		point = get_closest_boundary(distance*forward, origin, out_dir);
-		
-		if (abs(round(point.x) - point.x) < abs(round(point.y) - point.y))
-		{
-			if (abs(round(point.x) - point.x) < abs(round(point.z) - point.z))
-			{
-				if (forward.x < 0)
-				{
-					out_dir = dir_neg_x;
-				}
-				else
-				{
-					out_dir = dir_x;
-				}
-			}
-			else
-			{
-				if (forward.z < 0)
-				{
-					out_dir = dir_neg_z;
-				}
-				else
-				{
-					out_dir = dir_z;
-				}
-			}
-		}
-		else
-		{
-			if (abs(round(point.y) - point.y) < abs(round(point.z) - point.z))
-			{
-				if (forward.y < 0)
-				{
-					out_dir = dir_neg_y;
-				}
-				else
-				{
-					out_dir = dir_y;
-				}
-			}
-			else
-			{
-				if (forward.z < 0)
-				{
-					out_dir = dir_neg_z;
-				}
-				else
-				{
-					out_dir = dir_z;
-				}
-			}
-		}
-
-		if (glm::length(point - origin) > max_distance)
-		{
-			return glm::vec3(100, 300, 0);
-		}
-	}
-}
-
 
 
 template <typename T> int sign(T val) {
@@ -499,6 +291,22 @@ glm::vec3 ray_cast_block_finder(glm::vec3 in_position, glm::vec3 in_ray, glm::ve
 	return intersected_block;
 }
 
+glm::vec3 TGLChunkSpawn::get_block_pointed_at(glm::vec3 origin, glm::vec3 pointing_vector, double max_distance, e_block_type& out_block_type)
+{
+		glm::vec3 next_ray_crosshair = pointing_vector*0.01f;
+		e_block_type block_type_crosshair = bt_air;
+		glm::vec3 next_block_crosshair = origin;
+		glm::vec3 prev_block_crosshair = next_block_crosshair;
+		while (block_type_crosshair == bt_air && glm::length(player->get_pos() - next_block_crosshair) < max_distance)
+		{
+			prev_block_crosshair = next_block_crosshair;
+			next_block_crosshair = ray_cast_block_finder(player->get_pos(), player->crosshair, player->get_pos() + next_ray_crosshair*1.01f, next_ray_crosshair);
+			block_type_crosshair = block_generator->get_point(next_block_crosshair.x, next_block_crosshair.z, next_block_crosshair.y);
+		}
+		out_block_type = block_type_crosshair;
+		return next_block;
+}
+
 void TGLChunkSpawn::tick(double time_delta)
 {
 	static double time_sum = 0;
@@ -509,6 +317,7 @@ void TGLChunkSpawn::tick(double time_delta)
 		glm::vec3 hitting = player->get_hitting();
 		TGLInventoryItem& equipped = player->get_equipped();
 
+		// 3D Crosshair
 		glm::vec3 next_ray_crosshair = player->crosshair*0.01f;
 		e_block_type block_type_crosshair = bt_air;
 		glm::vec3 next_block_crosshair = player->get_pos();
@@ -520,13 +329,23 @@ void TGLChunkSpawn::tick(double time_delta)
 			block_type_crosshair = block_generator->get_point(next_block_crosshair.x, next_block_crosshair.z, next_block_crosshair.y);
 		}
 		debug_actor.set_pos(next_ray_crosshair + player->get_pos());
-
-		//hitting = glm::vec3(floor(hitting.x), floor(hitting.y), floor(hitting.z)+1);
-		if (hitting.y < 256)// && glm::length(hitting - player->get_pos()) < 5)
+		// End 3D Crosshair
+		
+		// Process hits
+		for (hit : posted_hits)
 		{
-			dir out_dir;
+			
+		}
+		
+		// Process placements
+		for (placement : posted_placements)
+		{
+			
+		}
+		
+		if (hitting.y < 256)
+		{
 			e_block_type block_type = bt_air;
-			//hitting = get_forward_blocks(player->get_pos(), hitting, block_generator, out_dir);
 			
 			glm::vec3 next_ray = hitting*0.01f;
 			glm::vec3 next_block = player->get_pos();
@@ -538,8 +357,9 @@ void TGLChunkSpawn::tick(double time_delta)
 				block_type = block_generator->get_point(next_block.x, next_block.z, next_block.y);
 			}
 			hitting = next_block;
-			int chunk_x = floor(hitting.x / 16.0);
-			int chunk_y = floor(hitting.z / 16.0);
+			int chunk_x;
+			int chunk_y;
+			get_chunk_of_point(chunk_x, chunk_y)
 			if (block_type != bt_air)
 			{
 				
@@ -597,24 +417,9 @@ void TGLChunkSpawn::tick(double time_delta)
 						chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
 					}
 				}
-				/*
-				else if (equipped.type == iid_sand_block)
-				{
-
-					chunk_x = floor(hitting.x / 16.0);
-					chunk_y = floor(hitting.z / 16.0);
-
-					glm::vec3 to_create((unsigned int)(prev_block.x - chunk_x * 16), (unsigned int)(prev_block.y), (unsigned int)(prev_block.z - chunk_y * 16));
-
-					chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(bt_sand, to_create);
-					block_generator->set_point(item_id_to_block_type(iid_sand_block), prev_block.x, prev_block.z, prev_block.y);
-					
-				}
-				*/
 				else
 				{
-					chunk_x = floor(hitting.x / 16.0);
-					chunk_y = floor(hitting.z / 16.0);
+					get_chunk_of_point(chunk_x, chunk_y)
 
 					glm::vec3 to_create((unsigned int)(prev_block.x - chunk_x * 16), (unsigned int)(prev_block.y), (unsigned int)(prev_block.z - chunk_y * 16));
 					e_block_type add_type = item_id_to_block_type(equipped.type);
@@ -739,11 +544,7 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 		}
 	}
 
-
-	//retval = test_chunk->Instance(block_generator, FVector(chunk_x * 16, chunk_y * 1600, -500), 0);
-
 	chunks[chunk_coord(chunk_x, chunk_y)] = new TGLChunk(block_mesh_vertices, block_material, block_type_count, instances);
-	//chunks[chunk_coord(chunk_x, chunk_y)]->translate(glm::vec3(16*chunk_x, -200, 16 * chunk_y));
 	chunks[chunk_coord(chunk_x, chunk_y)]->translate(glm::vec3(16 * chunk_x, 0, 16 * chunk_y));
 	gl_base.add_actor(chunks[chunk_coord(chunk_x, chunk_y)]);
 }
@@ -920,4 +721,20 @@ e_block_type TGLChunkSpawn::get_point(int x, int y, int z)
 e_block_type * TGLChunkSpawn::get_points(int x, int y, int division)
 {
 	return block_generator->get_points((x), (y), 0, division);
+}
+
+void TGLChunkSpawn::get_chunk_of_point(glm::vec3 in_point, int& out_chunk_x, int& out_chunk_y)
+{
+	out_chunk_x = floor(in_point.x / 16.0);
+	out_chunk_y = floor(in_point.z / 16.0);
+}
+
+void post_hit(glm::vec3 in_hit)
+{
+	posted_hits.push_back(in_hit);
+}
+
+void post_placement(block_def in_block)
+{
+	posted_placements.push_back(in_block);
 }

@@ -36,12 +36,19 @@ class TGLChunkSpawn : public TGLActor
 
 	std::vector <TGLMesh*> meshes;
 	std::vector <chunk_coord> chunks_to_load;
+	
+	std::deque <glm::vec3> posted_hits;
+	static const unsigned int hits_to_break = 1;
+	std::deque <block_def> posted_placements;
 
 	bool test_chunk;
+	e_block_type pointed_at;
 
 public:
 
 	TGLChunkSpawn();
+
+	glm::vec3 get_block_pointed_at(glm::vec3 origin, glm::vec3 pointing_vector, double max_distance = 5.0, e_block_type& out_block_type = pointed_at)
 
 	void tick(double time_delta);
 
@@ -56,6 +63,14 @@ public:
 	e_block_type get_point(int x, int y, int z);
 
 	e_block_type * get_points(int x, int y, int division);
+	
+	void get_chunk_of_point(glm::vec3 in_point, int& out_chunk_x, int& out_chunk_y);
+	
+	void post_hit(glm::vec3 in_hit);
+	
+	void post_placement(glm::vec3 in_loc, e_block_type in_type);
+	
+	glm::vec3 get_block_pointed_at()
 };
 
 #endif

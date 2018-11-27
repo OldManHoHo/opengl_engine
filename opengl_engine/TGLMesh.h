@@ -1,4 +1,6 @@
 #pragma once
+#ifndef _TGL_MESH
+#define _TGL_MESH
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -71,3 +73,4 @@ public:
 	void refresh_instances();
 };
 
+#endif

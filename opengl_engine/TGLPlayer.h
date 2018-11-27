@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _TGL_PLAYER
+#define _TGL_PLAYER
+
 
 #include <vector>
 
@@ -6,6 +9,7 @@
 #include "TGLMesh.h"
 #include "TGLInventory.h"
 #include "TGLHudElement.h"
+
 
 class TGLPlayer : public TGLCamera
 {
@@ -18,6 +22,8 @@ public:
 	float y_angle;
 	float x_angle;
 
+	glm::vec3 crosshair;
+
 	bool hitting_bool;
 	glm::vec3 hitting;
 
@@ -28,5 +34,7 @@ public:
 	glm::vec3 get_hitting();
 	void add_hud(TGLHudElement * in_hud);
 	TGLInventoryItem& get_equipped();
+	bool change_inventory_amount(TGLItemId item_type, int in_amount);
 };
 
+#endif

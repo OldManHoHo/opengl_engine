@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BlockGenerator.h" />
-    <ClInclude Include="block_vertices.h" />
+    <ClInclude Include="useful_structures.h" />
     <ClInclude Include="Cellular.h" />
     <ClInclude Include="FastNoiseSIMD\FastNoiseSIMD.h" />
     <ClInclude Include="FastNoiseSIMD\FastNoiseSIMD_internal.h" />
@@ -80,6 +80,7 @@
     <ClCompile Include="TGLPlayer.cpp" />
     <ClCompile Include="TGLShader.cpp" />
     <ClCompile Include="TGLTexture.cpp" />
+    <ClCompile Include="useful_structures.cpp" />
     <ClCompile Include="WhiteNoise.cpp" />
   </ItemGroup>
   <ItemGroup>

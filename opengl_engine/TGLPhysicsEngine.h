@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _TGL_PHYSICSENGINE
+#define _TGL_PHYSICSENGINE
+
 #include <vector>
 
 #include "TGLActor.h"
@@ -21,3 +24,4 @@ public:
 	FILE * out_file;
 };
 
+#endif

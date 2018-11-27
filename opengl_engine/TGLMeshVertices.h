@@ -1,4 +1,6 @@
 #pragma once
+#ifndef _TGL_MESHVERTICES
+#define _TGL_MESHVERTICES
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -22,3 +24,4 @@ public:
 	void calculate_normals(std::vector<GLfloat> const &vertices);
 };
 
+#endif

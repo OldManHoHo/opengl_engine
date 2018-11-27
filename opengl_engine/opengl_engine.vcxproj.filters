@@ -93,9 +93,6 @@
     <ClInclude Include="TGLBounds.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="block_vertices.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TGLHud.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -103,6 +100,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TGLHudElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="useful_structures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -198,6 +198,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TGLHudElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="useful_structures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

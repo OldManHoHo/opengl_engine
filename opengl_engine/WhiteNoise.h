@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _WHITENOISE
+#define _WHITENOISE
+
 #include "FastNoiseSIMD/FastNoiseSIMD.h"
 #include "Generator.h"
 class WhiteNoise :
@@ -18,3 +21,4 @@ public:
 	float * get_points_2d(int in_x, int in_y, int division);
 };
 
+#endif

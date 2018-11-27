@@ -245,6 +245,10 @@ void TGLBase::update()
 
 				if (sub_el->texture_active)
 				{
+					GLuint offset_loc_1 = glGetUniformLocation(shader_id, "tex_offset_1");
+					GLuint offset_loc_2 = glGetUniformLocation(shader_id, "tex_offset_2");
+					glUniform2fv(offset_loc_1, 1, glm::value_ptr(sub_el->top_left_tex_offset));
+					glUniform2fv(offset_loc_2, 1, glm::value_ptr(sub_el->bottom_right_tex_offset));
 					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_2D, sub_el->tex->get_name());
 				}

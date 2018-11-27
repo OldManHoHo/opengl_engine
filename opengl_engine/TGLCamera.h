@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _TGL_CAMERA
+#define _TGL_CAMERA
+
 #include "TGLActor.h"
 
 class TGLCamera : public TGLActor
@@ -18,3 +21,4 @@ public:
 	void tick(double time_delta);
 };
 
+#endif

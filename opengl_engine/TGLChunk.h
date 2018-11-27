@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _TGL_CHUNK
+#define _TGL_CHUNK
+
 #include "TGLActor.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -19,3 +22,4 @@ public:
 	void add_instance(int block_type, glm::vec3 loc);
 };
 
+#endif

@@ -1,4 +1,6 @@
 #pragma once
+#ifndef _TGL_ACTOR
+#define _TGL_ACTOR
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -54,3 +56,5 @@ public:
 	bool get_on_ground();
 };
 
+
+#endif

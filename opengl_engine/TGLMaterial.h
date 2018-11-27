@@ -1,4 +1,6 @@
 #pragma once
+#ifndef _TGL_MATERIAL
+#define _TGL_MATERIAL
 
 #include <vector>
 
@@ -30,3 +32,4 @@ public:
 	GLuint get_uv_VBO(int uv_index);
 };
 
+#endif

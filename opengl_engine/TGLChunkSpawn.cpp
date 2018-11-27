@@ -1,6 +1,6 @@
 #include "TGLChunkSpawn.h"
 #include "TGLBase.h"
-#include "block_vertices.h"
+#include "useful_structures.h"
 
 #define PI 3.1415926
 
@@ -45,6 +45,8 @@ std::vector <GLfloat> vertex_data_block_small = {
 0.5f, -0.5f, 0.5f,
 };
 */
+
+
 
 
 TGLChunkSpawn::TGLChunkSpawn():block_type_count(7),test_chunk(false)
@@ -153,7 +155,7 @@ TGLChunkSpawn::TGLChunkSpawn():block_type_count(7),test_chunk(false)
 	block_texture = new TGLTexture("content/textures/mc.png");
 	block_material = new TGLMaterial;
 
-	block_mesh_vertices = new TGLMeshVertices(vertex_data_block_small);
+	block_mesh_vertices = new TGLMeshVertices(useful_structures::vertex_data_block_small);
 	
 	TGLShader v_shader("vertex_shader.glsl", GL_VERTEX_SHADER);
 	TGLShader f_shader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
@@ -506,19 +508,30 @@ void TGLChunkSpawn::tick(double time_delta)
 		TGLPlayer * player = gl_base.get_player();
 		glm::vec3 hitting = player->get_hitting();
 		TGLInventoryItem& equipped = player->get_equipped();
-		
-		
+
+		glm::vec3 next_ray_crosshair = player->crosshair*0.01f;
+		e_block_type block_type_crosshair = bt_air;
+		glm::vec3 next_block_crosshair = player->get_pos();
+		glm::vec3 prev_block_crosshair = next_block_crosshair;
+		while (block_type_crosshair == bt_air && glm::length(player->get_pos() - next_block_crosshair) < 5)
+		{
+			prev_block_crosshair = next_block_crosshair;
+			next_block_crosshair = ray_cast_block_finder(player->get_pos(), player->crosshair, player->get_pos() + next_ray_crosshair*1.01f, next_ray_crosshair);
+			block_type_crosshair = block_generator->get_point(next_block_crosshair.x, next_block_crosshair.z, next_block_crosshair.y);
+		}
+		debug_actor.set_pos(next_ray_crosshair + player->get_pos());
+
 		//hitting = glm::vec3(floor(hitting.x), floor(hitting.y), floor(hitting.z)+1);
 		if (hitting.y < 256)// && glm::length(hitting - player->get_pos()) < 5)
 		{
 			dir out_dir;
-			int block_type = 0;
+			e_block_type block_type = bt_air;
 			//hitting = get_forward_blocks(player->get_pos(), hitting, block_generator, out_dir);
 			
 			glm::vec3 next_ray = hitting*0.01f;
 			glm::vec3 next_block = player->get_pos();
 			glm::vec3 prev_block = next_block;
-			while (block_type == 0 && glm::length(player->get_pos() - next_block) < 5)
+			while (block_type == bt_air && glm::length(player->get_pos() - next_block) < 5)
 			{
 				prev_block = next_block;
 				next_block = ray_cast_block_finder(player->get_pos(), hitting, player->get_pos() + next_ray*1.01f, next_ray);
@@ -527,12 +540,12 @@ void TGLChunkSpawn::tick(double time_delta)
 			hitting = next_block;
 			int chunk_x = floor(hitting.x / 16.0);
 			int chunk_y = floor(hitting.z / 16.0);
-			if (block_type)
+			if (block_type != bt_air)
 			{
 				
 				if (test_chunk)
 				{
-					block_type = (abs(chunk_x + chunk_y) % 6) + 1;
+					//block_type = (abs(chunk_x + chunk_y) % 6) + 1;
 				}
 				std::cout << "REMOVING " << block_type << " FROM " << hitting.x - chunk_x * 16 << ", " << hitting.y << ", " << hitting.z - chunk_y * 16 << "\n";
 				std::cout << "from chunk " << chunk_x << ", " << chunk_y << "\n";
@@ -543,7 +556,8 @@ void TGLChunkSpawn::tick(double time_delta)
 					bool was_deleted = chunks[chunk_coord(chunk_x, chunk_y)]->remove_instance(block_type, to_remove);
 					if (was_deleted)
 					{
-						block_generator->set_point(0, hitting.x, hitting.z, hitting.y);
+						block_generator->set_point(bt_air, hitting.x, hitting.z, hitting.y);
+						player->change_inventory_amount(block_type_to_item_id(block_type), 1);
 					}
 
 					glm::vec3 to_add(to_remove.x + 1, to_remove.y, to_remove.z);
@@ -583,17 +597,37 @@ void TGLChunkSpawn::tick(double time_delta)
 						chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
 					}
 				}
-				else if (equipped.type == soil_block)
+				/*
+				else if (equipped.type == iid_sand_block)
 				{
-					
 
 					chunk_x = floor(hitting.x / 16.0);
 					chunk_y = floor(hitting.z / 16.0);
 
 					glm::vec3 to_create((unsigned int)(prev_block.x - chunk_x * 16), (unsigned int)(prev_block.y), (unsigned int)(prev_block.z - chunk_y * 16));
 
-					chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(7, to_create);
-					block_generator->set_point(7, prev_block.x, prev_block.z, prev_block.y);
+					chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(bt_sand, to_create);
+					block_generator->set_point(item_id_to_block_type(iid_sand_block), prev_block.x, prev_block.z, prev_block.y);
+					
+				}
+				*/
+				else
+				{
+					chunk_x = floor(hitting.x / 16.0);
+					chunk_y = floor(hitting.z / 16.0);
+
+					glm::vec3 to_create((unsigned int)(prev_block.x - chunk_x * 16), (unsigned int)(prev_block.y), (unsigned int)(prev_block.z - chunk_y * 16));
+					e_block_type add_type = item_id_to_block_type(equipped.type);
+					if (add_type != none)
+					{
+						bool can_do = player->change_inventory_amount(equipped.type, -1);
+						if (can_do)
+						{
+							chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(add_type, to_create);
+							block_generator->set_point(add_type, prev_block.x, prev_block.z, prev_block.y);
+						}
+						
+					}
 				}
 			}
 		}
@@ -656,27 +690,27 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 			{
 				for (int k = 150; k < 256; k++)
 				{
-					instances[0].push_back(i-1);
-					instances[0].push_back(k);
-					instances[0].push_back(j - 1);
+					instances[bt_dirt_with_grass - 1].push_back(i-1);
+					instances[bt_dirt_with_grass - 1].push_back(k);
+					instances[bt_dirt_with_grass - 1].push_back(j - 1);
 				}
 			}
 			else if (chunk_x == 5 && chunk_y == 0)
 			{
 				for (int k = 150; k < 256; k++)
 				{
-					instances[1].push_back(i - 1);
-					instances[1].push_back(k);
-					instances[1].push_back(j - 1);
+					instances[bt_dirt - 1].push_back(i - 1);
+					instances[bt_dirt - 1].push_back(k);
+					instances[bt_dirt - 1].push_back(j - 1);
 				}
 			}
 			else if (chunk_x == 0 && chunk_y == 5)
 			{
 				for (int k = 150; k < 256; k++)
 				{
-					instances[2].push_back(i - 1);
-					instances[2].push_back(k);
-					instances[2].push_back(j - 1);
+					instances[bt_stone - 1].push_back(i - 1);
+					instances[bt_stone - 1].push_back(k);
+					instances[bt_stone - 1].push_back(j - 1);
 				}
 			}
 			else
@@ -864,7 +898,7 @@ std::vector <chunk_coord> TGLChunkSpawn::get_chunks(int x0, int y0, int radius, 
 	return out_vecs;
 }
 
-int TGLChunkSpawn::get_point(int x, int y, int z)
+e_block_type TGLChunkSpawn::get_point(int x, int y, int z)
 {
 	if (!test_chunk)
 	{
@@ -874,16 +908,16 @@ int TGLChunkSpawn::get_point(int x, int y, int z)
 	{
 		if (z == 180)
 		{
-			return 2;
+			return bt_dirt;
 		}
 		else
 		{
-			return 0;
+			return bt_air;
 		}
 	}
 }
 
-unsigned char * TGLChunkSpawn::get_points(int x, int y, int division)
+e_block_type * TGLChunkSpawn::get_points(int x, int y, int division)
 {
 	return block_generator->get_points((x), (y), 0, division);
 }

@@ -6,9 +6,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-//#include "block_vertices.h"
+#include "useful_structures.h"
 
-extern std::vector <GLfloat> vertex_data_block_small;
+//extern std::vector <GLfloat> vertex_data_block_small;
 extern TGLBase gl_base;
 
 TGLPlayer::TGLPlayer():
@@ -28,7 +28,7 @@ TGLPlayer::TGLPlayer():
 	hitting = glm::vec3(0,300,0);
 	
 	{
-		TGLMeshVertices * block_mesh_vertices = new TGLMeshVertices(vertex_data_block_small);
+		TGLMeshVertices * block_mesh_vertices = new TGLMeshVertices(useful_structures::vertex_data_block_small);
 		TGLMesh * temp_mesh = new TGLMesh(block_mesh_vertices);
 		TGLMaterial * temp_mat = new TGLMaterial();
 
@@ -108,7 +108,13 @@ void TGLPlayer::tick(double time_delta)
 	//std::cout << "DEBUG Y POS " << debug_block->pos.y << ", " << "X POS" << debug_block->pos.x << ", " << "Z POS" << debug_block->pos.z << "\n";
 	glfwSetCursorPos(gl_base.get_window(), 0, 0);
 
-	
+	glm::vec3 forward_vector_crosshair(1.0, 0.0, 0.0);
+
+	forward_vector_crosshair = glm::mat3(get_rot())*forward_vector_crosshair;
+	//forward_vector += pos;
+	//forward_vector += glm::vec3(0.0, 0.5, 0);
+
+	crosshair = forward_vector_crosshair;
 
 	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_W) == GLFW_PRESS)
 	{
@@ -154,7 +160,6 @@ void TGLPlayer::tick(double time_delta)
 		//forward_vector += glm::vec3(0.0, 0.5, 0);
 		
 		set_hitting(forward_vector);
-		
 	}
 	else
 	{
@@ -166,48 +171,94 @@ void TGLPlayer::tick(double time_delta)
 	{
 		equipped_item = inventory.get_item(0, 0);
 		hud[0]->sub_elements[0]->color = light_grey;
-		hud[0]->sub_elements[1]->color = mid_grey;
 		hud[0]->sub_elements[2]->color = mid_grey;
-		hud[0]->sub_elements[3]->color = mid_grey;
 		hud[0]->sub_elements[4]->color = mid_grey;
+		hud[0]->sub_elements[6]->color = mid_grey;
+		hud[0]->sub_elements[8]->color = mid_grey;
 	}
 	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_2) == GLFW_PRESS)
 	{
 		equipped_item = inventory.get_item(1, 0);
 		hud[0]->sub_elements[0]->color = mid_grey;
-		hud[0]->sub_elements[1]->color = light_grey;
-		hud[0]->sub_elements[2]->color = mid_grey;
-		hud[0]->sub_elements[3]->color = mid_grey;
+		hud[0]->sub_elements[2]->color = light_grey;
 		hud[0]->sub_elements[4]->color = mid_grey;
+		hud[0]->sub_elements[6]->color = mid_grey;
+		hud[0]->sub_elements[8]->color = mid_grey;
 	}
 	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_3) == GLFW_PRESS)
 	{
 		equipped_item = inventory.get_item(2, 0);
 		hud[0]->sub_elements[0]->color = mid_grey;
-		hud[0]->sub_elements[1]->color = mid_grey;
-		hud[0]->sub_elements[2]->color = light_grey;
-		hud[0]->sub_elements[3]->color = mid_grey;
-		hud[0]->sub_elements[4]->color = mid_grey;
+		hud[0]->sub_elements[2]->color = mid_grey;
+		hud[0]->sub_elements[4]->color = light_grey;
+		hud[0]->sub_elements[6]->color = mid_grey;
+		hud[0]->sub_elements[8]->color = mid_grey;
 	}
 	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_4) == GLFW_PRESS)
 	{
 		equipped_item = inventory.get_item(3, 0);
 		hud[0]->sub_elements[0]->color = mid_grey;
-		hud[0]->sub_elements[1]->color = mid_grey;
 		hud[0]->sub_elements[2]->color = mid_grey;
-		hud[0]->sub_elements[3]->color = light_grey;
 		hud[0]->sub_elements[4]->color = mid_grey;
+		hud[0]->sub_elements[6]->color = light_grey;
+		hud[0]->sub_elements[8]->color = mid_grey;
 	}
 	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_5) == GLFW_PRESS)
 	{
 		equipped_item = inventory.get_item(4, 0);
 		hud[0]->sub_elements[0]->color = mid_grey;
-		hud[0]->sub_elements[1]->color = mid_grey;
 		hud[0]->sub_elements[2]->color = mid_grey;
-		hud[0]->sub_elements[3]->color = mid_grey;
-		hud[0]->sub_elements[4]->color = light_grey;
+		hud[0]->sub_elements[4]->color = mid_grey;
+		hud[0]->sub_elements[6]->color = mid_grey;
+		hud[0]->sub_elements[8]->color = light_grey;
 	}
 	
+	TGLInventoryItem * next_item = inventory.get_item(0, 0);
+	if (next_item != nullptr)
+	{
+		hud[0]->sub_elements[1]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
+	}
+	else
+	{
+		hud[0]->sub_elements[1]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
+	}
+	next_item = inventory.get_item(1, 0);
+	if (next_item != nullptr)
+	{
+		hud[0]->sub_elements[3]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
+	}
+	else
+	{
+		hud[0]->sub_elements[3]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
+	}
+	next_item = inventory.get_item(2, 0);
+	if (next_item != nullptr)
+	{
+		hud[0]->sub_elements[5]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
+	}
+	else
+	{
+		hud[0]->sub_elements[5]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
+	}
+	next_item = inventory.get_item(3, 0);
+	if (next_item != nullptr)
+	{
+		hud[0]->sub_elements[7]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
+	}
+	else
+	{
+		hud[0]->sub_elements[7]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
+	}
+	next_item = inventory.get_item(4, 0);
+	if (next_item != nullptr)
+	{
+		hud[0]->sub_elements[9]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
+	}
+	else
+	{
+		hud[0]->sub_elements[9]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
+	}
+
 
 	glm::vec3 forward_vector2(0.0, 0.0, 2);
 
@@ -241,4 +292,9 @@ void TGLPlayer::add_hud(TGLHudElement * in_hud)
 TGLInventoryItem& TGLPlayer::get_equipped()
 {
 	return *equipped_item;
+}
+
+bool TGLPlayer::change_inventory_amount(TGLItemId item_type, int in_amount)
+{
+	return inventory.change_quantity(item_type, in_amount);
 }

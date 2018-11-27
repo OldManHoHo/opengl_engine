@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _TGL_COMPONENT
+#define _TGL_COMPONENT
+
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -38,3 +41,4 @@ public:
 	void set_pos(glm::vec3 in_pos);
 };
 
+#endif

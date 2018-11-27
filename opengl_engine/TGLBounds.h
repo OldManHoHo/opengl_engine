@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _TGL_BOUNDS
+#define _TGL_BOUNDS
+
 class TGLBounds
 {
 public:
@@ -26,3 +29,5 @@ public:
 	double height;
 	double depth;
 };
+
+#endif

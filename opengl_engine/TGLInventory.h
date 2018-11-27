@@ -1,15 +1,27 @@
-#include <vector>
-#include<stdio.h> 
+#ifndef _TGL_INVENTORY
+#define _TGL_INVENTORY
 
+#include <vector>
+#include <stdio.h> 
+#include "BlockGenerator.h"
 
 enum TGLItemId
 {
 	none,
-	pickaxe,
-	soil_block,
-	stone_block,
-	sand_block
+	iid_dirt_with_grass_block,
+	iid_dirt_block,
+	iid_stone_block,
+	iid_tree_block,
+	iid_leaves_block,
+	iid_water_block,
+	iid_sand_block,
+	pickaxe
 };
+
+
+
+e_block_type item_id_to_block_type(TGLItemId item_id);
+TGLItemId block_type_to_item_id(e_block_type in_block_type);
 
 class TGLInventoryCoords
 {
@@ -69,3 +81,5 @@ public:
 	// Management
 	void repair_garbage();
 };
+
+#endif

@@ -7,6 +7,20 @@
 #include "Cellular.h"
 #include "WhiteNoise.h"
 
+enum e_block_type
+{
+	bt_air,
+	bt_dirt_with_grass,
+	bt_dirt,
+	bt_stone,
+	bt_tree,
+	bt_leaves,
+	bt_water,
+	bt_sand,
+	bt_invalid
+};
+
+
 struct chunk_coord
 {
 	chunk_coord(int in_x, int in_y) { x = in_x; y = in_y; }
@@ -38,7 +52,7 @@ struct block_coord
 struct block_def
 {
 	block_coord loc;
-	int type;
+	e_block_type type;
 	bool operator== (const block_def& in_def)
 	{
 		return loc == in_def.loc;
@@ -59,7 +73,7 @@ class BlockGenerator
 	WhiteNoise * trees;
 	Simplex * caves;
 	Simplex * caves2;
-	unsigned char * blocks;
+	e_block_type * blocks;
 	int size_x;
 	int size_y;
 	int counter;
@@ -78,14 +92,14 @@ public:
 	BlockGenerator(bool tester = false);
 	~BlockGenerator();
 
-	unsigned char get_point(int in_x, int in_y, int in_z);
-	unsigned char get_point_2d(int in_x, int in_y);
-	unsigned char * get_points(int in_x, int in_y, int in_z, int division);
-	unsigned char * get_points_2d(int in_x, int in_y, int division);
-	void set_point(int block_type, int in_x, int in_y, int in_z);
-	int check_for_mod(int in_x, int in_y, int in_z);
-	unsigned char index(int in_x, int in_y, int in_z);
+	e_block_type get_point(int in_x, int in_y, int in_z);
+	e_block_type get_point_2d(int in_x, int in_y);
+	e_block_type * get_points(int in_x, int in_y, int in_z, int division);
+	e_block_type * get_points_2d(int in_x, int in_y, int division);
+	void set_point(e_block_type block_type, int in_x, int in_y, int in_z);
+	e_block_type check_for_mod(int in_x, int in_y, int in_z);
+	e_block_type index(int in_x, int in_y, int in_z);
 	bool is_visible(int in_x, int in_y, int in_z);
-	void get_tree(float * in_noise, unsigned char * in_blocks, int in_x, int in_y, int in_z);
+	void get_tree(float * in_noise, e_block_type * in_blocks, int in_x, int in_y, int in_z);
 };
 

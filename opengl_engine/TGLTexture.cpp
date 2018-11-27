@@ -26,7 +26,7 @@ TGLTexture::TGLTexture(char * filename)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	// load and generate the texture
-	int width, height, nrChannels;
+	
 	unsigned char *data = stbi_load(filename, &width, &height, &nrChannels, 4);
 	if (data)
 	{

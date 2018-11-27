@@ -8,16 +8,17 @@
 #include "TGLCamera.h"
 #include "TGLPlayer.h"
 #include "TGLChunkSpawn.h"
+#include "useful_structures.h"
 
 
-extern std::vector <GLfloat> vertex_data_block_small;
+//extern std::vector <GLfloat> useful_structures::vertex_data_block_small;
 
 TGLBase gl_base;
 TGLActor debug_actor;
 
 TGLMesh * create_cube_mesh()
 {
-	TGLMeshVertices * block_mesh_vertices = new TGLMeshVertices(vertex_data_block_small);
+	TGLMeshVertices * block_mesh_vertices = new TGLMeshVertices(useful_structures::vertex_data_block_small);
 	TGLMesh * temp_mesh = new TGLMesh(block_mesh_vertices);
 	TGLMaterial * temp_mat = new TGLMaterial();
 
@@ -60,21 +61,32 @@ int main()
 {
 	gl_base.init();
 	
-	TGLHudElement inventory(560, 120, glm::vec2(100,100), glm::vec3(0.2, 0.2, 0.2));
+	TGLHudElement inventory(600, 120, glm::vec2(100,100), glm::vec3(0.2, 0.2, 0.2));
 	int offset = 10;
+	int shift = 120;
 	TGLHudElement inventory_item(100, 100, glm::vec2(offset, 10), glm::vec3(0.5, 0.5, 0.5), "content/textures/pickaxe.png");
-	offset += 110;
-	TGLHudElement inventory_item2(100, 100, glm::vec2(offset, 10), glm::vec3(0.5, 0.5, 0.5));
-	offset += 110;
-	TGLHudElement inventory_item3(100, 100, glm::vec2(offset, 10), glm::vec3(0.5, 0.5, 0.5));
-	offset += 110;
-	TGLHudElement inventory_item4(100, 100, glm::vec2(offset, 10), glm::vec3(0.5, 0.5, 0.5));
-	offset += 110;
-	TGLHudElement inventory_item5(100, 100, glm::vec2(offset, 10), glm::vec3(0.5, 0.5, 0.5));
+	TGLHudElement inventory_itemb(120, 120, glm::vec2(offset - 10, 0), glm::vec3(0.5, 0.5, 0.5));
+	offset += shift;
+	TGLHudElement inventory_item2(100, 100, glm::vec2(offset, 10), glm::vec3(0.5, 0.5, 0.5), "content/textures/mc.png", 0, 0, 16, 16);
+	TGLHudElement inventory_item2b(120, 120, glm::vec2(offset-10, 0), glm::vec3(0.5, 0.5, 0.5));
+	offset += shift;
+	TGLHudElement inventory_item3(100, 100, glm::vec2(offset, 10), glm::vec3(0.5, 0.5, 0.5), "content/textures/mc.png");
+	TGLHudElement inventory_item3b(120, 120, glm::vec2(offset - 10, 0), glm::vec3(0.5, 0.5, 0.5));
+	offset += shift;
+	TGLHudElement inventory_item4(100, 100, glm::vec2(offset, 10), glm::vec3(0.5, 0.5, 0.5), "content/textures/mc.png");
+	TGLHudElement inventory_item4b(120, 120, glm::vec2(offset - 10, 0), glm::vec3(0.5, 0.5, 0.5));
+	offset += shift;
+	TGLHudElement inventory_item5(100, 100, glm::vec2(offset, 10), glm::vec3(0.5, 0.5, 0.5), "content/textures/mc.png");
+	TGLHudElement inventory_item5b(120, 120, glm::vec2(offset - 10, 0), glm::vec3(0.5, 0.5, 0.5));
+	inventory.sub_elements.push_back(&inventory_itemb);
 	inventory.sub_elements.push_back(&inventory_item);
+	inventory.sub_elements.push_back(&inventory_item2b);
 	inventory.sub_elements.push_back(&inventory_item2);
+	inventory.sub_elements.push_back(&inventory_item3b);
 	inventory.sub_elements.push_back(&inventory_item3);
+	inventory.sub_elements.push_back(&inventory_item4b);
 	inventory.sub_elements.push_back(&inventory_item4);
+	inventory.sub_elements.push_back(&inventory_item5b);
 	inventory.sub_elements.push_back(&inventory_item5);
 
 	debug_actor.add_component(create_cube_mesh());

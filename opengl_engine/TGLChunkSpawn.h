@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _TGL_CHUNKSPAWN
+#define _TGL_CHUNKSPAWN
+
 #include <map>
 
 #include <glad/glad.h>
@@ -16,7 +19,6 @@ struct face_map_pair
 	int x;
 	int y;
 };
-
 
 
 
@@ -51,7 +53,9 @@ public:
 
 	std::vector <chunk_coord> TGLChunkSpawn::get_chunks(int x0, int y0, int radius, float view_angle_1, float view_angle_2);
 
-	int get_point(int x, int y, int z);
+	e_block_type get_point(int x, int y, int z);
 
-	unsigned char * get_points(int x, int y, int division);
+	e_block_type * get_points(int x, int y, int division);
 };
+
+#endif

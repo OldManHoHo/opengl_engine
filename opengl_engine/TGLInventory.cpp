@@ -1,6 +1,24 @@
 #include "TGLInventory.h"
 #include <iostream>
 
+
+int block_place_range = int(iid_sand_block) + 1;
+
+e_block_type item_id_to_block_type(TGLItemId item_id)
+{
+	if (item_id < block_place_range && item_id != none)
+	{
+		return static_cast<e_block_type>(item_id);
+	}
+	return bt_invalid;
+}
+
+TGLItemId block_type_to_item_id(e_block_type in_block_type)
+{
+	return static_cast<TGLItemId>(in_block_type);
+	return none;
+}
+
 TGLInventoryItem::TGLInventoryItem(TGLItemId in_type, unsigned int in_quantity) :
 	quantity(in_quantity),
 	type(in_type)
@@ -25,7 +43,7 @@ TGLInventory::TGLInventory(int in_x_size, int in_y_size) :
 	y_size(in_y_size)
 {
 	set_item(0, 0, pickaxe, 1);
-	set_item(1, 0, soil_block, 10);
+	set_item(1, 0, iid_dirt_block, 10);
 }
 
 std::vector <TGLInventoryItem*>& TGLInventory::get_items()
@@ -149,14 +167,14 @@ int main_inventory()
 
 	std::vector <TGLInventoryItem*>& item_refs = test_inventory.get_items();
 	test_inventory.print_inventory();
-	test_inventory.set_item(9, 4, sand_block, 100);
+	test_inventory.set_item(9, 4, iid_sand_block, 100);
 	test_inventory.print_inventory();
-	test_inventory.change_quantity(sand_block, -100);
+	test_inventory.change_quantity(iid_sand_block, -100);
 	test_inventory.print_inventory();
 	test_inventory.delete_item(0, 0);
 	test_inventory.print_inventory();
-	test_inventory.change_quantity(stone_block, 1);
+	test_inventory.change_quantity(iid_stone_block, 1);
 	test_inventory.print_inventory();
-	test_inventory.change_quantity(stone_block, 4);
+	test_inventory.change_quantity(iid_stone_block, 4);
 	test_inventory.print_inventory();
 }

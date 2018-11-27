@@ -1,4 +1,6 @@
 #pragma once
+#ifndef _TGL_BASE
+#define _TGL_BASE
 
 #define GLM_ENABLE_EXPERIMENTAL
 
@@ -61,3 +63,5 @@ public:
 	void set_world_actor(TGLActor * in_actor);
 };
 
+
+#endif

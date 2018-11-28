@@ -10,12 +10,13 @@
 #include "TGLInventory.h"
 #include "TGLHudElement.h"
 #include "TGLChunkSpawn.h"
+#include "TGLInputHandler.h"
 
 class TGLPlayer : public TGLCamera
 {
 	TGLMesh * debug_block;
 	
-	
+	TGLInputHandler input_handler;
 
 public:
 	double multi_press_threshold;

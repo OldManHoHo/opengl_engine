@@ -114,5 +114,6 @@ public:
 	e_block_type index(int in_x, int in_y, int in_z);
 	bool is_visible(int in_x, int in_y, int in_z);
 	void get_tree(float * in_noise, e_block_type * in_blocks, int in_x, int in_y, int in_z);
+
 };
 

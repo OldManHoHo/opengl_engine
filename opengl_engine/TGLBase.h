@@ -62,6 +62,7 @@ public:
 	TGLPlayer * get_player();
 	glm::vec3 get_player_pos();
 	void set_world_actor(TGLActor * in_actor);
+	void get_game_state();
 };
 
 

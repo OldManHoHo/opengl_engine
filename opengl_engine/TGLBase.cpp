@@ -362,3 +362,11 @@ void TGLBase::set_world_actor(TGLActor * in_actor)
 {
 	chunks_spawner = in_actor;
 }
+
+void TGLBase::get_game_state()
+{
+	for (auto actor : actors)
+	{
+		actor->get_game_state();
+	}
+}

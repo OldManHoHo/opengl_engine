@@ -2,7 +2,8 @@
 
 
 
-TGLActor::TGLActor()
+TGLActor::TGLActor():
+	id(_id_counter)
 {
 	transform = glm::mat4(1.0);
 	scale = glm::vec3(1.0, 1.0, 1.0);
@@ -15,6 +16,8 @@ TGLActor::TGLActor()
 	on_ground = false;
 	static_physics = false;
 	transform_calculated = false;
+	
+	_id += 1;
 }
 
 
@@ -122,4 +125,15 @@ void TGLActor::set_on_ground(bool in_on_ground)
 bool TGLActor::get_on_ground()
 {
 	return on_ground;
+}
+
+void register_network_property(double * in_prop)
+{
+	double_props.push_back(in_prop);
+	prev_double_props.push_back(*in_prop);
+}
+
+void queue_network_message(void * in_message)
+{
+	network_messsages.push_back(in_message);
 }

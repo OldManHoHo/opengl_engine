@@ -65,6 +65,8 @@ extern TGLActor debug_actor;
 
 void TGLPlayer::tick(double time_delta)
 {
+	input_handler.tick(time_delta);
+	
 	double xpos, ypos;
 	static float debug_rot = 0.0;
 	debug_rot +=  5;
@@ -117,7 +119,7 @@ void TGLPlayer::tick(double time_delta)
 
 	crosshair = forward_vector_crosshair;
 
-	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_W) == GLFW_PRESS)
+	if (key_states['w'])
 	{
 		//glm::vec3 forward_vector(time_delta * 50 * sin(-y_angle), vel.y, time_delta*50*cos(-y_angle));
 		
@@ -138,142 +140,22 @@ void TGLPlayer::tick(double time_delta)
 		vel.x = 0;
 		vel.z = 0;
 	}
-	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_S) == GLFW_PRESS)
+	if (key_states['s'])
 	{
 		glm::vec3 forward_vector(0.0, 0.0, time_delta*-30);
 
 		forward_vector = forward_vector*glm::mat3(get_rot());
 		
 	}
-	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_SPACE) == GLFW_PRESS)
+	if (key_states[' '])
 	{
 		if (get_on_ground())
 		{
 			vel.y += 5;
 		}
 	}
-	if (glfwGetMouseButton(gl_base.get_window(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && 0)
-	{
-		glm::vec3 forward_vector(1.0, 0.0, 0.0);
-		
-		forward_vector = glm::mat3(get_rot())*forward_vector;
-		//forward_vector += pos;
-		//forward_vector += glm::vec3(0.0, 0.5, 0);
-		
-		set_hitting(forward_vector);
-	}
-	else
-	{
-		set_hitting(glm::vec3(0, 300, 0));
-	}
+
 	return;
-	glm::vec3 light_grey = glm::vec3(0.5, 0.5, 0.5);
-	glm::vec3 mid_grey = glm::vec3(0.35, 0.35, 0.35);
-	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_1) == GLFW_PRESS)
-	{
-		equipped_item = inventory.get_item(0, 0);
-		hud[0]->sub_elements[0]->color = light_grey;
-		hud[0]->sub_elements[2]->color = mid_grey;
-		hud[0]->sub_elements[4]->color = mid_grey;
-		hud[0]->sub_elements[6]->color = mid_grey;
-		hud[0]->sub_elements[8]->color = mid_grey;
-	}
-	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_2) == GLFW_PRESS)
-	{
-		equipped_item = inventory.get_item(1, 0);
-		hud[0]->sub_elements[0]->color = mid_grey;
-		hud[0]->sub_elements[2]->color = light_grey;
-		hud[0]->sub_elements[4]->color = mid_grey;
-		hud[0]->sub_elements[6]->color = mid_grey;
-		hud[0]->sub_elements[8]->color = mid_grey;
-	}
-	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_3) == GLFW_PRESS)
-	{
-		equipped_item = inventory.get_item(2, 0);
-		hud[0]->sub_elements[0]->color = mid_grey;
-		hud[0]->sub_elements[2]->color = mid_grey;
-		hud[0]->sub_elements[4]->color = light_grey;
-		hud[0]->sub_elements[6]->color = mid_grey;
-		hud[0]->sub_elements[8]->color = mid_grey;
-	}
-	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_4) == GLFW_PRESS)
-	{
-		equipped_item = inventory.get_item(3, 0);
-		hud[0]->sub_elements[0]->color = mid_grey;
-		hud[0]->sub_elements[2]->color = mid_grey;
-		hud[0]->sub_elements[4]->color = mid_grey;
-		hud[0]->sub_elements[6]->color = light_grey;
-		hud[0]->sub_elements[8]->color = mid_grey;
-	}
-	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_5) == GLFW_PRESS)
-	{
-		equipped_item = inventory.get_item(4, 0);
-		hud[0]->sub_elements[0]->color = mid_grey;
-		hud[0]->sub_elements[2]->color = mid_grey;
-		hud[0]->sub_elements[4]->color = mid_grey;
-		hud[0]->sub_elements[6]->color = mid_grey;
-		hud[0]->sub_elements[8]->color = light_grey;
-	}
-	
-	TGLInventoryItem * next_item = inventory.get_item(0, 0);
-	if (next_item != nullptr)
-	{
-		hud[0]->sub_elements[1]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
-	}
-	else
-	{
-		hud[0]->sub_elements[1]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
-	}
-	next_item = inventory.get_item(1, 0);
-	if (next_item != nullptr)
-	{
-		hud[0]->sub_elements[3]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
-	}
-	else
-	{
-		hud[0]->sub_elements[3]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
-	}
-	next_item = inventory.get_item(2, 0);
-	if (next_item != nullptr)
-	{
-		hud[0]->sub_elements[5]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
-	}
-	else
-	{
-		hud[0]->sub_elements[5]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
-	}
-	next_item = inventory.get_item(3, 0);
-	if (next_item != nullptr)
-	{
-		hud[0]->sub_elements[7]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
-	}
-	else
-	{
-		hud[0]->sub_elements[7]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
-	}
-	next_item = inventory.get_item(4, 0);
-	if (next_item != nullptr)
-	{
-		hud[0]->sub_elements[9]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
-	}
-	else
-	{
-		hud[0]->sub_elements[9]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
-	}
-
-
-	glm::vec3 forward_vector2(0.0, 0.0, 2);
-
-	//forward_vector2 = forward_vector2*get_rot();
-	//forward_vector2 = forward_vector2 + get_pos();
-	//debug_block->set_pos(glm::vec3(0,0,0));
-	
-	//debug_block->set_pos(forward_vector2);
-	//debug_block->set_rot(get_rot());
-	//debug_block->rotate(-x_angle, glm::vec3(-1.0, 0.0, 0.0));
-	//debug_block->rotate(y_angle, glm::vec3(0, 1.0, 0));
-	
-	
 }
 
 void TGLPlayer::set_hitting(glm::vec3 in_hitting)

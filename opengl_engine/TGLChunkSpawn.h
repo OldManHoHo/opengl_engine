@@ -7,6 +7,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <vector>
+#include <deque>
 
 #include "TGLActor.h"
 #include "TGLChunk.h"
@@ -25,8 +26,9 @@ typedef double hit_properties;
 struct block_hit
 {
 	glm::vec3 loc;
+	e_block_type type;
 	hit_properties props;
-}
+};
 
 class TGLChunkSpawn : public TGLActor
 {
@@ -48,13 +50,13 @@ class TGLChunkSpawn : public TGLActor
 	std::deque <block_def> posted_placements;
 
 	bool test_chunk;
-	e_block_type pointed_at;
+	static e_block_type pointed_at;
 
 public:
 
 	TGLChunkSpawn();
 
-	glm::vec3 get_block_pointed_at(glm::vec3 origin, glm::vec3 pointing_vector, double max_distance = 5.0, e_block_type& out_block_type = pointed_at)
+	glm::vec3 get_block_pointed_at(glm::vec3 origin, glm::vec3 pointing_vector, double max_distance, e_block_type& out_block_type, glm::vec3& out_prev_block);
 
 	void tick(double time_delta);
 
@@ -74,9 +76,8 @@ public:
 	
 	void post_hit(block_hit in_hit);
 	
-	void post_placement(glm::vec3 in_loc, e_block_type in_type);
+	void post_placement(block_def in_block);
 	
-	glm::vec3 get_block_pointed_at()
 };
 
 #endif

@@ -297,15 +297,15 @@ glm::vec3 TGLChunkSpawn::get_block_pointed_at(glm::vec3 origin, glm::vec3 pointi
 		e_block_type block_type_crosshair = bt_air;
 		glm::vec3 next_block_crosshair = origin;
 		glm::vec3 prev_block_crosshair = next_block_crosshair;
-		while (block_type_crosshair == bt_air && glm::length(player->get_pos() - next_block_crosshair) < max_distance)
+		while (block_type_crosshair == bt_air && glm::length(origin - next_block_crosshair) < max_distance)
 		{
 			prev_block_crosshair = next_block_crosshair;
-			next_block_crosshair = ray_cast_block_finder(player->get_pos(), player->crosshair, player->get_pos() + next_ray_crosshair*1.01f, next_ray_crosshair);
+			next_block_crosshair = ray_cast_block_finder(origin, pointing_vector, origin + next_ray_crosshair*1.01f, next_ray_crosshair);
 			block_type_crosshair = block_generator->get_point(next_block_crosshair.x, next_block_crosshair.z, next_block_crosshair.y);
 		}
 		out_block_type = block_type_crosshair;
 		out_prev_block = prev_block_crosshair;
-		return next_block;
+		return next_block_crosshair;
 }
 
 
@@ -335,71 +335,90 @@ void TGLChunkSpawn::tick(double time_delta)
 		// End 3D Crosshair
 		
 		// Process hits
-		for (hit : posted_hits)
+		for (auto hit : posted_hits)
 		{
 			int chunk_x;
 			int chunk_y;
-			get_chunk_of_point(hit.loc, chunk_x, chunk_y)
+			get_chunk_of_point(hit.loc, chunk_x, chunk_y);
 			
 			//std::cout << "REMOVING " << block_type << " FROM " << hit.loc.x - chunk_x * 16 << ", " << hit.loc.y << ", " << hit.loc.z - chunk_y * 16 << "\n";
 			//std::cout << "from chunk " << chunk_x << ", " << chunk_y << "\n";
 			glm::vec3 to_remove((unsigned int)(hit.loc.x - chunk_x * 16), (unsigned int)(hit.loc.y), (unsigned int)(hit.loc.z - chunk_y * 16));
+			e_block_type type_to_remove = block_generator->get_point(hit.loc.x, hit.loc.z, hit.loc.y);
+			if (type_to_remove != bt_air)
+			{
+				bool was_deleted = chunks[chunk_coord(chunk_x, chunk_y)]->remove_instance(type_to_remove, to_remove);
+				if (was_deleted)
+				{
+					block_generator->set_point(bt_air, hit.loc.x, hit.loc.z, hit.loc.y);
+				}
 
-			bool was_deleted = chunks[chunk_coord(chunk_x, chunk_y)]->remove_instance(block_type, to_remove);
-			if (was_deleted)
-			{
-				block_generator->set_point(bt_air, hit.loc.x, hit.loc.z, hit.loc.y);
-			}
 
-			glm::vec3 to_add(to_remove.x + 1, to_remove.y, to_remove.z);
-			int new_block_type = block_generator->get_point(hit.loc.x + 1, hit.loc.z, hit.loc.y);
-			if (new_block_type != 0)
-			{
-				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
-			}
-			to_add = glm::vec3(to_remove.x - 1, to_remove.y, to_remove.z);
-			new_block_type = block_generator->get_point(hit.loc.x - 1, hit.loc.z, hit.loc.y);
-			if (new_block_type != 0)
-			{
-				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
-			}
-			to_add = glm::vec3(to_remove.x, to_remove.y + 1, to_remove.z);
-			new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z, hit.loc.y + 1);
-			if (new_block_type != 0)
-			{
-				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
-			}
-			to_add = glm::vec3(to_remove.x, to_remove.y - 1, to_remove.z);
-			new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z, hit.loc.y - 1);
-			if (new_block_type != 0)
-			{
-				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
-			}
-			to_add = glm::vec3(to_remove.x, to_remove.y, to_remove.z + 1);
-			new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z + 1, hit.loc.y);
-			if (new_block_type != 0)
-			{
-				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
-			}
-			to_add = glm::vec3(to_remove.x, to_remove.y, to_remove.z - 1);
-			new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z - 1, hit.loc.y);
-			if (new_block_type != 0)
-			{
-				chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+				//glm::vec3 to_add(to_remove.x + 1, to_remove.y, to_remove.z);
+				get_chunk_of_point(hit.loc + glm::vec3(1, 0, 0), chunk_x, chunk_y);
+				glm::vec3 to_add((unsigned int)(hit.loc.x + 1 - chunk_x * 16), (unsigned int)(hit.loc.y), (unsigned int)(hit.loc.z - chunk_y * 16));
+				int new_block_type = block_generator->get_point(hit.loc.x + 1, hit.loc.z, hit.loc.y);
+				if (new_block_type != 0)
+				{
+					chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+				}
+				get_chunk_of_point(hit.loc + glm::vec3(-1, 0, 0), chunk_x, chunk_y);
+				//to_add = glm::vec3(to_remove.x - 1, to_remove.y, to_remove.z);
+				to_add = glm::vec3((unsigned int)(hit.loc.x - 1 - chunk_x * 16), (unsigned int)(hit.loc.y), (unsigned int)(hit.loc.z - chunk_y * 16));
+				new_block_type = block_generator->get_point(hit.loc.x - 1, hit.loc.z, hit.loc.y);
+				if (new_block_type != 0)
+				{
+					chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+				}
+				get_chunk_of_point(hit.loc + glm::vec3(0, 1, 0), chunk_x, chunk_y);
+				//to_add = glm::vec3(to_remove.x, to_remove.y + 1, to_remove.z);
+				to_add = glm::vec3((unsigned int)(hit.loc.x - chunk_x * 16), (unsigned int)(hit.loc.y + 1), (unsigned int)(hit.loc.z - chunk_y * 16));
+				new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z, hit.loc.y + 1);
+				if (new_block_type != 0)
+				{
+					chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+				}
+				get_chunk_of_point(hit.loc + glm::vec3(0, -1, 0), chunk_x, chunk_y);
+				//to_add = glm::vec3(to_remove.x, to_remove.y - 1, to_remove.z);
+				to_add = glm::vec3((unsigned int)(hit.loc.x - chunk_x * 16), (unsigned int)(hit.loc.y - 1), (unsigned int)(hit.loc.z - chunk_y * 16));
+				new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z, hit.loc.y - 1);
+				if (new_block_type != 0)
+				{
+					chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+				}
+				get_chunk_of_point(hit.loc + glm::vec3(0, 0, 1), chunk_x, chunk_y);
+				//to_add = glm::vec3(to_remove.x, to_remove.y, to_remove.z + 1);
+				to_add = glm::vec3((unsigned int)(hit.loc.x - chunk_x * 16), (unsigned int)(hit.loc.y), (unsigned int)(hit.loc.z + 1 - chunk_y * 16));
+				new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z + 1, hit.loc.y);
+				if (new_block_type != 0)
+				{
+					chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+				}
+				get_chunk_of_point(hit.loc + glm::vec3(0, 0, -1), chunk_x, chunk_y);
+				//to_add = glm::vec3(to_remove.x, to_remove.y, to_remove.z - 1);
+				to_add = glm::vec3((unsigned int)(hit.loc.x - chunk_x * 16), (unsigned int)(hit.loc.y), (unsigned int)(hit.loc.z - 1 - chunk_y * 16));
+				new_block_type = block_generator->get_point(hit.loc.x, hit.loc.z - 1, hit.loc.y);
+				if (new_block_type != 0)
+				{
+					chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+				}
 			}
 		}
+		posted_hits.clear();
 		
 		// Process placements
-		for (placement : posted_placements)
+		for (auto placement : posted_placements)
 		{
-			get_chunk_of_point(placement.loc, chunk_x, chunk_y);
+			int chunk_x, chunk_y;
+			get_chunk_of_point(placement.loc.get_vec(), chunk_x, chunk_y);
 
 			glm::vec3 to_create((unsigned int)(placement.loc.x - chunk_x * 16), (unsigned int)(placement.loc.y), (unsigned int)(placement.loc.z - chunk_y * 16));
 			chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(placement.type, to_create);
 			block_generator->set_point(placement.type, placement.loc.x, placement.loc.z, placement.loc.y);
 		}
+		posted_placements.clear();
 		
-		if (hitting.y < 256)
+		if (hitting.y < 256 && 0)
 		{
 			e_block_type block_type = bt_air;
 			
@@ -415,7 +434,7 @@ void TGLChunkSpawn::tick(double time_delta)
 			hitting = next_block;
 			int chunk_x;
 			int chunk_y;
-			get_chunk_of_point(chunk_x, chunk_y)
+			get_chunk_of_point(hitting, chunk_x, chunk_y);
 			if (block_type != bt_air)
 			{
 				
@@ -785,12 +804,12 @@ void TGLChunkSpawn::get_chunk_of_point(glm::vec3 in_point, int& out_chunk_x, int
 	out_chunk_y = floor(in_point.z / 16.0);
 }
 
-void post_hit(glm::vec3 in_hit)
+void TGLChunkSpawn::post_hit(block_hit in_hit)
 {
 	posted_hits.push_back(in_hit);
 }
 
-void post_placement(block_def in_block)
+void TGLChunkSpawn::post_placement(block_def in_block)
 {
 	posted_placements.push_back(in_block);
 }

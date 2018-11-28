@@ -16,6 +16,12 @@
     <Filter Include="FastNoiseSIMD">
       <UniqueIdentifier>{ebbbe624-6981-47e5-8758-949bc1b38221}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tcm">
+      <UniqueIdentifier>{985a257f-3598-468a-bee9-82b37f32871b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\tcm">
+      <UniqueIdentifier>{13cdb87f-3c68-43d7-9858-92b5d8095b2e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\glad\glad.h">
@@ -104,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="useful_structures.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tmc\TMCPlayer.h">
+      <Filter>Header Files\tcm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -202,6 +211,9 @@
     </ClCompile>
     <ClCompile Include="useful_structures.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tmc\TMCPlayer.cpp">
+      <Filter>Source Files\tcm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

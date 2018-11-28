@@ -14,11 +14,16 @@
 class TGLPlayer : public TGLCamera
 {
 	TGLMesh * debug_block;
-	std::vector <TGLHudElement*> hud;
-	TGLInventoryItem * equipped_item;
-	TGLInventory inventory;
+	
+	
 
 public:
+	double multi_press_threshold;
+	std::vector <TGLHudElement*> hud;
+
+	TGLInventory inventory;
+	TGLInventoryItem * equipped_item;
+
 	float y_angle;
 	float x_angle;
 

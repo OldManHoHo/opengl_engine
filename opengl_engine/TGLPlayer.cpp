@@ -1,10 +1,10 @@
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include "TGLPlayer.h"
 
 #include "TGLBase.h"
 #include <glm/gtx/matrix_decompose.hpp>
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include "useful_structures.h"
 
@@ -12,7 +12,8 @@
 extern TGLBase gl_base;
 
 TGLPlayer::TGLPlayer():
-	inventory(10, 10)
+	inventory(10, 10),
+	multi_press_threshold(0.5)
 {
 	glfwSetInputMode(gl_base.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	x_angle = 0;
@@ -151,7 +152,7 @@ void TGLPlayer::tick(double time_delta)
 			vel.y += 5;
 		}
 	}
-	if (glfwGetMouseButton(gl_base.get_window(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+	if (glfwGetMouseButton(gl_base.get_window(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && 0)
 	{
 		glm::vec3 forward_vector(1.0, 0.0, 0.0);
 		
@@ -165,6 +166,7 @@ void TGLPlayer::tick(double time_delta)
 	{
 		set_hitting(glm::vec3(0, 300, 0));
 	}
+	return;
 	glm::vec3 light_grey = glm::vec3(0.5, 0.5, 0.5);
 	glm::vec3 mid_grey = glm::vec3(0.35, 0.35, 0.35);
 	if (glfwGetKey(gl_base.get_window(), GLFW_KEY_1) == GLFW_PRESS)

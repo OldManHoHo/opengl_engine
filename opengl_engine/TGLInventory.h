@@ -3,7 +3,9 @@
 
 #include <vector>
 #include <stdio.h> 
+
 #include "BlockGenerator.h"
+#include "TGLChunkSpawn.h"
 
 enum TGLItemId
 {
@@ -56,9 +58,7 @@ public:
 // to store easy access to 5 items in the TGLInventory's main vector.
 class TGLInventory//: public TGLComponent
 {
-	// class constants
-	static const unsigned int default_quick_use_size = 5;
-	static TGLInventoryItem no_item;
+	
 
 	// object data
 	unsigned int x_size;
@@ -66,6 +66,10 @@ class TGLInventory//: public TGLComponent
 	std::vector <TGLInventoryItem*> items;
 
 public:
+	// class constants
+	static const unsigned int default_quick_use_size = 5;
+	static TGLInventoryItem no_item;
+
 	TGLInventory(int in_x_size, int in_y_size);
 
 	// Item retrieval

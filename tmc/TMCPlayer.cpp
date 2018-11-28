@@ -1,4 +1,8 @@
 #include "TMCPlayer.h"
+#include "TGLBase.h"
+#include "useful_structures.h"
+
+extern TGLBase gl_base;
 
 TMCPlayer::TMCPlayer():
     chunk_spawn(nullptr),
@@ -29,28 +33,39 @@ void TMCPlayer::init_inventory(int num_slots)
 void TMCPlayer::tick(double time_delta)
 {
     TGLPlayer::tick(time_delta);
+
+	static double time_since_last = 10;
+
+	time_since_last += time_delta;
     
     if (glfwGetMouseButton(gl_base.get_window(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 	{
-		glm::vec3 forward_vector(1.0, 0.0, 0.0);
 		
-		forward_vector = glm::mat3(get_rot())*forward_vector;
-		//forward_vector += pos;
-		//forward_vector += glm::vec3(0.0, 0.5, 0);
-		
-		set_hitting(forward_vector);
-		e_block_type hit_type;
-		glm::vec3 block_to_add;
-		glm::vec3 hit_block = get_block_pointed_at(get_pos(), forward_vector, max_hit_distance, hit_type, block_to_add);
-		
-		
-		if (chunk_spawn != nullptr)
+
+		if (time_since_last >= multi_press_threshold)
 		{
-		    hit_properties props = get_equipped().get_hit_properties();
-		    block_hit hit_to_post;
-		    hit_to_post.loc = hit_block;
-		    hit_to_post.props = props;
-		    chunk_spawn->post_hit(block_hit);
+			glm::vec3 forward_vector(1.0, 0.0, 0.0);
+
+			forward_vector = glm::mat3(get_rot())*forward_vector;
+			//forward_vector += pos;
+			//forward_vector += glm::vec3(0.0, 0.5, 0);
+
+			set_hitting(forward_vector);
+			e_block_type hit_type;
+			glm::vec3 block_to_add;
+			glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(get_pos(), forward_vector, max_hit_distance, hit_type, block_to_add);
+
+
+			if (chunk_spawn != nullptr)
+			{
+				hit_properties props = get_equipped().get_hit_properties();
+				block_hit hit_to_post;
+				hit_to_post.loc = hit_block;
+				hit_to_post.props = props;
+				hit_to_post.type = item_id_to_block_type(get_equipped().type);
+				chunk_spawn->post_hit(hit_to_post);
+			}
+			time_since_last = 0;
 		}
 	}
 	if (glfwGetMouseButton(gl_base.get_window(), GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
@@ -64,19 +79,19 @@ void TMCPlayer::tick(double time_delta)
 		set_hitting(forward_vector);
 		e_block_type hit_type;
 		glm::vec3 block_to_add;
-		glm::vec3 hit_block = get_block_pointed_at(get_pos(), forward_vector, max_hit_distance, hit_type, block_to_add);
+		glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(get_pos(), forward_vector, max_hit_distance, hit_type, block_to_add);
 		
 		
 		if (chunk_spawn != nullptr)
 		{
 		    e_block_type type_to_add = item_id_to_block_type(get_equipped().type);
-		    chunk_spawn->post_placement(block_to_add, type_to_add);
+		    chunk_spawn->post_placement(block_def(block_to_add.x, block_to_add.y, block_to_add.z, type_to_add));
 		    change_inventory_amount(get_equipped().type, -1);
 		}
 	}
 	
-	int equipped_index = 0;
-	for (i = 0; i < inventory.default_quick_use_size; ++i)
+	static int equipped_index = 0;
+	for (int i = 0; i < inventory.default_quick_use_size; ++i)
 	{
 	    if (glfwGetKey(gl_base.get_window(), GLFW_KEY_1 + i) == GLFW_PRESS)
     	{
@@ -84,7 +99,7 @@ void TMCPlayer::tick(double time_delta)
     		equipped_index = i;
     	}
 	}
-	for (i = 0; i < inventory.default_quick_use_size; ++i)
+	for (int i = 0; i < inventory.default_quick_use_size; ++i)
 	{
 	    if (i == equipped_index)
 	    {

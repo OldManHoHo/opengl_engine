@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\tmc\TMCPlayer.h" />
     <ClInclude Include="BlockGenerator.h" />
     <ClInclude Include="useful_structures.h" />
     <ClInclude Include="Cellular.h" />
@@ -50,6 +51,7 @@
     <ClInclude Include="WhiteNoise.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\tmc\TMCPlayer.cpp" />
     <ClCompile Include="BlockGenerator.cpp" />
     <ClCompile Include="Cellular.cpp" />
     <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD.cpp" />
@@ -194,7 +196,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\;.\include;.\opengl_engine\include;C:\Users\teddy\Source\Repos\opengl_engine\glfw-3.2.1\include;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\FastNoiseSIMD;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\glm-0.9.9-a2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;.\opengl_engine\include;C:\Users\teddy\Source\Repos\opengl_engine\glfw-3.2.1\include;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\FastNoiseSIMD;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\glm-0.9.9-a2;C:\Users\teddy\Source\Repos\opengl_engine\tmc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

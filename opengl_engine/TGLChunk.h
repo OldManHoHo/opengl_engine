@@ -2,10 +2,11 @@
 #ifndef _TGL_CHUNK
 #define _TGL_CHUNK
 
-#include "TGLActor.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "TGLActor.h"
 #include "TGLMeshVertices.h"
 #include "TGLMaterial.h"
 #include "TGLActor.h"

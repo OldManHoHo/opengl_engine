@@ -256,7 +256,7 @@ void TGLMesh::enable_instancing(GLfloat * instance_locations, int in_instance_co
 	glVertexAttribPointer(instance_attrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(instance_attrib);
 	glVertexAttribDivisor(instance_attrib, 1);
-
+	refresh_instances();
 
 }
 
@@ -276,9 +276,13 @@ void TGLMesh::remove_instance(int index)
 	glBindBuffer(GL_ARRAY_BUFFER, instance_VBO);
 	
 	//vbo_mem = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	GLfloat * temp_buf = new GLfloat[instance_count * 3 * sizeof(GLfloat) - index * 3 * sizeof(GLfloat)];
+	GLfloat * temp_buf = new GLfloat[(instance_count-1) * 3 * sizeof(GLfloat) - index * 3 * sizeof(GLfloat)];
 	glGetBufferSubData(GL_ARRAY_BUFFER, (index+1) * 3 * sizeof(GLfloat), (instance_count-1) * 3 * sizeof(GLfloat) - (index) * 3 * sizeof(GLfloat), temp_buf);
 	glBufferSubData(GL_ARRAY_BUFFER, (index) * 3 * sizeof(GLfloat), (instance_count-1) * 3 * sizeof(GLfloat) - (index) * 3 * sizeof(GLfloat), temp_buf);
+
+	//glGetBufferSubData(GL_ARRAY_BUFFER, 0, (instance_count - 1) * 3 * sizeof(GLfloat) - (index) * 3 * sizeof(GLfloat), temp_buf);
+	//glBufferSubData(GL_ARRAY_BUFFER, (index) * 3 * sizeof(GLfloat), (instance_count - 1) * 3 * sizeof(GLfloat) - (index) * 3 * sizeof(GLfloat), temp_buf);
+
 	//memmove(&vbo_mem[index * 3], &vbo_mem[(index + 1) * 3], instance_count * 3 * sizeof(GLfloat) - index * 3 * sizeof(GLfloat));
 	//glUnmapBuffer(GL_ARRAY_BUFFER);
 	refresh_instances();

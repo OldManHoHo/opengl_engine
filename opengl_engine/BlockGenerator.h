@@ -2,6 +2,10 @@
 #include <map>
 #include <vector>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Generator.h"
 #include "Simplex.h"
 #include "Cellular.h"
@@ -44,6 +48,8 @@ struct block_coord
 	{
 		return (in_coord.x == x && in_coord.y == y && in_coord.z == z);
 	}
+
+	glm::vec3 get_vec() { return glm::vec3(x, y, z); }
 	int x;
 	int y;
 	int z;
@@ -53,10 +59,17 @@ struct block_def
 {
 	block_coord loc;
 	e_block_type type;
+	block_def() {}
+	block_def(int in_x, int in_y, int in_z, e_block_type in_type) :
+		loc(in_x, in_y, in_z),
+		type(in_type)
+	{}
+
 	bool operator== (const block_def& in_def)
 	{
 		return loc == in_def.loc;
 	}
+
 };
 
 

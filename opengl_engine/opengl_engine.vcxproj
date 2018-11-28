@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\tmc\TMCPlayer.h" />
     <ClInclude Include="BlockGenerator.h" />
+    <ClInclude Include="TGLLamp.h" />
     <ClInclude Include="TMCDroppedItem.h" />
     <ClInclude Include="useful_structures.h" />
     <ClInclude Include="Cellular.h" />
@@ -76,6 +77,7 @@
     <ClCompile Include="TGLHud.cpp" />
     <ClCompile Include="TGLHudElement.cpp" />
     <ClCompile Include="TGLInventory.cpp" />
+    <ClCompile Include="TGLLamp.cpp" />
     <ClCompile Include="TGLMaterial.cpp" />
     <ClCompile Include="TGLMesh.cpp" />
     <ClCompile Include="TGLMeshVertices.cpp" />

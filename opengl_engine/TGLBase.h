@@ -12,6 +12,7 @@
 
 #include "TGLMesh.h"
 #include "TGLCamera.h"
+#include "TGLLamp.h"
 #include "TGLPlayer.h"
 #include "TGLPhysicsEngine.h"
 #include "TGLHudElement.h"
@@ -29,6 +30,7 @@ class TGLBase
 	std::vector <TGLMesh*> meshes;
 	std::vector <TGLActor*> actors;
 	std::vector <TGLHudElement*> HUD_elements;
+	std::vector <TGLLamp*> lights;
 	TGLCamera * active_camera;
 	TGLActor * chunks_spawner;
 	TGLPhysicsEngine physics_engine;
@@ -56,6 +58,7 @@ public:
 	void remove_actor(TGLActor * in_actor);
 	void add_camera(TGLCamera * in_camera);
 	void add_hud_element(TGLHudElement * in_element);
+	void add_light(TGLLamp * in_lamp);
 	void load_model(float * vertices);
 	void load_shader(char * vertex_shader, char * fragment_shader);
 	GLFWwindow * get_window();

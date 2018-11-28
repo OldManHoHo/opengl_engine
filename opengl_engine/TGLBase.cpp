@@ -176,6 +176,12 @@ void TGLBase::update()
 					glUniformMatrix4fv(view, 1, GL_FALSE, glm::value_ptr(cam_view));
 
 
+					GLuint sun_dir = glGetUniformLocation(shader_id, "sun_dir");
+					glUniform3fv(sun_dir, 1, glm::value_ptr(lights[0]->dir));
+
+					GLuint sun_color = glGetUniformLocation(shader_id, "sun_color");
+					glUniform3fv(sun_color, 1, glm::value_ptr(lights[0]->intensity));
+
 					std::vector <TGLTexture*> textures = mesh_comp->get_textures();
 					int count = 0;
 					for (auto tex_it = textures.begin(); tex_it != textures.end(); ++tex_it)
@@ -361,4 +367,9 @@ glm::vec3 TGLBase::get_player_pos()
 void TGLBase::set_world_actor(TGLActor * in_actor)
 {
 	chunks_spawner = in_actor;
+}
+
+void TGLBase::add_light(TGLLamp * in_lamp)
+{
+	lights.push_back(in_lamp);
 }

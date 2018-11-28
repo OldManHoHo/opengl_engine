@@ -8,6 +8,7 @@ out vec2 tex_coord_switch;
 out vec3 normal_camspace;
 out vec3 light_camspace;
 out vec2 glpos;
+out vec3 light_color;
 
 out float cos;
 
@@ -15,10 +16,14 @@ uniform mat4 mesh;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform vec3 sun_dir;
+uniform vec3 sun_color;
 
 void main()
 {
-	vec3 light = normalize(vec3(0.0,-1.0,0.5));
+	vec3 light = normalize(sun_dir);//normalize(vec3(0.0,-1.0,0.5));//
+	light_color = sun_color;
+
 	gl_Position = projection*view*model*mesh*vec4(aPos + instance_pos, 1.0);
 	glpos = gl_Position.xy;
 	//gl_Position = projection*view*model*mesh*vec4(aPos, 1.0);

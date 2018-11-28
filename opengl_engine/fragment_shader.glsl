@@ -6,6 +6,7 @@ in vec2 tex_coord_switch;
 in vec3 normal_camspace;
 in vec3 light_camspace;
 in vec2 glpos;
+in vec3 light_color;
 
 in float cos;
 
@@ -17,6 +18,7 @@ void main()
 	vec3 l = normalize(light_camspace);
     FragColor = texture(texture0, tex_coord_switch);
 	FragColor.xyz = FragColor.xyz*max(-dot(n,l),0.4);
+	FragColor.xyz = FragColor.xyz*light_color;
 	if (FragColor.a <= 0.0)
 	{
 		discard;

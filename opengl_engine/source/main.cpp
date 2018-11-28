@@ -7,6 +7,7 @@
 #include "TGLBase.h"
 #include "TGLCamera.h"
 #include "TMCPlayer.h"
+#include "TGLLamp.h"
 #include "TGLChunkSpawn.h"
 #include "useful_structures.h"
 
@@ -97,6 +98,7 @@ int main()
 
 	//TGLPlayer main_cam;
 	TMCPlayer main_cam;
+	TGLLamp sun;
 	main_cam.add_hud(&inventory);
 	main_cam.set_chunk_spawn(&chunk_spawn);
 	
@@ -105,6 +107,8 @@ int main()
 	gl_base.add_actor(&chunk_spawn);
 	gl_base.add_actor(&debug_actor);
 	gl_base.add_hud_element(&inventory);
+	gl_base.add_light(&sun);
+	gl_base.add_actor(&sun);
 	//debug_actor.set_pos(glm::vec3(0, 185, 0));
 	while (1)
 	{

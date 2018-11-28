@@ -1,7 +1,6 @@
-#pragma once
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "tgl_gl.h"
+
 #include <iostream>
 
 #include "TGLBase.h"
@@ -15,31 +14,6 @@
 
 TGLBase gl_base;
 TGLActor debug_actor;
-
-TGLMesh * create_cube_mesh()
-{
-	TGLMeshVertices * block_mesh_vertices = new TGLMeshVertices(useful_structures::vertex_data_block_small);
-	TGLMesh * temp_mesh = new TGLMesh(block_mesh_vertices);
-	TGLMaterial * temp_mat = new TGLMaterial();
-
-	TGLShader v_shader("vertex_shader.glsl", GL_VERTEX_SHADER);
-	TGLShader f_shader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-
-	GLenum err;
-	while ((err = glGetError()) != GL_NO_ERROR)
-	{
-		printf("GL ERROR: %d\n", err);
-	}
-
-	temp_mat->add_shader(&v_shader);
-	temp_mat->add_shader(&f_shader);
-	temp_mat->link_shader();
-
-	//temp_mesh->set_material(block_material, 0);
-	temp_mesh->set_material(temp_mat);
-	return temp_mesh;
-}
-
 class rot_actor : public TGLActor
 {
 	void tick(double time_delta)
@@ -60,7 +34,8 @@ class rot_actor : public TGLActor
 int main()
 {
 	gl_base.init();
-	
+
+#ifdef _TGL_CLIENT
 	TGLHudElement inventory(600, 120, glm::vec2(100,100), glm::vec3(0.2, 0.2, 0.2));
 	int offset = 10;
 	int shift = 120;
@@ -89,7 +64,9 @@ int main()
 	inventory.sub_elements.push_back(&inventory_item5b);
 	inventory.sub_elements.push_back(&inventory_item5);
 
-	debug_actor.add_component(create_cube_mesh());
+
+	debug_actor.add_component(useful_structures::create_cube_mesh());
+#endif
 	debug_actor.set_scale(glm::vec3(0.1,0.1,0.1));
 
 	TGLChunkSpawn chunk_spawn;
@@ -97,14 +74,18 @@ int main()
 
 	//TGLPlayer main_cam;
 	TMCPlayer main_cam;
-	main_cam.add_hud(&inventory);
+	
 	main_cam.set_chunk_spawn(&chunk_spawn);
 	
-	gl_base.add_camera(&main_cam);
+	
 	gl_base.add_actor(&main_cam);
 	gl_base.add_actor(&chunk_spawn);
 	gl_base.add_actor(&debug_actor);
+#ifdef _TGL_CLIENT
+	gl_base.add_camera(&main_cam);
+	main_cam.add_hud(&inventory);
 	gl_base.add_hud_element(&inventory);
+#endif
 	//debug_actor.set_pos(glm::vec3(0, 185, 0));
 	while (1)
 	{

@@ -3,8 +3,7 @@
 #define _TGL_CHUNK
 
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "tgl_gl.h"
 
 #include "TGLActor.h"
 #include "TGLMeshVertices.h"

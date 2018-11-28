@@ -2,8 +2,7 @@
 #ifndef _TGL_TEXTURE
 #define _TGL_TEXTURE
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "tgl_gl.h"
 
 class TGLTexture
 {

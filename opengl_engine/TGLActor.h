@@ -6,13 +6,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
+#include <deque>
 
 #include "TGLComponent.h"
 #include "TGLBounds.h"
 
 class TGLActor
 {
-	static int _id_counter = 0;
+	static int _id_counter;
 
 protected:
 	glm::vec3 pos;
@@ -29,16 +30,16 @@ protected:
 	
 // NETWORK
 	std::vector <double*> double_props;
-	std::vector <float*> double_props;
-	std::vector <char*> double_props;
-	std::vector <int*> double_props;
+	std::vector <float*> float_props;
+	std::vector <char*> char_props;
+	std::vector <int*> int_props;
 	std::vector <glm::vec3*> vec3_props;
 	std::vector <glm::mat4*> mat4_props;
 	
 	std::vector <double*> prev_double_props;
-	std::vector <float*> prev_double_props;
-	std::vector <char*> prev_double_props;
-	std::vector <int*> prev_double_props;
+	std::vector <float*> prev_float_props;
+	std::vector <char*> prev_char_props;
+	std::vector <int*> prev_int_props;
 	std::vector <glm::vec3*> prev_vec3_props;
 	std::vector <glm::mat4*> prev_mat4_props;
 	

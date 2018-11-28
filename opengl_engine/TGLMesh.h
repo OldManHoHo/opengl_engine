@@ -2,8 +2,9 @@
 #ifndef _TGL_MESH
 #define _TGL_MESH
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+
+#include "tgl_gl.h"
+
 #include <vector>
 #include <set>
 

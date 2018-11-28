@@ -17,6 +17,7 @@ TGLBase::~TGLBase()
 {
 }
 
+#ifdef _TGL_CLIENT
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -63,8 +64,66 @@ void TGLBase::processInput(GLFWwindow *window)
 		glfwSetWindowShouldClose(window, true);
 }
 
+GLFWwindow * TGLBase::get_window()
+{
+	return window;
+}
+
+
+void TGLBase::add_camera(TGLCamera * in_camera)
+{
+	active_camera = in_camera;
+}
+
+
+void TGLBase::add_hud_element(TGLHudElement * in_element)
+{
+	HUD_elements.push_back(in_element);
+}
+
+
+void TGLBase::load_model(float * vertices)
+{
+
+	unsigned int VBO;
+
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+
+}
+
+void TGLBase::load_shader(char * vertex_shader, char * fragment_shader)
+{
+	unsigned int vertexShader;
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+	glShaderSource(vertexShader, 1, &vertex_shader, NULL);
+	glCompileShader(vertexShader);
+
+	unsigned int fragmentShader;
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragment_shader, NULL);
+	glCompileShader(fragmentShader);
+
+	unsigned int shaderProgram;
+	shaderProgram = glCreateProgram();
+
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
+
+	glUseProgram(shaderProgram);
+
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+}
+#endif
+
 int TGLBase::init()
 {
+#ifdef _TGL_CLIENT
 	gl_init();
 	
 	window_width = 3000;
@@ -104,6 +163,7 @@ int TGLBase::init()
 	default_material->add_shader(&f_shader);
 	default_material->link_shader();
 	default_shader_program = default_material->get_shader_program();
+#endif
 }
 
 void TGLBase::update()
@@ -123,13 +183,16 @@ void TGLBase::update()
 		time_sum = 0;
 	}
 	{
+#ifdef _TGL_CLIENT
 		// input
 		processInput(window);
+
 
 		// rendering commands here
 		glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glm::mat4 cam_view = active_camera->get_view();
+#endif
 		//for (auto actor_it = actors.begin(); actor_it != actors.end(); ++actor_it)
 		//{
 		for (int i = 0; i < actors.size(); ++i)
@@ -138,6 +201,7 @@ void TGLBase::update()
 			//std::vector <TGLComponent*> components = (*actor_it)->get_components();
 			for (auto mesh_it = components.begin(); mesh_it != components.end(); ++mesh_it)
 			{
+#ifdef _TGL_CLIENT
 				if ((*mesh_it)->get_draw_flag())
 				{
 					TGLMesh * mesh_comp = (TGLMesh*)(*mesh_it);
@@ -194,12 +258,14 @@ void TGLBase::update()
 						glDrawArrays(GL_TRIANGLES, 0, mesh_comp->get_length());
 					}
 				}
+#endif
 			}
 
 			actors[i]->tick(time_delta);
 			
 			//(*actor_it)->tick(time_delta);
 		}
+#ifdef _TGL_CLIENT
 		for (int i = 0; i < HUD_elements.size(); ++i)
 		{
 			GLuint shader_id = HUD_elements[i]->mat.get_shader_program();
@@ -256,10 +322,13 @@ void TGLBase::update()
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 			}
 		}
+#endif
 		physics_engine.tick(time_delta, actors, (TGLChunkSpawn*)chunks_spawner);
 			// check and call events and swap the buffers
+#ifdef _TGL_CLIENT
 		glfwPollEvents();
 		glfwSwapBuffers(window);
+#endif
 	}
 	end = std::chrono::steady_clock::now();
 	/*
@@ -295,58 +364,6 @@ void TGLBase::remove_actor(TGLActor * in_actor)
 	}
 }
 
-void TGLBase::add_camera(TGLCamera * in_camera)
-{
-	active_camera = in_camera;
-}
-
-void TGLBase::add_hud_element(TGLHudElement * in_element)
-{
-	HUD_elements.push_back(in_element);
-}
-
-void TGLBase::load_model(float * vertices)
-{
-
-	unsigned int VBO;
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-
-}
-
-void TGLBase::load_shader(char * vertex_shader, char * fragment_shader)
-{
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-	glShaderSource(vertexShader, 1, &vertex_shader, NULL);
-	glCompileShader(vertexShader);
-
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragment_shader, NULL);
-	glCompileShader(fragmentShader);
-
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	glUseProgram(shaderProgram);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-}
-
-GLFWwindow * TGLBase::get_window()
-{
-	return window;
-}
 
 TGLPlayer * TGLBase::get_player()
 {
@@ -367,6 +384,6 @@ void TGLBase::get_game_state()
 {
 	for (auto actor : actors)
 	{
-		actor->get_game_state();
+		//actor->get_game_state();
 	}
 }

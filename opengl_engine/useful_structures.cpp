@@ -2,7 +2,6 @@
 
 namespace useful_structures
 {
-
 	extern std::map<TGLItemId, glm::vec2> item_id_to_texture_coords = {
 		{ iid_dirt_with_grass_block, glm::vec2(0,16)},
 		{ iid_dirt_block, glm::vec2(16*2,16) },
@@ -97,12 +96,13 @@ namespace useful_structures
 		-1.0f,-1.0f,1.0f,
 		1.0f,-1.0f,1.0f,
 	};
-
+#ifdef _TGL_CLIENT
 	TGLMesh * create_cube_mesh()
 	{
 		TGLMeshVertices * block_mesh_vertices = new TGLMeshVertices(useful_structures::vertex_data_block_small);
 		TGLMesh * temp_mesh = new TGLMesh(block_mesh_vertices);
 		TGLMaterial * temp_mat = new TGLMaterial();
+
 
 		TGLShader v_shader("vertex_shader.glsl", GL_VERTEX_SHADER);
 		TGLShader f_shader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
@@ -119,6 +119,8 @@ namespace useful_structures
 
 		//temp_mesh->set_material(block_material, 0);
 		temp_mesh->set_material(temp_mat);
+
 		return temp_mesh;
 	}
+#endif
 }

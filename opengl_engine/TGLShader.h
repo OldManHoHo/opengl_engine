@@ -2,8 +2,8 @@
 #ifndef _TGL_SHADER
 #define _TGL_SHADER
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+
+#include "tgl_gl.h"
 
 class TGLShader
 {

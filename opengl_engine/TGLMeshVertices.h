@@ -2,8 +2,8 @@
 #ifndef _TGL_MESHVERTICES
 #define _TGL_MESHVERTICES
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "tgl_gl.h"
+
 #include <vector>
 
 #include <glm/glm.hpp>

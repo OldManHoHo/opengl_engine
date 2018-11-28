@@ -1,7 +1,12 @@
+#include <algorithm>
+
 #include "TGLChunkSpawn.h"
 #include "TGLBase.h"
 #include "useful_structures.h"
+
+#ifndef _EXCLUDE_TMC_DROPPED_ITEM
 #include "TMCDroppedItem.h"
+#endif
 
 #define PI 3.1415926
 
@@ -365,7 +370,7 @@ void TGLChunkSpawn::tick(double time_delta)
 		}
 		//debug_actor.set_pos(next_ray_crosshair + player->get_pos());
 		// End 3D Crosshair
-#endif _TGL_CLIENT
+#endif
 		
 		// Process hits
 		for (auto hit : posted_hits)
@@ -380,19 +385,22 @@ void TGLChunkSpawn::tick(double time_delta)
 			e_block_type type_to_remove = block_generator->get_point(hit.loc.x, hit.loc.z, hit.loc.y);
 			if (type_to_remove != bt_air)
 			{
+				bool was_deleted = true;
 #ifdef _TGL_CLIENT
-				bool was_deleted = chunks[chunk_coord(chunk_x, chunk_y)]->remove_instance(type_to_remove, to_remove);
+				was_deleted = chunks[chunk_coord(chunk_x, chunk_y)]->remove_instance(type_to_remove, to_remove);
 #endif
 				if (was_deleted)
 				{
 					block_generator->set_point(bt_air, hit.loc.x, hit.loc.z, hit.loc.y);
 
+#ifndef _EXCLUDE_TMC_DROPPED_ITEM
 					TMCDroppedItem * added = new TMCDroppedItem(block_type_to_item_id(type_to_remove));
 					((TGLMesh*)(added->get_components()[0]))->set_material(block_material, (e_block_type)(type_to_remove - 1));
 					added->set_pos(hit.loc);
 					//debug_actor.set_pos(hit_block);
 					gl_base.add_actor((TGLActor*)added);
 					dropped_items.add_item((TGLActor*)added, chunk_coord(chunk_x, chunk_y));
+#endif
 				}
 
 #ifdef _TGL_CLIENT
@@ -583,9 +591,10 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 			}
 		}
 	}
-
+#ifdef _TGL_CLIENT
 	chunks[chunk_coord(chunk_x, chunk_y)] = new TGLChunk(block_mesh_vertices, block_material, block_type_count, instances);
 	chunks[chunk_coord(chunk_x, chunk_y)]->translate(glm::vec3(16 * chunk_x, 0, 16 * chunk_y));
+#endif
 	gl_base.add_actor(chunks[chunk_coord(chunk_x, chunk_y)]);
 }
 
@@ -806,12 +815,12 @@ std::vector <TGLActor*> TGLChunkSpawn::collect_nearby_dropped_items(glm::vec3 po
 
 void TGLChunkSpawn::client_request_chunk(int chunk_x, int chunk_y)
 {
-	void * chunk_request = create_client_request_message(chunk_x, chunk_y);
-	queue_network_message(chunk_request);
+	//void * chunk_request = create_client_request_message(chunk_x, chunk_y);
+	//queue_network_message(chunk_request);
 }
 
 void TGLChunkSpawn::server_send_chunk_mods(int chunk_x, int chunk_y)
 {
-	void * chunk_mods = create_chunk_mod_message(chunk_x, chunk_y);
-	queue_network_message(chunk_mods);
+	//void * chunk_mods = create_chunk_mod_message(chunk_x, chunk_y);
+	//queue_network_message(chunk_mods);
 }

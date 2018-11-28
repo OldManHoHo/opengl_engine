@@ -4,8 +4,8 @@
 
 #include <map>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "tgl_gl.h"
+
 #include <vector>
 #include <deque>
 
@@ -76,8 +76,8 @@ public:
 	void tick(double time_delta);
 	void spawn_chunk(int chunk_x, int chunk_y);
 	std::vector <GLfloat> create_uv_map(std::vector <face_map_pair> pairs);
-	bool TGLChunkSpawn::between_angles(float x, float y, float in_angle_1, float in_angle_2);
-	std::vector <chunk_coord> TGLChunkSpawn::get_chunks(int x0, int y0, int radius, float view_angle_1, float view_angle_2);
+	bool between_angles(float x, float y, float in_angle_1, float in_angle_2);
+	std::vector <chunk_coord> get_chunks(int x0, int y0, int radius, float view_angle_1, float view_angle_2);
 	e_block_type get_point(int x, int y, int z);
 	e_block_type * get_points(int x, int y, int division);
 	void get_chunk_of_point(glm::vec3 in_point, int& out_chunk_x, int& out_chunk_y);

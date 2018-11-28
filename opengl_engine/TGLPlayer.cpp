@@ -1,5 +1,4 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "tgl_gl.h"
 
 #include "TGLPlayer.h"
 
@@ -15,7 +14,9 @@ TGLPlayer::TGLPlayer():
 	inventory(10, 10),
 	multi_press_threshold(0.25)
 {
+#ifdef _TGL_CLIENT
 	glfwSetInputMode(gl_base.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+#endif
 	x_angle = 0;
 	y_angle = 0;
 
@@ -28,31 +29,6 @@ TGLPlayer::TGLPlayer():
 	mass = 68;
 	hitting = glm::vec3(0,300,0);
 	
-	{
-		TGLMeshVertices * block_mesh_vertices = new TGLMeshVertices(useful_structures::vertex_data_block_small);
-		TGLMesh * temp_mesh = new TGLMesh(block_mesh_vertices);
-		TGLMaterial * temp_mat = new TGLMaterial();
-
-		TGLShader v_shader("vertex_shader.glsl", GL_VERTEX_SHADER);
-		TGLShader f_shader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-
-		GLenum err;
-		while ((err = glGetError()) != GL_NO_ERROR)
-		{
-			printf("GL ERROR: %d\n", err);
-		}
-
-		temp_mat->add_shader(&v_shader);
-		temp_mat->add_shader(&f_shader);
-		temp_mat->link_shader();
-
-		//temp_mesh->set_material(block_material, 0);
-		temp_mesh->set_material(temp_mat);
-		//add_component(temp_mesh);
-		temp_mesh->translate(glm::vec3(2.0, 0, 0.0));
-		temp_mesh->is_child = true;
-		debug_block = temp_mesh;
-	}
 }
 
 
@@ -74,7 +50,9 @@ void TGLPlayer::tick(double time_delta)
 	glm::vec3 up_vector(0.0, 1.0, 0.0);
 	up_vector = glm::mat3(get_rot())*up_vector;
 	glm::vec3 x_vector(1.0, 0.0, 0.0);
-	glfwGetCursorPos(gl_base.get_window(), &xpos, &ypos);
+	//glfwGetCursorPos(gl_base.get_window(), &xpos, &ypos);
+	xpos = input_handler.mouse_x;
+	ypos = input_handler.mouse_y;
 	x_angle += ypos*3.14159 / 5000;
 	while (x_angle > 3.14159)
 	{
@@ -109,7 +87,9 @@ void TGLPlayer::tick(double time_delta)
 	}
 	
 	//std::cout << "DEBUG Y POS " << debug_block->pos.y << ", " << "X POS" << debug_block->pos.x << ", " << "Z POS" << debug_block->pos.z << "\n";
+#ifdef _TGL_CLIENT
 	glfwSetCursorPos(gl_base.get_window(), 0, 0);
+#endif
 
 	glm::vec3 forward_vector_crosshair(1.0, 0.0, 0.0);
 
@@ -119,7 +99,7 @@ void TGLPlayer::tick(double time_delta)
 
 	crosshair = forward_vector_crosshair;
 
-	if (key_states['w'])
+	if (input_handler.key_states['w'])
 	{
 		//glm::vec3 forward_vector(time_delta * 50 * sin(-y_angle), vel.y, time_delta*50*cos(-y_angle));
 		
@@ -140,14 +120,14 @@ void TGLPlayer::tick(double time_delta)
 		vel.x = 0;
 		vel.z = 0;
 	}
-	if (key_states['s'])
+	if (input_handler.key_states['s'])
 	{
 		glm::vec3 forward_vector(0.0, 0.0, time_delta*-30);
 
 		forward_vector = forward_vector*glm::mat3(get_rot());
 		
 	}
-	if (key_states[' '])
+	if (input_handler.key_states[' '])
 	{
 		if (get_on_ground())
 		{

@@ -21,7 +21,9 @@ double clamp(double value, double min, double max)
 
 TGLPhysicsEngine::TGLPhysicsEngine()
 {
-	fopen_s(&out_file, "test.text", "a");
+
+	//fopen(&out_file, "test.text", "a");
+
 }
 
 

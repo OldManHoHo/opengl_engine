@@ -13,6 +13,8 @@
 #include "TGLChunk.h"
 #include "TGLMesh.h"
 #include "BlockGenerator.h"
+//#include "TMCDroppedItem.h"
+
 
 struct face_map_pair
 {
@@ -28,6 +30,18 @@ struct block_hit
 	glm::vec3 loc;
 	e_block_type type;
 	hit_properties props;
+};
+
+template <class keyClass, class elementClass>
+class chunk_searcher
+{
+	
+public:
+	std::map <keyClass, std::vector<elementClass>> listing;
+	void add_item(elementClass in_item, keyClass key);
+	void remove_item(elementClass in_item, keyClass key);
+	keyClass find_item(elementClass in_item);
+
 };
 
 class TGLChunkSpawn : public TGLActor
@@ -48,6 +62,8 @@ class TGLChunkSpawn : public TGLActor
 	std::deque <block_hit> posted_hits;
 	static const unsigned int hits_to_break = 1;
 	std::deque <block_def> posted_placements;
+	//td::unordered_map <chunk_coord, std::vector<TGLActor*>> dropped_items;
+	chunk_searcher<chunk_coord, TGLActor*> dropped_items;
 
 	bool test_chunk;
 	static e_block_type pointed_at;
@@ -77,6 +93,8 @@ public:
 	void post_hit(block_hit in_hit);
 	
 	void post_placement(block_def in_block);
+
+	std::vector <TGLActor*> collect_nearby_dropped_items(glm::vec3 pos, double radius);
 	
 };
 

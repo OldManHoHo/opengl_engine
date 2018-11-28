@@ -18,5 +18,8 @@ namespace useful_structures
 	extern std::vector <GLfloat> vertex_data_block_small;
 
 	extern std::vector <GLfloat> vertex_data_block;
+
+	TGLMesh * create_cube_mesh();
+
 }
 #endif

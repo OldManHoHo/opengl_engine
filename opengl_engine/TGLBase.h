@@ -53,6 +53,7 @@ public:
 	void update();
 	void add_mesh(TGLMesh * in_mesh);
 	void add_actor(TGLActor * in_actor);
+	void remove_actor(TGLActor * in_actor);
 	void add_camera(TGLCamera * in_camera);
 	void add_hud_element(TGLHudElement * in_element);
 	void load_model(float * vertices);

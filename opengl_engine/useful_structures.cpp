@@ -97,4 +97,28 @@ namespace useful_structures
 		-1.0f,-1.0f,1.0f,
 		1.0f,-1.0f,1.0f,
 	};
+
+	TGLMesh * create_cube_mesh()
+	{
+		TGLMeshVertices * block_mesh_vertices = new TGLMeshVertices(useful_structures::vertex_data_block_small);
+		TGLMesh * temp_mesh = new TGLMesh(block_mesh_vertices);
+		TGLMaterial * temp_mat = new TGLMaterial();
+
+		TGLShader v_shader("vertex_shader.glsl", GL_VERTEX_SHADER);
+		TGLShader f_shader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+
+		GLenum err;
+		while ((err = glGetError()) != GL_NO_ERROR)
+		{
+			printf("GL ERROR: %d\n", err);
+		}
+
+		temp_mat->add_shader(&v_shader);
+		temp_mat->add_shader(&f_shader);
+		temp_mat->link_shader();
+
+		//temp_mesh->set_material(block_material, 0);
+		temp_mesh->set_material(temp_mat);
+		return temp_mesh;
+	}
 }

@@ -1,6 +1,7 @@
 #include "TMCPlayer.h"
 #include "TGLBase.h"
 #include "useful_structures.h"
+#include "TMCDroppedItem.h"
 
 extern TGLBase gl_base;
 
@@ -30,6 +31,8 @@ void TMCPlayer::init_inventory(int num_slots)
 	}
 }
 
+extern TGLActor debug_actor;
+
 void TMCPlayer::tick(double time_delta)
 {
     TGLPlayer::tick(time_delta);
@@ -40,6 +43,14 @@ void TMCPlayer::tick(double time_delta)
 	time_since_last_left += time_delta;
 	time_since_last_right += time_delta;
     
+	std::vector <TGLActor*> collected_items = chunk_spawn->collect_nearby_dropped_items(get_pos(), item_collect_radius);
+	for (auto item : collected_items)
+	{
+		inventory.change_quantity(((TMCDroppedItem*)item)->item_type, 1);
+		gl_base.remove_actor(item);
+		delete item;
+	}
+
     if (glfwGetMouseButton(gl_base.get_window(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 	{
 		
@@ -66,6 +77,7 @@ void TMCPlayer::tick(double time_delta)
 				hit_to_post.props = props;
 				hit_to_post.type = item_id_to_block_type(get_equipped().type);
 				chunk_spawn->post_hit(hit_to_post);
+
 			}
 			time_since_last_left = 0;
 		}

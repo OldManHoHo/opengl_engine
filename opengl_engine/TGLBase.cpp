@@ -283,6 +283,18 @@ void TGLBase::add_actor(TGLActor * in_actor)
 	actors.push_back(in_actor);
 }
 
+void TGLBase::remove_actor(TGLActor * in_actor)
+{
+	for (int i = 0; i < actors.size(); ++i)
+	{
+		if (actors[i] == in_actor)
+		{
+			actors[i] = actors[actors.size() - 1];
+			actors.resize(actors.size() - 1);
+		}
+	}
+}
+
 void TGLBase::add_camera(TGLCamera * in_camera)
 {
 	active_camera = in_camera;

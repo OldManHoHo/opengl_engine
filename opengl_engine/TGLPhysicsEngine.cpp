@@ -35,7 +35,7 @@ void TGLPhysicsEngine::tick(double time_delta, std::vector <TGLActor*> const & a
 	{
 		if ((*it)->get_bounds() != nullptr)
 		{
-			if(1)
+			if((*it)->mass > 0)
 			{
 				
 				//std::ofstream out_file;

@@ -1,6 +1,7 @@
 #include "TGLChunkSpawn.h"
 #include "TGLBase.h"
 #include "useful_structures.h"
+#include "TMCDroppedItem.h"
 
 #define PI 3.1415926
 
@@ -46,7 +47,37 @@ std::vector <GLfloat> vertex_data_block_small = {
 };
 */
 
+template <class keyClass, class elementClass>
+void chunk_searcher<keyClass,elementClass>::add_item(elementClass in_item, keyClass key)
+{
+	if (listing.find(key) != listing.end())
+	{
+		listing[key].push_back(in_item);
+	}
+	else
+	{
+		listing[key] = std::vector<elementClass>(1, in_item);
+	}
+}
 
+template <class keyClass, class elementClass>
+void chunk_searcher<keyClass, elementClass>::remove_item(elementClass in_item, keyClass key)
+{
+	if (listing.find(key) != listing.end())
+	{
+		for (int i = 0; i < listing[key].size(); ++i)
+		{
+			if (listing[key][i] == in_item)
+			{
+				listing[key][i] = listing[key][listing[key].size() - 1];
+				listing[key].resize(listing[key].size() - 1);
+			}
+		}
+	}
+}
+template <class keyClass, class elementClass>
+keyClass chunk_searcher<keyClass, elementClass>::find_item(elementClass in_item)
+{}
 
 
 TGLChunkSpawn::TGLChunkSpawn():
@@ -331,7 +362,7 @@ void TGLChunkSpawn::tick(double time_delta)
 			next_block_crosshair = ray_cast_block_finder(player->get_pos(), player->crosshair, player->get_pos() + next_ray_crosshair*1.01f, next_ray_crosshair);
 			block_type_crosshair = block_generator->get_point(next_block_crosshair.x, next_block_crosshair.z, next_block_crosshair.y);
 		}
-		debug_actor.set_pos(next_ray_crosshair + player->get_pos());
+		//debug_actor.set_pos(next_ray_crosshair + player->get_pos());
 		// End 3D Crosshair
 		
 		// Process hits
@@ -351,6 +382,13 @@ void TGLChunkSpawn::tick(double time_delta)
 				if (was_deleted)
 				{
 					block_generator->set_point(bt_air, hit.loc.x, hit.loc.z, hit.loc.y);
+
+					TMCDroppedItem * added = new TMCDroppedItem(block_type_to_item_id(type_to_remove));
+					((TGLMesh*)(added->get_components()[0]))->set_material(block_material, (e_block_type)(type_to_remove - 1));
+					added->set_pos(hit.loc);
+					//debug_actor.set_pos(hit_block);
+					gl_base.add_actor((TGLActor*)added);
+					dropped_items.add_item((TGLActor*)added, chunk_coord(chunk_x, chunk_y));
 				}
 
 
@@ -812,4 +850,28 @@ void TGLChunkSpawn::post_hit(block_hit in_hit)
 void TGLChunkSpawn::post_placement(block_def in_block)
 {
 	posted_placements.push_back(in_block);
+}
+
+std::vector <TGLActor*> TGLChunkSpawn::collect_nearby_dropped_items(glm::vec3 pos, double radius)
+{
+	std::vector <TGLActor*> out_items;
+	chunk_coord chnk(0,0);
+	get_chunk_of_point(pos, chnk.x, chnk.y);
+	std::vector <chunk_coord> near_coords = { chnk, chunk_coord(chnk.x + 1,chnk.y), chunk_coord(chnk.x - 1,chnk.y), chunk_coord(chnk.x,chnk.y + 1), chunk_coord(chnk.x,chnk.y - 1) };
+
+	for (auto coord : near_coords)
+	{
+		std::vector <TGLActor*>& chunk_items = dropped_items.listing[coord];
+		for (auto vec_it : chunk_items)
+		{
+			glm::vec3 item_pos = vec_it->get_pos();
+			if (glm::length(item_pos - pos) < radius)
+			{
+				dropped_items.remove_item(vec_it, coord);
+				out_items.push_back(vec_it);
+			}
+		}
+	}
+
+	return out_items;
 }

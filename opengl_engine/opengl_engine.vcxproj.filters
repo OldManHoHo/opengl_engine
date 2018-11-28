@@ -114,6 +114,9 @@
     <ClInclude Include="..\tmc\TMCPlayer.h">
       <Filter>Header Files\tcm</Filter>
     </ClInclude>
+    <ClInclude Include="TMCDroppedItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\glad.c">
@@ -214,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="..\tmc\TMCPlayer.cpp">
       <Filter>Source Files\tcm</Filter>
+    </ClCompile>
+    <ClCompile Include="TMCDroppedItem.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

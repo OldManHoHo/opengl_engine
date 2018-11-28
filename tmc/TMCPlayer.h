@@ -13,6 +13,7 @@ class TMCPlayer : public TGLPlayer
     static const int inventory_slot_border = 10;
     static const int inventory_screen_pos_x = 100;
     static const int inventory_screen_pos_y = 100;
+	static const int item_collect_radius = 2;
     glm::vec3 equipped_border_color;
     glm::vec3 unequipped_border_color;
     

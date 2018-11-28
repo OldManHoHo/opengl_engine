@@ -316,6 +316,15 @@ int TGLMesh::add_instance(glm::vec3 loc)
 	}
 	else
 	{
+		refresh_instances();
+		local_vbo_mem.resize((instance_count + 50) * 3, 0.0);
+		local_vbo_mem[instance_count * 3] = loc.x;
+		local_vbo_mem[instance_count * 3 + 1] = loc.y;
+		local_vbo_mem[instance_count * 3 + 2] = loc.z;
+		buffer_size = instance_count + 50;
+		instance_count += 1;
+		glBufferData(GL_ARRAY_BUFFER, (instance_count + 50) * 3 * sizeof(GLfloat), &local_vbo_mem[0], GL_DYNAMIC_DRAW);
+		return instance_count - 1;
 		printf("TOO MANY INSTANCES\n");
 	}
 }

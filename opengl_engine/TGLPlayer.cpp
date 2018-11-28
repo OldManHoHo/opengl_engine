@@ -13,7 +13,7 @@ extern TGLBase gl_base;
 
 TGLPlayer::TGLPlayer():
 	inventory(10, 10),
-	multi_press_threshold(0.5)
+	multi_press_threshold(0.25)
 {
 	glfwSetInputMode(gl_base.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	x_angle = 0;

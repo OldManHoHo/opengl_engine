@@ -34,15 +34,17 @@ void TMCPlayer::tick(double time_delta)
 {
     TGLPlayer::tick(time_delta);
 
-	static double time_since_last = 10;
+	static double time_since_last_left = 10;
+	static double time_since_last_right = 10;
 
-	time_since_last += time_delta;
+	time_since_last_left += time_delta;
+	time_since_last_right += time_delta;
     
     if (glfwGetMouseButton(gl_base.get_window(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 	{
 		
 
-		if (time_since_last >= multi_press_threshold)
+		if (time_since_last_left >= multi_press_threshold)
 		{
 			glm::vec3 forward_vector(1.0, 0.0, 0.0);
 
@@ -65,29 +67,36 @@ void TMCPlayer::tick(double time_delta)
 				hit_to_post.type = item_id_to_block_type(get_equipped().type);
 				chunk_spawn->post_hit(hit_to_post);
 			}
-			time_since_last = 0;
+			time_since_last_left = 0;
 		}
 	}
 	if (glfwGetMouseButton(gl_base.get_window(), GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
 	{
-		glm::vec3 forward_vector(1.0, 0.0, 0.0);
-		
-		forward_vector = glm::mat3(get_rot())*forward_vector;
-		//forward_vector += pos;
-		//forward_vector += glm::vec3(0.0, 0.5, 0);
-		
-		set_hitting(forward_vector);
-		e_block_type hit_type;
-		glm::vec3 block_to_add;
-		glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(get_pos(), forward_vector, max_hit_distance, hit_type, block_to_add);
-		
-		
-		if (chunk_spawn != nullptr)
+		if (time_since_last_right >= multi_press_threshold)
 		{
-		    e_block_type type_to_add = item_id_to_block_type(get_equipped().type);
-		    chunk_spawn->post_placement(block_def(block_to_add.x, block_to_add.y, block_to_add.z, type_to_add));
-		    change_inventory_amount(get_equipped().type, -1);
+			glm::vec3 forward_vector(1.0, 0.0, 0.0);
+
+			forward_vector = glm::mat3(get_rot())*forward_vector;
+			//forward_vector += pos;
+			//forward_vector += glm::vec3(0.0, 0.5, 0);
+
+			set_hitting(forward_vector);
+			e_block_type hit_type;
+			glm::vec3 block_to_add;
+			glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(get_pos(), forward_vector, max_hit_distance, hit_type, block_to_add);
+
+
+			if (chunk_spawn != nullptr)
+			{
+				e_block_type type_to_add = item_id_to_block_type(get_equipped().type);
+				if (type_to_add != bt_invalid)
+				{
+					chunk_spawn->post_placement(block_def(block_to_add.x, block_to_add.y, block_to_add.z, type_to_add));
+					change_inventory_amount(get_equipped().type, -1);
+				}
+			}
 		}
+		time_since_last_right = 0;
 	}
 	
 	static int equipped_index = 0;

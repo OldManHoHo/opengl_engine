@@ -12,6 +12,7 @@ class TGLCamera : public TGLActor
 	glm::mat4 view;
 
 public:
+	glm::vec3 eye_loc;
 	TGLCamera();
 	~TGLCamera();
 	void set_projection(glm::mat4 in_mat);

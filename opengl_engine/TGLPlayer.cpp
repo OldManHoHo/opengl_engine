@@ -24,7 +24,7 @@ TGLPlayer::TGLPlayer():
 			glm::vec3(0.0f, 5.0f, -5.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f)));
 
-	TGLBounds * new_bounds = new TGLBlockBounds(0.9, 3.2, 0.9);
+	TGLBounds * new_bounds = new TGLBlockBounds(0.925, 1.85, 0.925);
 	set_bounds(new_bounds);
 	mass = 68;
 	hitting = glm::vec3(0,300,0);

@@ -31,7 +31,8 @@ glm::mat4 TGLCamera::get_view()
 	glm::vec3 up(0.0f, 1.0f, 0.0f);
 	forward = glm::mat3(get_rot())*forward;
 	up = glm::mat3(get_rot())*up;
-	view = glm::lookAt(get_pos(), get_pos() + forward, up);
+	eye_loc = get_pos() + up*float(1.65 - 1.85 / 2);
+	view = glm::lookAt(eye_loc, eye_loc + forward, up);
 	return view;
 }
 

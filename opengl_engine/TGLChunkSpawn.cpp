@@ -491,6 +491,19 @@ void TGLChunkSpawn::tick(double time_delta)
 
 		chunks_to_load = get_chunks(-int(player->get_pos().x/16), -int(player->get_pos().z/16), 10, first_angle, second_angle);
 
+#ifdef _TGL_CLIENT
+		for (auto it = chunks_to_load.begin(); it != chunks_to_load.end(); ++it)
+		{
+			if (chunks.find((*it)) == chunks.end())
+			{
+				//printf("Spawning %d, %d\n", (*it).x, (*it).y);
+
+				//client_request_chunk((*it).x, (*it).y);
+				spawn_chunk((*it).x, (*it).y);
+				break;
+			}
+		}
+#else
 		for (auto it = chunks_to_load.begin(); it != chunks_to_load.end(); ++it)
 		{
 			if (chunks.find((*it)) == chunks.end())
@@ -511,6 +524,7 @@ void TGLChunkSpawn::tick(double time_delta)
 				break;
 			}
 		}
+#endif
 #endif
 		time_sum = 0;
 	}

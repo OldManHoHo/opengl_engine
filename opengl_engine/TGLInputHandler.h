@@ -1,4 +1,9 @@
+#ifndef _TGL_INPUTHANDLER
+#define _TGL_INPUTHANDLER
+
 #include <map>
+
+#include "tgl_gl.h"
 
 class TGLInputHandler
 {
@@ -8,3 +13,5 @@ public:
     TGLInputHandler();
     void tick(double time_delta);
 };
+
+#endif

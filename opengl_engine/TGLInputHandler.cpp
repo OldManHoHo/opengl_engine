@@ -1,4 +1,7 @@
 #include "TGLInputHandler.h"
+#include "TGLBase.h"
+
+extern TGLBase gl_base;
 
 TGLInputHandler::TGLInputHandler()
 {
@@ -9,6 +12,11 @@ TGLInputHandler::TGLInputHandler()
     key_states[' '] = false;
     key_states[1] = false;
     key_states[2] = false;
+	key_states['1'] = false;
+	key_states['1'+1] = false;
+	key_states['1'+2] = false;
+	key_states['1'+3] = false;
+	key_states['1'+4] = false;
 }
 
 void TGLInputHandler::tick(double time_delta)
@@ -16,6 +24,7 @@ void TGLInputHandler::tick(double time_delta)
 #ifdef _TGL_SERVER
     
 #elif defined(_TGL_CLIENT)
+	glfwGetCursorPos(gl_base.get_window(), &mouse_x, &mouse_y);
     if (glfwGetKey(gl_base.get_window(), GLFW_KEY_W) == GLFW_PRESS)
 	{
 	    key_states['w'] = true;
@@ -71,6 +80,17 @@ void TGLInputHandler::tick(double time_delta)
 	else
 	{
 	    key_states[2] = false;
+	}
+	for (int i = 0; i < 9; ++i)
+	{
+		if (glfwGetKey(gl_base.get_window(), GLFW_KEY_1 + i) == GLFW_PRESS)
+		{
+			key_states['1' + i] = true;
+		}
+		else
+		{
+			key_states['1' + i] = false;
+		}
 	}
 #endif
 }

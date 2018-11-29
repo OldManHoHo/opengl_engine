@@ -75,6 +75,7 @@ public:
 	glm::vec3 get_block_pointed_at(glm::vec3 origin, glm::vec3 pointing_vector, double max_distance, e_block_type& out_block_type, glm::vec3& out_prev_block);
 	void tick(double time_delta);
 	void spawn_chunk(int chunk_x, int chunk_y);
+	void despawn_chunk(int chunk_x, int chunk_y);
 	std::vector <GLfloat> create_uv_map(std::vector <face_map_pair> pairs);
 	bool between_angles(float x, float y, float in_angle_1, float in_angle_2);
 	std::vector <chunk_coord> get_chunks(int x0, int y0, int radius, float view_angle_1, float view_angle_2);

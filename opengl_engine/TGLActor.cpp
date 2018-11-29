@@ -23,6 +23,10 @@ TGLActor::TGLActor():
 
 TGLActor::~TGLActor()
 {
+	for (auto c : components)
+	{
+		delete c;
+	}
 }
 
 

@@ -108,6 +108,10 @@ TGLMesh::TGLMesh(TGLMeshVertices const* in_vertices)
 
 TGLMesh::~TGLMesh()
 {
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &normal_VBO);
+	glDeleteBuffers(1, &instance_VBO);
 }
 
 GLuint TGLMesh::new_attrib()

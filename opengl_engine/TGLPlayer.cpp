@@ -94,6 +94,7 @@ void TGLPlayer::tick(double time_delta)
 	glm::vec3 forward_vector_crosshair(1.0, 0.0, 0.0);
 
 	forward_vector_crosshair = glm::mat3(get_rot())*forward_vector_crosshair;
+	forward_vec = forward_vector_crosshair;
 	//forward_vector += pos;
 	//forward_vector += glm::vec3(0.0, 0.5, 0);
 

@@ -8,7 +8,9 @@ TMCDroppedItem::TMCDroppedItem(TGLItemId in_item_type):
 	set_bounds(new_bounds);
 	mass = 10;
 	{
+#ifdef _TGL_CLIENT
 		add_component(useful_structures::create_cube_mesh());
+#endif
 		set_scale(glm::vec3(0.1, 0.1, 0.1));
 	}
 }

@@ -662,9 +662,11 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 
 void TGLChunkSpawn::despawn_chunk(int chunk_x, int chunk_y)
 {
+#ifdef _TGL_CLIENT
 	gl_base.remove_actor(chunks[chunk_coord(chunk_x, chunk_y)]);
 	delete chunks[chunk_coord(chunk_x, chunk_y)];
 	chunks.erase(chunk_coord(chunk_x, chunk_y));
+#endif
 }
 
 std::vector <GLfloat> TGLChunkSpawn::create_uv_map(std::vector <face_map_pair> pairs)

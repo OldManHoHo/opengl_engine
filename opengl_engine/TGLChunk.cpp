@@ -4,6 +4,7 @@
 
 TGLChunk::TGLChunk(TGLMeshVertices * mesh_vertices, TGLMaterial * block_material, int type_count, std::vector <std::vector <GLfloat>> instances)
 {
+	is_chunk = true;
 	block_instances = instances;
 	static_physics = true;
 	for (int i = 0; i < type_count; ++i)

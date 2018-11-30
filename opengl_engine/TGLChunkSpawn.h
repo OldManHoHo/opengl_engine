@@ -88,6 +88,7 @@ public:
 	
 	void client_request_chunk(int chunk_x, int chunk_y);
 	void server_send_chunk_mods(int chunk_x, int chunk_y);
+	bool chunk_in_fov(int chunk_x, int chunk_y, glm::vec3 player, glm::vec3 player_forward);
 };
 
 #endif

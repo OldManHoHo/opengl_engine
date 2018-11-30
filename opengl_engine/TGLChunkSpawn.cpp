@@ -532,6 +532,8 @@ void TGLChunkSpawn::tick(double time_delta)
 		chunks_to_load = get_chunks(chunk_x, chunk_y, 10, first_angle, second_angle);
 		*/
 #ifdef _TGL_CLIENT
+		if (chunks.size() < 400)
+		{
 		for (auto it = chunks_to_load.begin(); it != chunks_to_load.end(); ++it)
 		{
 			if (chunks.find((*it)) == chunks.end())
@@ -539,9 +541,12 @@ void TGLChunkSpawn::tick(double time_delta)
 				//printf("Spawning %d, %d\n", (*it).x, (*it).y);
 
 				//client_request_chunk((*it).x, (*it).y);
-				spawn_chunk((*it).x, (*it).y);
+				
+					spawn_chunk((*it).x, (*it).y);
+				
 				break;
 			}
+		}
 		}
 		for (auto it = chunks.begin(); it != chunks.end(); ++it)
 		{
@@ -601,7 +606,7 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 				instances[tp].push_back(180);
 				instances[tp].push_back(j-1);
 			}
-			else if (chunk_x == 0 && chunk_y == 0)
+			else if (chunk_x == 0 && chunk_y == 0 && 0)
 			{
 				for (int k = 150; k < 256; k++)
 				{
@@ -610,7 +615,7 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 					instances[bt_dirt_with_grass - 1].push_back(j - 1);
 				}
 			}
-			else if (chunk_x == 5 && chunk_y == 0)
+			else if (chunk_x == 5 && chunk_y == 0 && 0)
 			{
 				for (int k = 150; k < 256; k++)
 				{
@@ -619,7 +624,7 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 					instances[bt_dirt - 1].push_back(j - 1);
 				}
 			}
-			else if (chunk_x == 0 && chunk_y == 5)
+			else if (chunk_x == 0 && chunk_y == 5 && 0)
 			{
 				for (int k = 150; k < 256; k++)
 				{
@@ -894,4 +899,27 @@ void TGLChunkSpawn::server_send_chunk_mods(int chunk_x, int chunk_y)
 {
 	//void * chunk_mods = create_chunk_mod_message(chunk_x, chunk_y);
 	//queue_network_message(chunk_mods);
+}
+
+bool TGLChunkSpawn::chunk_in_fov(int chunk_x, int chunk_y, glm::vec3 player, glm::vec3 player_forward)
+{
+	glm::vec3 chunk_angle = glm::vec3(player_forward.x, 0, player_forward.z) / glm::length(glm::vec3(player_forward.x, 0, player_forward.z));
+
+	glm::vec3 between_vec = glm::normalize(glm::vec3(chunk_x * 16, player.y, chunk_y * 16) - player);
+	double angle_between = acos(glm::dot(chunk_angle, between_vec));
+	int p_chunk_x, p_chunk_y;
+	get_chunk_of_point(player, p_chunk_x, p_chunk_y);
+	double chunk_distance = glm::length(glm::vec2(p_chunk_x, p_chunk_y) - glm::vec2(chunk_x, chunk_y));
+	if (chunk_distance < 2)
+	{
+		return true;
+	}
+	if (angle_between > 3.14159 / 2.25)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }

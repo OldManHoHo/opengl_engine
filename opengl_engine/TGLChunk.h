@@ -15,6 +15,8 @@ class TGLChunk : public TGLActor
 {
 	std::vector <std::vector <GLfloat>> block_instances;
 public:
+	//const int x;
+	//const int y;
 	TGLChunk(TGLMeshVertices * mesh_vertices, TGLMaterial * block_material, int type_count, std::vector <std::vector <GLfloat>> instances);
 	~TGLChunk();
 

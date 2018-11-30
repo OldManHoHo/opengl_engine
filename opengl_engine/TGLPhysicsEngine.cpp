@@ -233,9 +233,9 @@ void TGLPhysicsEngine::collide_aligned_block_and_block2(TGLActor * in_actor, glm
 	if (y_pen > 0 && x_pen > 0 && z_pen > 0)
 	{
 		// Collision detected
-		glm::vec3 collision_pos_1 = in_actor->vel*abs(float(y_pen / in_actor->vel.y));
-		glm::vec3 collision_pos_2 = in_actor->vel*abs(float(x_pen / in_actor->vel.x));
-		glm::vec3 collision_pos_3 = in_actor->vel*abs(float(z_pen / in_actor->vel.z));
+		glm::vec3 collision_pos_1 = in_actor->vel*float(abs(y_pen / in_actor->vel.y));
+		glm::vec3 collision_pos_2 = in_actor->vel*float(abs(x_pen / in_actor->vel.x));
+		glm::vec3 collision_pos_3 = in_actor->vel*float(abs(z_pen / in_actor->vel.z));
 		glm::vec3 collision_pos;
 		double l1 = glm::length(collision_pos_1);
 		double l2 = glm::length(collision_pos_2);

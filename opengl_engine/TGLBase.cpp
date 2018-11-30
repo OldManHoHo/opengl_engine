@@ -173,7 +173,7 @@ void TGLBase::update()
 	auto duration = std::chrono::duration_cast< std::chrono::microseconds> (end - begin);
 	time_count++;
 	double time_delta = duration.count() / 1000000.0;
-	time_delta = 1.0 / 180;
+	//time_delta = 1.0 / 1000;
 	time_sum += time_delta;
 	begin = std::chrono::steady_clock::now();
 	

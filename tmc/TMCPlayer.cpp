@@ -87,7 +87,6 @@ void TMCPlayer::tick(double time_delta)
 				hit_to_post.props = props;
 				hit_to_post.type = item_id_to_block_type(get_equipped().type);
 				chunk_spawn->post_hit(hit_to_post);
-
 			}
 			time_since_last_left = 0;
 		}

@@ -361,15 +361,15 @@ e_block_type BlockGenerator::index(int in_x, int in_y, int in_z)
 
 bool BlockGenerator::is_visible(int in_x, int in_y, int in_z)
 {
-	if (index(in_x, in_y, in_z + 1) != 0 && index(in_x, in_y, in_z + 1) != 5 && index(in_x, in_y, in_z + 1) != 6)
+	if (index(in_x, in_y, in_z + 1) != 0 && index(in_x, in_y, in_z + 1) != 5 && index(in_x, in_y, in_z + 1) != 6 )
 	{
-		if (index(in_x, in_y, in_z - 1) != 0 && index(in_x, in_y, in_z - 1) != 5 && index(in_x, in_y, in_z - 1) != 6)
+		if (index(in_x, in_y, in_z - 1) != 0 && index(in_x, in_y, in_z - 1) != 5 && index(in_x, in_y, in_z - 1) != 6 )
 		{
-			if (index(in_x, in_y + 1, in_z) != 0 && index(in_x, in_y + 1, in_z) != 5 && index(in_x, in_y + 1, in_z) != 6)
+			if (index(in_x, in_y + 1, in_z) != 0 && index(in_x, in_y + 1, in_z) != 5 && index(in_x, in_y + 1, in_z) != 6 )
 			{
-				if (index(in_x, in_y - 1, in_z) != 0 && index(in_x, in_y - 1, in_z) != 5 && index(in_x, in_y - 1, in_z) != 6)
+				if (index(in_x, in_y - 1, in_z) != 0 && index(in_x, in_y - 1, in_z) != 5 && index(in_x, in_y - 1, in_z) != 6 )
 				{
-					if (index(in_x + 1, in_y, in_z) != 0 && index(in_x + 1, in_y, in_z) != 5 && index(in_x + 1, in_y, in_z) != 6)
+					if (index(in_x + 1, in_y, in_z) != 0 && index(in_x + 1, in_y, in_z) != 5 && index(in_x + 1, in_y, in_z) != 6 )
 					{
 						if (index(in_x - 1, in_y, in_z) != 0 && index(in_x - 1, in_y, in_z) != 5 && index(in_x - 1, in_y, in_z) != 6)
 						{

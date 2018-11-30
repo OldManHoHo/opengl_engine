@@ -15,7 +15,7 @@
 class TGLPlayer : public TGLCamera
 {
 	TGLMesh * debug_block;
-	
+	TGLInventoryItem blank_item;
 	
 protected:
 	TGLInputHandler input_handler;

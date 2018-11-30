@@ -10,9 +10,10 @@
 //extern std::vector <GLfloat> vertex_data_block_small;
 extern TGLBase gl_base;
 
-TGLPlayer::TGLPlayer():
+TGLPlayer::TGLPlayer() :
 	inventory(10, 10),
-	multi_press_threshold(0.25)
+	multi_press_threshold(0.25),
+	blank_item(none, 0)
 {
 #ifdef _TGL_CLIENT
 	glfwSetInputMode(gl_base.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -133,6 +134,10 @@ void TGLPlayer::tick(double time_delta)
 		if (get_on_ground())
 		{
 			vel.y += 5;
+			if (vel.y > 5)
+			{
+				vel.y = 5;
+			}
 		}
 	}
 
@@ -156,7 +161,14 @@ void TGLPlayer::add_hud(TGLHudElement * in_hud)
 
 TGLInventoryItem& TGLPlayer::get_equipped()
 {
-	return *equipped_item;
+	if (equipped_item != nullptr)
+	{
+		return *equipped_item;
+	}
+	else
+	{
+		return blank_item;
+	}
 }
 
 bool TGLPlayer::change_inventory_amount(TGLItemId item_type, int in_amount)

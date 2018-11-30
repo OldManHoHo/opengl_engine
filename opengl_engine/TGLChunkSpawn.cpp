@@ -335,7 +335,7 @@ glm::vec3 TGLChunkSpawn::get_block_pointed_at(glm::vec3 origin, glm::vec3 pointi
 		e_block_type block_type_crosshair = bt_air;
 		glm::vec3 next_block_crosshair = origin;
 		glm::vec3 prev_block_crosshair = next_block_crosshair;
-		while (block_type_crosshair == bt_air && glm::length(origin - next_block_crosshair) < max_distance)
+		while ((block_type_crosshair == bt_water || block_type_crosshair == bt_air) && glm::length(origin - next_block_crosshair) < max_distance)
 		{
 			prev_block_crosshair = next_block_crosshair;
 			next_block_crosshair = ray_cast_block_finder(origin, pointing_vector, origin + next_ray_crosshair*1.01f, next_ray_crosshair);
@@ -643,7 +643,7 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 					//{
 					//	printf("FART\n");
 					//}
-					if (block_type > 0 && block_generator->is_visible(i, j, k) && k > 150)
+					if (block_type > 0 && block_generator->is_visible(i, j, k) && k > 100)
 					{
 						instances[block_type - 1].push_back(i-1);
 						instances[block_type - 1].push_back(k);

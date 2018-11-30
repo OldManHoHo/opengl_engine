@@ -43,14 +43,28 @@ void TGLPhysicsEngine::tick(double time_delta, std::vector <TGLActor*> const & a
 		{
 			if((*it)->mass > 0)
 			{
-				
+				double speed_mult = 1.0;
 				//std::ofstream out_file;
 				//out_file.open("test.txt", std::ios::app);
 				
+				TGLBlockBounds * bounds = (TGLBlockBounds*)(*it)->get_bounds();
+				glm::vec3 feet = (*it)->get_pos() - glm::vec3(0, bounds->height, 0);
+
+				feet = glm::vec3(round(feet.x), round(feet.y), round(feet.z));
+
+				e_block_type in_type = chunks_spawner->get_point(round(feet.x), round(feet.z), round(feet.y));
+
 				(*it)->set_on_ground(false);
 				(*it)->vel += float(time_delta)*(*it)->accel + float(time_delta*9.81)*glm::vec3(0, -1.0, 0);
+
+				if (in_type == bt_water)
+				{
+					speed_mult = 0.25;
+					(*it)->set_on_ground(true);
+				}
+
 				std::vector <glm::vec3> collision_blocks = get_world_blocks((*it), chunks_spawner);
-				move(time_delta, (*it), collision_blocks);
+				move(time_delta, (*it), collision_blocks, speed_mult);
 				/*
 				
 				for (auto block_it = collision_blocks.begin(); block_it != collision_blocks.end(); ++block_it)
@@ -135,7 +149,7 @@ std::vector <glm::vec3> TGLPhysicsEngine::get_world_blocks(TGLActor * in_actor, 
 			{
 				e_block_type block_type = chunks_spawner->get_point(x[i], z[k],y[j]);
 				
-				if (block_type != bt_air)
+				if (block_type != bt_air && block_type != bt_water)
 				{
 					out_points.push_back(glm::vec3(x[i], y[j], z[k]));
 					
@@ -162,7 +176,7 @@ std::vector <glm::vec3> TGLPhysicsEngine::get_world_blocks(TGLActor * in_actor, 
 	return out_points;
 }
 
-void TGLPhysicsEngine::move(double time_delta, TGLActor * in_actor, std::vector <glm::vec3>  in_blocks)
+void TGLPhysicsEngine::move(double time_delta, TGLActor * in_actor, std::vector <glm::vec3>  in_blocks, double in_speed_mult)
 {
 	TGLBlockBounds * actor_bounds = (TGLBlockBounds*)(in_actor->get_bounds());
 	double block_height = 1.0;
@@ -173,7 +187,7 @@ void TGLPhysicsEngine::move(double time_delta, TGLActor * in_actor, std::vector 
 
 
 
-	in_actor->pos.x += in_actor->vel.x*time_delta;
+	in_actor->pos.x += in_actor->vel.x*time_delta*in_speed_mult;
 
 	for (auto in_block : in_blocks)
 	{
@@ -187,7 +201,7 @@ void TGLPhysicsEngine::move(double time_delta, TGLActor * in_actor, std::vector 
 		}
 	}
 
-	in_actor->pos.z += in_actor->vel.z*time_delta;
+	in_actor->pos.z += in_actor->vel.z*time_delta*in_speed_mult;
 
 	for (auto in_block : in_blocks)
 	{
@@ -201,7 +215,7 @@ void TGLPhysicsEngine::move(double time_delta, TGLActor * in_actor, std::vector 
 		}
 	}
 
-	in_actor->pos.y += in_actor->vel.y*time_delta;
+	in_actor->pos.y += in_actor->vel.y*time_delta*in_speed_mult;
 
 	for (auto in_block : in_blocks)
 	{

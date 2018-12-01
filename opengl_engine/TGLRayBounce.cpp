@@ -1,7 +1,8 @@
 #include "TGLRayBounce.h"
 
 
-TGLRayBounce::TGLRayBounce()
+TGLRayBounce::TGLRayBounce():
+	swapper(0)
 {
 
 
@@ -17,6 +18,7 @@ void TGLRayBounce::init()
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
 	//GLuint FramebufferName = 0;
 	glGenFramebuffers(1, &FramebufferName);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 
 	// The texture we're going to render to
@@ -46,6 +48,41 @@ void TGLRayBounce::init()
 	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
+
+
+
+	glGenFramebuffers(1, &FramebufferName2);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName2);
+
+	// The texture we're going to render to
+	glGenTextures(1, &depthTexture2);
+
+	// "Bind" the newly created texture : all future texture functions will modify this texture
+	glBindTexture(GL_TEXTURE_2D, depthTexture2);
+
+	// Give an empty image to OpenGL ( the last "0" )
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 3000, 3000, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+	// Poor filtering. Needed !
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	// The depth buffer
+	glGenRenderbuffers(1, &depthrenderbuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 3000, 3000);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
+
+	// Set "depthTexture2" as our colour attachement #0
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, depthTexture2, 0);
+
+	// Set the list of draw buffers.
+	GLenum DrawBuffers2[1] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, DrawBuffers2); // "1" is the size of DrawBuffers
+
+
+
 	v_shader = new TGLShader("ray_bounce_vertex.glsl", GL_VERTEX_SHADER);
 	f_shader = new TGLShader("ray_bounce_fragment.glsl", GL_FRAGMENT_SHADER);
 
@@ -70,4 +107,33 @@ void TGLRayBounce::set_up()
 	// Send our transformation to the currently bound shader,
 	// in the "MVP" uniform
 	glUniformMatrix4fv(depthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
+}
+
+void TGLRayBounce::swap_buffers()
+{
+	swapper = (swapper + 1) % 2;
+}
+
+GLuint TGLRayBounce::get_framebuffer()
+{
+	if (swapper == 0)
+	{
+		return FramebufferName;
+	}
+	else
+	{
+		return FramebufferName2;
+	}
+}
+
+GLuint TGLRayBounce::get_texture()
+{
+	if (swapper == 0)
+	{
+		return depthTexture2;
+	}
+	else
+	{
+		return depthTexture;
+	}
 }

@@ -593,12 +593,12 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 	}
 	int count = 0;
 
-	block_generator->get_points((chunk_x * 16 - 1), (chunk_y * 16 - 1), 0, 18);
-	//block_generator->get_points((chunk_x * 16 - 1), (chunk_y * 16 - 1), 0, 16);
+	//block_generator->get_points((chunk_x * 16 - 1), (chunk_y * 16 - 1), 0, 18);
+	block_generator->get_points((chunk_x * 16), (chunk_y * 16), 0, 16);
 	
-	for (int i = 1; i < 17; ++i)
+	for (int i = 0; i < 16; ++i)
 	{
-		for (int j = 1; j < 17; ++j)
+		for (int j = 0; j < 16; ++j)
 		{
 			if (test_chunk)
 			{
@@ -651,9 +651,9 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 					//}
 					if (block_type > 0 && block_generator->is_visible(i, j, k) && k > 100)
 					{
-						instances[block_type - 1].push_back(i-1);
+						instances[block_type - 1].push_back(i);
 						instances[block_type - 1].push_back(k);
-						instances[block_type - 1].push_back(j-1);
+						instances[block_type - 1].push_back(j);
 					}
 				}
 			}
@@ -923,4 +923,9 @@ bool TGLChunkSpawn::chunk_in_fov(int chunk_x, int chunk_y, glm::vec3 player, glm
 	{
 		return true;
 	}
+}
+
+double TGLChunkSpawn::get_block_light_value(int in_x, int in_y, int in_z)
+{
+
 }

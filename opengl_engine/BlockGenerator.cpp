@@ -250,8 +250,8 @@ e_block_type * BlockGenerator::get_points(int in_x, int in_y, int in_z, int divi
 
 							if (abs(trees_noise[counter]) + abs(noises[j*division + k])*0.1 < 0.04)
 							{
-								int chunk_x = floor((in_x+1) / 16.0);
-								int chunk_y = floor((in_y+1) / 16.0);
+								int chunk_x = floor((in_x) / 16.0);
+								int chunk_y = floor((in_y) / 16.0);
 								get_tree(trees_noise, blocks, j, k, i, chunk_x, chunk_y);
 							}
 						}
@@ -400,43 +400,43 @@ void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in
 		{
 			break;
 		}
-		in_blocks[in_x * 18 * 256 + in_y * 256 + in_z + count] = bt_tree;
-		set_point(bt_tree, chunk_x * 16 - 1 + in_x, chunk_y * 16 - 1 + in_y, in_z + count);
+		in_blocks[in_x * 16 * 256 + in_y * 256 + in_z + count] = bt_tree;
+		set_point(bt_tree, chunk_x * 16 + in_x, chunk_y * 16 + in_y, in_z + count);
 		if (count > 2)
 		{
-			if (in_y + 1 <= 17)
+			if (in_y + 1 <= 15)
 			{
-				if (abs(in_noise[in_x * 18 * 256 + (in_y + 1) * 256 + in_z + count]) > branch_prob)
+				if (abs(in_noise[in_x * 16 * 256 + (in_y + 1) * 256 + in_z + count]) > branch_prob)
 				{
-					in_blocks[in_x * 18 * 256 + (in_y + 1) * 256 + in_z + count] = bt_leaves;
-					set_point(bt_leaves, chunk_x*16 - 1 + in_x, chunk_y * 16 - 1 + in_y + 1, in_z + count);
+					in_blocks[in_x * 16 * 256 + (in_y + 1) * 256 + in_z + count] = bt_leaves;
+					set_point(bt_leaves, chunk_x*16 + in_x, chunk_y * 16 + in_y + 1, in_z + count);
 				}
 			}
 			if (in_y - 1 >= 0)
 			{
-				if (abs(in_noise[in_x * 18 * 256 + (in_y - 1) * 256 + in_z + count]) > branch_prob)
+				if (abs(in_noise[in_x * 16 * 256 + (in_y - 1) * 256 + in_z + count]) > branch_prob)
 				{
-					in_blocks[in_x * 18 * 256 + (in_y - 1) * 256 + in_z + count] = bt_leaves;
-					set_point(bt_leaves, chunk_x * 16 - 1 + in_x, chunk_y * 16 - 1 + in_y - 1, in_z + count);
+					in_blocks[in_x * 16 * 256 + (in_y - 1) * 256 + in_z + count] = bt_leaves;
+					set_point(bt_leaves, chunk_x * 16 + in_x, chunk_y * 16 + in_y - 1, in_z + count);
 				}
 			}
-			if (in_x + 1 <= 17)
+			if (in_x + 1 <= 15)
 			{
-				if (abs(in_noise[(in_x + 1) * 18 * 256 + in_y * 256 + in_z + count]) > branch_prob)
+				if (abs(in_noise[(in_x + 1) * 16 * 256 + in_y * 256 + in_z + count]) > branch_prob)
 				{
-					in_blocks[(in_x + 1) * 18 * 256 + in_y * 256 + in_z + count] = bt_leaves;
-					set_point(bt_leaves, chunk_x * 16 - 1 + in_x + 1, chunk_y * 16 - 1 + in_y, in_z + count);
+					in_blocks[(in_x + 1) * 16 * 256 + in_y * 256 + in_z + count] = bt_leaves;
+					set_point(bt_leaves, chunk_x * 16 + in_x + 1, chunk_y * 16 + in_y, in_z + count);
 				}
 			}
 			if (in_x - 1 >= 0)
 			{
-				if (abs(in_noise[(in_x - 1) * 18 * 256 + in_y * 256 + in_z + count]) > branch_prob)
+				if (abs(in_noise[(in_x - 1) * 16 * 256 + in_y * 256 + in_z + count]) > branch_prob)
 				{
-					in_blocks[(in_x - 1) * 18 * 256 + in_y * 256 + in_z + count] = bt_leaves;
-					set_point(bt_leaves, chunk_x * 16 - 1 + in_x - 1, chunk_y * 16 - 1 + in_y, in_z + count);
+					in_blocks[(in_x - 1) * 16 * 256 + in_y * 256 + in_z + count] = bt_leaves;
+					set_point(bt_leaves, chunk_x * 16 + in_x - 1, chunk_y * 16 + in_y, in_z + count);
 				}
 			}
-			if (in_noise[in_x * 18 * 256 + in_y * 256 + in_z + count] > prob)
+			if (in_noise[in_x * 16 * 256 + in_y * 256 + in_z + count] > prob)
 			{
 				break;
 			}

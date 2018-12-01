@@ -43,6 +43,11 @@ class TGLBase
 
 	GLuint default_shader_program;
 
+	glm::vec3 shadow_pos1;
+	glm::vec3 shadow_pos2;
+	glm::mat4 depthMVP1;
+	glm::mat4 depthMVP2;
+
 public:
 	TGLBase();
 	~TGLBase();

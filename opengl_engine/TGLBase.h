@@ -15,7 +15,7 @@
 #include "TGLPlayer.h"
 #include "TGLPhysicsEngine.h"
 #include "TGLHudElement.h"
-
+#include "TGLRayBounce.h"
 
 
 
@@ -23,6 +23,7 @@ class TGLBase
 {
 	int window_height;
 	int window_width;
+	
 
 #ifdef _TGL_CLIENT
 	GLFWwindow* window;
@@ -46,7 +47,7 @@ public:
 	TGLBase();
 	~TGLBase();
 
-	
+	TGLRayBounce ray_bounce;
 
 #ifdef _TGL_CLIENT
 	bool gl_init();

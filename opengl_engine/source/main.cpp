@@ -65,6 +65,9 @@ int main()
 	inventory.sub_elements.push_back(&inventory_item5);
 
 
+	TGLHudElement depth_buffer_display(500, 500, glm::vec2(100, 500), glm::vec3(0, 0, 0), "content/textures/mc.png");
+	depth_buffer_display.tex->texture = gl_base.ray_bounce.depthTexture;
+
 	debug_actor.add_component(useful_structures::create_cube_mesh());
 #endif
 	debug_actor.set_scale(glm::vec3(0.1,0.1,0.1));
@@ -85,6 +88,7 @@ int main()
 	gl_base.add_camera(&main_cam);
 	main_cam.add_hud(&inventory);
 	gl_base.add_hud_element(&inventory);
+	gl_base.add_hud_element(&depth_buffer_display);
 #endif
 	//debug_actor.set_pos(glm::vec3(0, 185, 0));
 	while (1)

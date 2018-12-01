@@ -20,6 +20,7 @@ TGLBase::~TGLBase()
 #ifdef _TGL_CLIENT
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
+
 	glViewport(0, 0, width, height);
 }
 
@@ -163,6 +164,8 @@ int TGLBase::init()
 	default_material->add_shader(&f_shader);
 	default_material->link_shader();
 	default_shader_program = default_material->get_shader_program();
+
+	ray_bounce.init();
 #endif
 }
 
@@ -177,6 +180,8 @@ void TGLBase::update()
 	time_sum += time_delta;
 	begin = std::chrono::steady_clock::now();
 	
+
+	static glm::vec3 shadow_pos;
 	if (time_count > 60)
 	{
 		printf("%f\n",(time_count/time_sum));
@@ -188,6 +193,14 @@ void TGLBase::update()
 		// input
 		processInput(window);
 
+		if (time_count % 10 == 0 || 1)
+		{
+			shadow_pos = active_camera->get_pos();
+			glBindFramebuffer(GL_FRAMEBUFFER, ray_bounce.FramebufferName);
+			glClearColor(1.0, 0.0f, 0.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
 
 		// rendering commands here
 		glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
@@ -232,7 +245,7 @@ void TGLBase::update()
 					}
 					else
 					{
-						
+
 						shader_id = default_shader_program;
 						glUseProgram(default_shader_program);
 					}
@@ -260,6 +273,60 @@ void TGLBase::update()
 						count += 1;
 					}
 
+
+					glBindFramebuffer(GL_FRAMEBUFFER, ray_bounce.FramebufferName);
+					glViewport(0, 0, 3000, 3000); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+					glUseProgram(ray_bounce.mat->get_shader_program());
+					//ray_bounce.set_up();
+
+					// Compute the MVP matrix from the light's point of view
+
+					glm::mat4 depthMVP;
+					glm::vec3 light_pos(shadow_pos.x + 10, 200, shadow_pos.z + 10);
+					double light_dist = glm::length(shadow_pos - light_pos);
+
+					glm::mat4 depthProjectionMatrix = glm::ortho<float>(-100, 100, -100, 100, light_dist - 100, light_dist + 100);
+
+					glm::mat4 depthViewMatrix = glm::lookAt(light_pos, shadow_pos, glm::vec3(1, 0, 0));
+					//glm::mat4 depthModelMatrix = glm::mat4(1.0);
+					depthMVP = depthProjectionMatrix * depthViewMatrix * actors[i]->get_transform() * mesh_comp->get_transform();
+
+					GLuint depthMatrixID = glGetUniformLocation(ray_bounce.mat->get_shader_program(), "depthMVP");
+					// Send our transformation to the currently bound shader,
+					// in the "MVP" uniform
+					
+					glUniformMatrix4fv(depthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
+
+					if (time_count % 10 == 0 || 1)
+					{
+						if (mesh_comp->get_instanced_flag())
+						{
+							glDrawArraysInstanced(GL_TRIANGLES, 0, mesh_comp->get_length(), mesh_comp->get_instance_count());
+						}
+						else
+						{
+							glDrawArrays(GL_TRIANGLES, 0, mesh_comp->get_length());
+						}
+					}
+
+					glBindFramebuffer(GL_FRAMEBUFFER, 0);
+					glViewport(0, 0, window_width, window_height);
+					glm::mat4 depthBiasMVP;
+					glUseProgram(shader_id);
+
+					glm::mat4 biasMatrix(
+						0.5, 0.0, 0.0, 0.0,
+						0.0, 0.5, 0.0, 0.0,
+						0.0, 0.0, 0.5, 0.0,
+						0.5, 0.5, 0.5, 1.0
+					);
+					depthBiasMVP = biasMatrix*depthMVP;
+
+					GLuint dbmvp = glGetUniformLocation(shader_id, "DepthBiasMVP");
+					glUniformMatrix4fv(dbmvp, 1, GL_FALSE, glm::value_ptr(depthBiasMVP));
+					glActiveTexture(GL_TEXTURE0 + 20);
+					glBindTexture(GL_TEXTURE_2D, ray_bounce.depthTexture);
+
 					if (mesh_comp->get_instanced_flag())
 					{
 						glDrawArraysInstanced(GL_TRIANGLES, 0, mesh_comp->get_length(), mesh_comp->get_instance_count());
@@ -268,6 +335,7 @@ void TGLBase::update()
 					{
 						glDrawArrays(GL_TRIANGLES, 0, mesh_comp->get_length());
 					}
+					
 				}
 #endif
 			}
@@ -295,6 +363,10 @@ void TGLBase::update()
 
 			if (HUD_elements[i]->texture_active)
 			{
+				GLuint offset_loc_1 = glGetUniformLocation(shader_id, "tex_offset_1");
+				GLuint offset_loc_2 = glGetUniformLocation(shader_id, "tex_offset_2");
+				glUniform2fv(offset_loc_1, 1, glm::value_ptr(HUD_elements[i]->top_left_tex_offset));
+				glUniform2fv(offset_loc_2, 1, glm::value_ptr(HUD_elements[i]->bottom_right_tex_offset));
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, HUD_elements[i]->tex->get_name());
 			}

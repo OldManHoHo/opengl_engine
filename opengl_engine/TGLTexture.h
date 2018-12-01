@@ -9,9 +9,9 @@ class TGLTexture
 	static GLuint texture_count;
 	
 	int nrChannels;
-	GLuint texture;
-
+	
 public:
+	GLuint texture;
 	int width;
 	int height;
 

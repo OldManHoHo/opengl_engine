@@ -21,7 +21,10 @@
   <ItemGroup>
     <ClInclude Include="..\tmc\TMCPlayer.h" />
     <ClInclude Include="BlockGenerator.h" />
+    <ClInclude Include="ray_bounce_fragment.glsl" />
+    <ClInclude Include="ray_bounce_vertex.glsl" />
     <ClInclude Include="TGLInputHandler.h" />
+    <ClInclude Include="TGLRayBounce.h" />
     <ClInclude Include="tgl_gl.h" />
     <ClInclude Include="TMCDroppedItem.h" />
     <ClInclude Include="useful_structures.h" />
@@ -84,6 +87,7 @@
     <ClCompile Include="TGLMeshVertices.cpp" />
     <ClCompile Include="TGLPhysicsEngine.cpp" />
     <ClCompile Include="TGLPlayer.cpp" />
+    <ClCompile Include="TGLRayBounce.cpp" />
     <ClCompile Include="TGLShader.cpp" />
     <ClCompile Include="TGLTexture.cpp" />
     <ClCompile Include="TMCDroppedItem.cpp" />

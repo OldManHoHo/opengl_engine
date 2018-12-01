@@ -594,6 +594,7 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 	int count = 0;
 
 	block_generator->get_points((chunk_x * 16 - 1), (chunk_y * 16 - 1), 0, 18);
+	//block_generator->get_points((chunk_x * 16 - 1), (chunk_y * 16 - 1), 0, 16);
 	
 	for (int i = 1; i < 17; ++i)
 	{

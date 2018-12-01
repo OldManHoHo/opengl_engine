@@ -193,7 +193,15 @@ void TGLBase::update()
 		// input
 		processInput(window);
 
-		if (time_count % 10 == 0 || 1)
+
+
+
+		// rendering commands here
+		glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glm::mat4 cam_view = active_camera->get_view();
+
+		if (time_count % 10 == 0)
 		{
 			shadow_pos = active_camera->get_pos();
 			glBindFramebuffer(GL_FRAMEBUFFER, ray_bounce.FramebufferName);
@@ -202,10 +210,6 @@ void TGLBase::update()
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 
-		// rendering commands here
-		glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glm::mat4 cam_view = active_camera->get_view();
 #endif
 		//for (auto actor_it = actors.begin(); actor_it != actors.end(); ++actor_it)
 		//{
@@ -285,7 +289,7 @@ void TGLBase::update()
 					glm::vec3 light_pos(shadow_pos.x + 10, 200, shadow_pos.z + 10);
 					double light_dist = glm::length(shadow_pos - light_pos);
 
-					glm::mat4 depthProjectionMatrix = glm::ortho<float>(-100, 100, -100, 100, light_dist - 100, light_dist + 100);
+					glm::mat4 depthProjectionMatrix = glm::ortho<float>(-30, 30, -30, 30, light_dist - 20, light_dist + 20);
 
 					glm::mat4 depthViewMatrix = glm::lookAt(light_pos, shadow_pos, glm::vec3(1, 0, 0));
 					//glm::mat4 depthModelMatrix = glm::mat4(1.0);
@@ -297,7 +301,7 @@ void TGLBase::update()
 					
 					glUniformMatrix4fv(depthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
 
-					if (time_count % 10 == 0 || 1)
+					if (time_count % 10 == 0)
 					{
 						if (mesh_comp->get_instanced_flag())
 						{
@@ -413,6 +417,7 @@ void TGLBase::update()
 		glfwSwapBuffers(window);
 #endif
 	}
+
 	end = std::chrono::steady_clock::now();
 	/*
 	if (std::chrono::duration_cast<std::chrono::microseconds> (end - begin).count() / 1000000.0 == 0.0)

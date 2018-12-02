@@ -8,6 +8,8 @@ in vec3 light_camspace;
 in vec2 glpos;
 in vec4 ShadowCoord;
 
+in vec3 light_color;
+
 in float cos;
 
 uniform sampler2D texture0;
@@ -18,21 +20,14 @@ void main()
 {
 	vec3 n = normalize(normal_camspace);
 	vec3 l = normalize(light_camspace);
-	l = normalize(vec3(-10,-20,-10));
-	float bias = 0.005*tan(acos(clamp(dot(n,l),0,1))); // cosTheta is dot( n,l ), clamped between 0 and 1
-	bias = clamp(bias, 0,0.01);
+	float bias = 0.01*tan(acos(clamp(dot(n,l),0,1))); // cosTheta is dot( n,l ), clamped between 0 and 1
+	bias = clamp(bias, 0,0.005);
 
-	float visibility = 1.2;
-	if ( texture( shadow_tex, ShadowCoord.xy ).r  <  ShadowCoord.z - bias){
-		visibility = 0.0;
-	}
-	if (ShadowCoord.x >= 1.0 || ShadowCoord.x <= 0 || ShadowCoord.y <= 0 || ShadowCoord.y >= 1.0)
-	{
-		visibility = 1.2;
-	}
+	float visibility = 1.0;
+	
+	//float shadow_dist = 2*abs(texture( shadow_tex, ShadowCoord.xy ).r  -  ShadowCoord.z);
 
-	if ( dot(l,n) >= 0.0)
-	{
+	if ( texture( shadow_tex, ShadowCoord.xy ).r  <  ShadowCoord.z - 0.005){
 		visibility = 0.0;
 	}
 
@@ -44,13 +39,25 @@ void main()
 	);
 
 	//for (int i=0;i<4;i++){
-	//  if ( texture( shadow_tex, ShadowCoord.xy + poissonDisk[i]/700.0 ).r  <  ShadowCoord.z-bias ){
-	//	visibility-=0.2;
-	 // }
+	 //if ( texture( shadow_tex, ShadowCoord.xy + poissonDisk[i]/700.0 ).r  <  ShadowCoord.z-bias ){
+		//visibility -= 0.2*shadow_dist;
+	  //}
 	//}
 
+	if ( dot(l,n) <= 0.0)
+	{
+		visibility = 0.0;
+	}
+
+	if (ShadowCoord.x >= 1.0 || ShadowCoord.x <= 0 || ShadowCoord.y <= 0 || ShadowCoord.y >= 1.0)
+	{
+		visibility = 1.0;
+	}
+
+	
+
     FragColor = texture(texture0, tex_coord_switch);
-	FragColor.xyz = FragColor.xyz*max(-visibility*dot(l,n),0.2);
+	FragColor.xyz = light_color*FragColor.xyz*max(visibility*dot(l,n),0.2);
 	//FragColor = texture( shadow_tex, ShadowCoord.xy );
 	if (FragColor.a <= 0.0)
 	{

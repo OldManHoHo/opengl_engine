@@ -8,7 +8,7 @@
 BlockGenerator::BlockGenerator(bool tester):test_gen(tester)
 {
 	auto timet = std::chrono::system_clock::now();
-	seed = std::chrono::duration_cast<std::chrono::seconds>(timet.time_since_epoch()).count() % 1000;
+	seed = 0;// std::chrono::duration_cast<std::chrono::seconds>(timet.time_since_epoch()).count() % 1000;
 	height = new Simplex(10 + seed, 1);
 	height2 = new Simplex(11 + seed, 4);
 	height3 = new Simplex(13 + seed, 0.1);

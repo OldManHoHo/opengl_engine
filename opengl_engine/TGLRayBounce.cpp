@@ -15,6 +15,8 @@ TGLRayBounce::~TGLRayBounce()
 
 void TGLRayBounce::init()
 {
+
+	shadow_map_size = pow(2, 12);
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
 	//GLuint FramebufferName = 0;
 	glGenFramebuffers(1, &FramebufferName);
@@ -28,7 +30,7 @@ void TGLRayBounce::init()
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
 
 	// Give an empty image to OpenGL ( the last "0" )
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 3000, 3000, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, shadow_map_size, shadow_map_size, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
 	// Poor filtering. Needed !
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -38,7 +40,7 @@ void TGLRayBounce::init()
 	GLuint depthrenderbuffer;
 	glGenRenderbuffers(1, &depthrenderbuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 3000, 3000);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, shadow_map_size, shadow_map_size);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
 
 	// Set "depthTexture" as our colour attachement #0
@@ -49,7 +51,7 @@ void TGLRayBounce::init()
 	glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
 
-
+	
 
 	glGenFramebuffers(1, &FramebufferName2);
 
@@ -62,7 +64,7 @@ void TGLRayBounce::init()
 	glBindTexture(GL_TEXTURE_2D, depthTexture2);
 
 	// Give an empty image to OpenGL ( the last "0" )
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 3000, 3000, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, shadow_map_size, shadow_map_size, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
 	// Poor filtering. Needed !
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -71,7 +73,7 @@ void TGLRayBounce::init()
 	// The depth buffer
 	glGenRenderbuffers(1, &depthrenderbuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 3000, 3000);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, shadow_map_size, shadow_map_size);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
 
 	// Set "depthTexture2" as our colour attachement #0

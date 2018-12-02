@@ -3,6 +3,7 @@
 #include "TGLChunkSpawn.h"
 #include "TGLBase.h"
 #include "useful_structures.h"
+#include <cstdlib>
 
 #ifndef _EXCLUDE_TMC_DROPPED_ITEM
 #include "TMCDroppedItem.h"
@@ -587,9 +588,10 @@ void TGLChunkSpawn::tick(double time_delta)
 void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 {
 	std::vector <std::vector<GLfloat>> instances;
+
 	for (int i = 0; i < block_type_count; ++i)
 	{
-		instances.push_back(std::vector<GLfloat>(99));
+		instances.push_back(std::vector<GLfloat>(0));
 	}
 	int count = 0;
 
@@ -925,7 +927,61 @@ bool TGLChunkSpawn::chunk_in_fov(int chunk_x, int chunk_y, glm::vec3 player, glm
 	}
 }
 
-double TGLChunkSpawn::get_block_light_value(int in_x, int in_y, int in_z)
+std::vector <GLshort> TGLChunkSpawn::get_block_light_value(int in_x, int in_y, int in_z)
 {
+	std::vector <GLbyte> light_vals;
+	std::vector <GLshort> light_vals_out;
+	int num_rays = 3;
+	double light_val = 0;
+	std::vector<glm::vec3> origins = {
+		glm::vec3(in_x, in_y + 0.5, in_z),
+		glm::vec3(0, 1, 0),
+		 glm::vec3(in_x, in_y - 0.5, in_z),
+		glm::vec3(0, -1, 0) ,
+		 glm::vec3(in_x + 0.5, in_y, in_z),
+		glm::vec3(1, 0, 0) ,
+		 glm::vec3(in_x - 0.5, in_y + 0.5, in_z),
+		glm::vec3(-1, 1, 0) ,
+		 glm::vec3(in_x, in_y, in_z + 0.5),
+		glm::vec3(0, 0, 1) ,
+		 glm::vec3(in_x, in_y, in_z - 0.5),
+		glm::vec3(0, 0, -1) ,
+	};
 
+	for (auto it = 0; it < origins.size(); it += 2)
+	{
+		glm::vec3 origin = origins[it];
+		glm::vec3 normal = origins[it+1];
+		for (int i = 0; i < num_rays; ++i)
+		{
+			double theta = rand() * 2 * PI / RAND_MAX;
+			double phi = rand() * (PI / 2) / RAND_MAX;
+
+			glm::vec3 ray(cos(theta)*cos(phi), sin(phi), sin(theta)*cos(phi));
+
+			glm::vec3 next_ray = ray * 0.01f;
+			e_block_type block_type_crosshair = bt_air;
+			glm::vec3 next_block = origin;
+			glm::vec3 prev_block = next_block;
+			bool done = false;
+			while (block_type_crosshair == bt_air && glm::length(origin - next_block) < 5)
+			{
+				prev_block = next_block;
+				next_block = ray_cast_block_finder(origin, ray, origin + next_ray * 1.01f, next_ray);
+				block_type_crosshair = block_generator->get_point(next_block.x, next_block.z, next_block.y);
+				if (block_type_crosshair != bt_air)
+				{
+					done = true;
+					break;
+				}
+			}
+			if (done == false)
+			{
+				light_val += GLbyte(255*(1 / num_rays)*cos(glm::dot(ray, normal)));
+			}
+		}
+		light_vals.push_back(light_val);
+	}
+	light_vals_out.assign((GLshort*)&light_vals[0], (GLshort*)&light_vals[0] + light_vals.size()/2);
+	return light_vals_out;
 }

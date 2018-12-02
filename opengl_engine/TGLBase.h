@@ -47,6 +47,12 @@ class TGLBase
 	glm::vec3 shadow_pos2;
 	glm::mat4 depthMVP1;
 	glm::mat4 depthMVP2;
+	glm::vec3 sun_pos_buf1;
+	glm::vec3 sun_pos_buf2;
+
+	bool shadow_maps_enabled;
+	glm::vec3 sun_pos;
+	glm::vec3 sun_intensity;
 
 public:
 	TGLBase();
@@ -77,6 +83,7 @@ public:
 	glm::vec3 get_player_pos();
 	void set_world_actor(TGLActor * in_actor);
 	void get_game_state();
+	void update_sun(double time_delta);
 };
 
 

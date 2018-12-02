@@ -16,6 +16,8 @@ class TGLRayBounce
 	int swapper;
 
 public:
+	unsigned int shadow_map_size;
+
 	TGLMaterial * mat;
 	GLuint depthTexture;
 	GLuint depthTexture2;

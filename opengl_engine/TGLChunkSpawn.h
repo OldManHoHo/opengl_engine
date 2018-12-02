@@ -90,7 +90,7 @@ public:
 	void server_send_chunk_mods(int chunk_x, int chunk_y);
 	bool chunk_in_fov(int chunk_x, int chunk_y, glm::vec3 player, glm::vec3 player_forward);
 
-	double TGLChunkSpawn::get_block_light_value(int in_x, int in_y, int in_z);
+	std::vector <GLshort> TGLChunkSpawn::get_block_light_value(int in_x, int in_y, int in_z);
 };
 
 #endif

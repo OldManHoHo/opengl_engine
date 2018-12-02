@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "TGLBase.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -6,8 +7,13 @@
 #include <chrono>
 #include <stdio.h>
 #include <thread>
+#include <ctime>
+#include <algorithm>
 
-TGLBase::TGLBase(): default_shader_program(0)
+
+TGLBase::TGLBase(): 
+	default_shader_program(0),
+	shadow_maps_enabled(true)
 {
 	
 }
@@ -30,6 +36,7 @@ bool TGLBase::gl_init()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	
 
 	return true;
 }
@@ -179,8 +186,14 @@ void TGLBase::update()
 	//time_delta = 1.0 / 1000;
 	time_sum += time_delta;
 	begin = std::chrono::steady_clock::now();
+
+	unsigned int shadow_map_size = ray_bounce.shadow_map_size;
+
+	update_sun(time_delta);
+
+	int shadow_map_interval = 20;
 	
-	if (time_count > 60)
+	if (time_count % 60 == 0)
 	{
 		printf("%f\n",(time_count/time_sum));
 		time_count = 0;
@@ -192,22 +205,86 @@ void TGLBase::update()
 		processInput(window);
 
 		// rendering commands here
-		glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
+		//glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
+		glClearColor(sun_intensity.r, sun_intensity.g, sun_intensity.b, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glm::mat4 cam_view = active_camera->get_view();
+#endif
 
-
-		
-		if (time_count == 10)
+#ifdef _TGL_CLIENT
+		if (shadow_maps_enabled && time_count % shadow_map_interval == 0)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, ray_bounce.get_framebuffer());
 			glClearColor(1.0, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+			glViewport(0, 0, shadow_map_size, shadow_map_size); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+			glUseProgram(ray_bounce.mat->get_shader_program());
+
+			for (int i = 0; i < actors.size(); ++i)
+			{
+				if (actors[i]->is_chunk)
+				{
+					TGLChunk * act_chunk = (TGLChunk*)actors[i];
+					int chunk_x, chunk_y;
+					((TGLChunkSpawn*)chunks_spawner)->get_chunk_of_point(act_chunk->get_pos() + glm::vec3(1, 0, 1), chunk_x, chunk_y);
+					if (!((TGLChunkSpawn*)chunks_spawner)->chunk_in_fov(chunk_x, chunk_y, active_camera->get_pos(), ((TGLPlayer*)active_camera)->forward_vec))
+					{
+						continue;
+					}
+				}
+				std::vector <TGLComponent*> components = actors[i]->get_components();
+				//std::vector <TGLComponent*> components = (*actor_it)->get_components();
+				for (auto mesh_it = components.end() - 1; mesh_it != components.begin() - 1; --mesh_it)
+				{
+
+					if ((*mesh_it)->get_draw_flag())
+					{
+						TGLMesh * mesh_comp = (TGLMesh*)(*mesh_it);
+						glBindVertexArray(mesh_comp->get_VAO());
+
+						// Compute the MVP matrix from the light's point of view
+
+						if (shadow_maps_enabled)
+						{
+							shadow_pos1 = active_camera->get_pos();
+							sun_pos_buf1 = sun_pos;
+							glm::vec3 light_pos(shadow_pos1.x + 10, 200, shadow_pos1.z + 10);
+							glm::vec3 side_vec = glm::cross(shadow_pos1 - sun_pos_buf1, glm::vec3(1, 0, 0) - sun_pos_buf1 - sun_pos_buf1);
+							double light_dist = glm::length(shadow_pos1 - sun_pos_buf1);
+
+							glm::mat4 depthProjectionMatrix = glm::ortho<float>(-30, 30, -30, 30, light_dist - 20, light_dist + 20);
+
+							glm::mat4 depthViewMatrix = glm::lookAt(sun_pos_buf1, shadow_pos1, glm::cross(side_vec, shadow_pos2 - sun_pos_buf1));
+							//glm::mat4 depthModelMatrix = glm::mat4(1.0);
+							depthMVP1 = depthProjectionMatrix * depthViewMatrix * actors[i]->get_transform() * mesh_comp->get_transform();
+
+							GLuint depthMatrixID = glGetUniformLocation(ray_bounce.mat->get_shader_program(), "depthMVP");
+							// Send our transformation to the currently bound shader,
+							// in the "MVP" uniform
+
+							glUniformMatrix4fv(depthMatrixID, 1, GL_FALSE, &depthMVP1[0][0]);
+
+
+							if (mesh_comp->get_instanced_flag())
+							{
+								glDrawArraysInstanced(GL_TRIANGLES, 0, mesh_comp->get_length(), mesh_comp->get_instance_count());
+							}
+							else
+							{
+								glDrawArrays(GL_TRIANGLES, 0, mesh_comp->get_length());
+							}
+						}
+
+					}
+				}
+			}
+
 		}
-
-
 #endif
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, window_width, window_height);
+
 		//for (auto actor_it = actors.begin(); actor_it != actors.end(); ++actor_it)
 		//{
 		for (int i = 0; i < actors.size(); ++i)
@@ -264,6 +341,11 @@ void TGLBase::update()
 					GLuint view = glGetUniformLocation(shader_id, "view");
 					glUniformMatrix4fv(view, 1, GL_FALSE, glm::value_ptr(cam_view));
 
+					GLuint light_dir_loc = glGetUniformLocation(shader_id, "in_light_pos");
+					glUniform3fv(light_dir_loc, 1, glm::value_ptr(sun_pos - active_camera->get_pos()));
+
+					GLuint light_color_loc = glGetUniformLocation(shader_id, "in_light_color");
+					glUniform3fv(light_color_loc, 1, glm::value_ptr(sun_intensity));
 
 					std::vector <TGLTexture*> textures = mesh_comp->get_textures();
 					int count = 0;
@@ -274,71 +356,38 @@ void TGLBase::update()
 						count += 1;
 					}
 
+					// SHADOW MAPS
 
-					glBindFramebuffer(GL_FRAMEBUFFER, ray_bounce.get_framebuffer());
-					glViewport(0, 0, 3000, 3000); // Render on the whole framebuffer, complete from the lower left corner to the upper right
-					glUseProgram(ray_bounce.mat->get_shader_program());
-					//ray_bounce.set_up();
-
-					// Compute the MVP matrix from the light's point of view
-
-					if (time_count == 10)
+					if (shadow_maps_enabled)
 					{
-						shadow_pos1 = active_camera->get_pos();
-						glm::vec3 light_pos(shadow_pos1.x + 10, 200, shadow_pos1.z + 10);
-						double light_dist = glm::length(shadow_pos1 - light_pos);
+						glm::vec3 light_pos(shadow_pos2.x + 10, 200, shadow_pos2.z + 10);
+						glm::vec3 side_vec = glm::cross(shadow_pos2 - sun_pos_buf2, glm::vec3(1, 0, 0) - sun_pos_buf2);
+						double light_dist = glm::length(shadow_pos2 - sun_pos_buf2);
 
 						glm::mat4 depthProjectionMatrix = glm::ortho<float>(-30, 30, -30, 30, light_dist - 20, light_dist + 20);
 
-						glm::mat4 depthViewMatrix = glm::lookAt(light_pos, shadow_pos1, glm::vec3(1, 0, 0));
+						glm::mat4 depthViewMatrix = glm::lookAt(sun_pos_buf2, shadow_pos2, glm::cross(side_vec, shadow_pos2 - sun_pos_buf2));
 						//glm::mat4 depthModelMatrix = glm::mat4(1.0);
-						depthMVP1 = depthProjectionMatrix * depthViewMatrix * actors[i]->get_transform() * mesh_comp->get_transform();
+						depthMVP2 = depthProjectionMatrix * depthViewMatrix * actors[i]->get_transform() * mesh_comp->get_transform();
 
-						GLuint depthMatrixID = glGetUniformLocation(ray_bounce.mat->get_shader_program(), "depthMVP");
-						// Send our transformation to the currently bound shader,
-						// in the "MVP" uniform
-					
-						glUniformMatrix4fv(depthMatrixID, 1, GL_FALSE, &depthMVP1[0][0]);
 
-					
-						if (mesh_comp->get_instanced_flag())
-						{
-							glDrawArraysInstanced(GL_TRIANGLES, 0, mesh_comp->get_length(), mesh_comp->get_instance_count());
-						}
-						else
-						{
-							glDrawArrays(GL_TRIANGLES, 0, mesh_comp->get_length());
-						}
+						
+						glm::mat4 depthBiasMVP;
+						//glUseProgram(shader_id);
+
+						glm::mat4 biasMatrix(
+							0.5, 0.0, 0.0, 0.0,
+							0.0, 0.5, 0.0, 0.0,
+							0.0, 0.0, 0.5, 0.0,
+							0.5, 0.5, 0.5, 1.0
+						);
+						depthBiasMVP = biasMatrix * depthMVP2;
+
+						GLuint dbmvp = glGetUniformLocation(shader_id, "DepthBiasMVP");
+						glUniformMatrix4fv(dbmvp, 1, GL_FALSE, glm::value_ptr(depthBiasMVP));
+						glActiveTexture(GL_TEXTURE0 + 20);
+						glBindTexture(GL_TEXTURE_2D, ray_bounce.get_texture());
 					}
-
-					glm::vec3 light_pos(shadow_pos2.x + 10, 200, shadow_pos2.z + 10);
-					double light_dist = glm::length(shadow_pos2 - light_pos);
-
-					glm::mat4 depthProjectionMatrix = glm::ortho<float>(-30, 30, -30, 30, light_dist - 20, light_dist + 20);
-
-					glm::mat4 depthViewMatrix = glm::lookAt(light_pos, shadow_pos2, glm::vec3(1, 0, 0));
-					//glm::mat4 depthModelMatrix = glm::mat4(1.0);
-					depthMVP2 = depthProjectionMatrix * depthViewMatrix * actors[i]->get_transform() * mesh_comp->get_transform();
-
-
-					glBindFramebuffer(GL_FRAMEBUFFER, 0);
-					glViewport(0, 0, window_width, window_height);
-					glm::mat4 depthBiasMVP;
-					glUseProgram(shader_id);
-
-					glm::mat4 biasMatrix(
-						0.5, 0.0, 0.0, 0.0,
-						0.0, 0.5, 0.0, 0.0,
-						0.0, 0.0, 0.5, 0.0,
-						0.5, 0.5, 0.5, 1.0
-					);
-					depthBiasMVP = biasMatrix*depthMVP2;
-
-					GLuint dbmvp = glGetUniformLocation(shader_id, "DepthBiasMVP");
-					glUniformMatrix4fv(dbmvp, 1, GL_FALSE, glm::value_ptr(depthBiasMVP));
-					glActiveTexture(GL_TEXTURE0 + 20);
-					glBindTexture(GL_TEXTURE_2D, ray_bounce.get_texture());
-
 					if (mesh_comp->get_instanced_flag())
 					{
 						glDrawArraysInstanced(GL_TRIANGLES, 0, mesh_comp->get_length(), mesh_comp->get_instance_count());
@@ -424,11 +473,12 @@ void TGLBase::update()
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 
-		if (time_count == 10)
+		if (shadow_maps_enabled && time_count % shadow_map_interval == 0)
 		{
 			ray_bounce.swap_buffers();
 			shadow_pos2 = shadow_pos1;
 			depthMVP2 = depthMVP1;
+			sun_pos_buf2 = sun_pos_buf1;
 		}
 
 #endif
@@ -490,4 +540,48 @@ void TGLBase::get_game_state()
 	{
 		//actor->get_game_state();
 	}
+}
+
+void TGLBase::update_sun(double time_delta)
+{
+	static double mult = 0;
+	std::time_t now_time = time(NULL);
+	struct tm * aTime = std::localtime(&now_time);
+	double ssy = aTime->tm_yday * 24 * 60 * 60 + aTime->tm_hour * 60 * 60 + aTime->tm_sec;
+	int adj_yday = ssy / 60 / 60 / 24;
+	int adj_hour = ssy / 60 / 60 - adj_yday * 24;
+	int adj_min = ssy / 60 - adj_hour * 60 - adj_yday * 24 * 60;
+
+	aTime->tm_hour = 17;
+	aTime->tm_min = 0;
+	aTime->tm_sec = 0;
+	double ssm = aTime->tm_hour * 60 * 60 + aTime->tm_min * 60 + aTime->tm_sec;
+	double full_day = 24 * 60 * 60;
+
+	double sun_degrees = 3.1415926 * 2 * ssm / full_day - 3.1415926 / 2;
+
+	sun_degrees = mult * 3.141592654 * 2;
+
+	glm::vec3 out_vec;
+	//dir = glm::vec3(1, 0, 0);
+	if (sun_degrees > 2 * 3.1415926)
+	{
+		sun_degrees -= 2 * 3.1415926;
+		mult = 0;
+	}
+	sun_intensity = glm::vec3(0.8, 0.8 - abs(cos(sun_degrees)*0.3), 0.8 - abs(cos(sun_degrees)*0.3))*std::max(float(0), float(sin(sun_degrees))) + glm::vec3(0.2, 0.2, 0.5);
+	if (sun_degrees < 3.14159)
+	{
+		sun_intensity = glm::vec3(1.0, 1.0 - pow(abs(cos(sun_degrees))*0.3, 2), 1.0 - pow(abs(cos(sun_degrees))*0.3, 2));
+	}
+	else
+	{
+		sun_intensity = glm::vec3(0.3, 0.3, 0.3);
+	}
+	//out_vec = glm::vec3(cos(sun_degrees), sin(sun_degrees), 0)*std::max(float(0), float(1 - sin(sun_degrees))) + glm::vec3(-1, -1, 0)*std::max(float(0), float(-sin(sun_degrees)));
+	out_vec = glm::vec3(cos(sun_degrees), sin(sun_degrees), 0);
+	sun_pos = out_vec * 50.0f + active_camera->get_pos();
+	mult += 0.002*time_delta;
+	//sun_pos = glm::vec3(0, 50, 0) + active_camera->get_pos();
+	return;
 }

@@ -5,7 +5,7 @@
 TGLCamera::TGLCamera()
 {
 	//projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
-	translate(glm::vec3(0.0, 200.0, 0.0));
+	translate(glm::vec3(10.0, 180.0, 10.0));
 	//set_transform(glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),
 	//	glm::vec3(0.0f, 0.0f, 0.0f),
 	//	glm::vec3(0.0f, 1.0f, 0.0f)));

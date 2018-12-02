@@ -29,7 +29,7 @@ public:
 	void init();
 	void set_up();
 	void swap_buffers();
-	GLuint TGLRayBounce::get_texture();
-	GLuint TGLRayBounce::get_framebuffer();
+	GLuint get_texture();
+	GLuint get_framebuffer();
 };
 

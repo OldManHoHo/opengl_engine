@@ -187,7 +187,6 @@ void TGLBase::update()
 	time_sum += time_delta;
 	begin = std::chrono::steady_clock::now();
 
-	unsigned int shadow_map_size = ray_bounce.shadow_map_size;
 
 	update_sun(time_delta);
 
@@ -201,6 +200,7 @@ void TGLBase::update()
 	}
 	{
 #ifdef _TGL_CLIENT
+		unsigned int shadow_map_size = ray_bounce.shadow_map_size;
 		// input
 		processInput(window);
 
@@ -281,9 +281,9 @@ void TGLBase::update()
 			}
 
 		}
-#endif
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, window_width, window_height);
+#endif
 
 		//for (auto actor_it = actors.begin(); actor_it != actors.end(); ++actor_it)
 		//{

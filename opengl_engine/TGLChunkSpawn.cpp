@@ -927,6 +927,8 @@ bool TGLChunkSpawn::chunk_in_fov(int chunk_x, int chunk_y, glm::vec3 player, glm
 	}
 }
 
+#ifdef _TGL_CLIENT
+
 std::vector <GLshort> TGLChunkSpawn::get_block_light_value(int in_x, int in_y, int in_z)
 {
 	std::vector <GLbyte> light_vals;
@@ -985,3 +987,4 @@ std::vector <GLshort> TGLChunkSpawn::get_block_light_value(int in_x, int in_y, i
 	light_vals_out.assign((GLshort*)&light_vals[0], (GLshort*)&light_vals[0] + light_vals.size()/2);
 	return light_vals_out;
 }
+#endif

@@ -15,7 +15,10 @@
 #include "TGLPlayer.h"
 #include "TGLPhysicsEngine.h"
 #include "TGLHudElement.h"
+
+#ifdef _TGL_CLIENT
 #include "TGLRayBounce.h"
+#endif
 
 
 
@@ -58,9 +61,9 @@ public:
 	TGLBase();
 	~TGLBase();
 
-	TGLRayBounce ray_bounce;
 
 #ifdef _TGL_CLIENT
+	TGLRayBounce ray_bounce;
 	bool gl_init();
 	GLFWwindow * gl_create_window(int in_width, int in_height);
 	bool glad_init();

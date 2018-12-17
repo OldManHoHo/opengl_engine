@@ -23,6 +23,7 @@ set (SRC ${top}/source/main.cpp
 	${top}/TGLCamera.cpp
 	${top}/TGLInputHandler.cpp
 	${top}/TGLComponent.cpp
+    ${top}/TGLUDPInterface.cpp
 	${top}/TMCDroppedItem.cpp
 	${top}/Simplex.cpp
 	${top}/WhiteNoise.cpp

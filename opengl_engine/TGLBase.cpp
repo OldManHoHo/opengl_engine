@@ -119,6 +119,27 @@ void TGLBase::load_shader(char * vertex_shader, char * fragment_shader)
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 }
+#else
+void TGLBase::send_game_state_to_all()
+{
+    udp_interface.send_to_all(
+}
+
+void TGLBase::generate_game_state(bool full)
+{
+    last_generated_game_state.actor_states.clear();
+    for (auto actor : actors)
+    {
+        if (full)
+        {
+            TGLActorState new_actor_state;
+            new_actor_state.transform = actor->get_transform();
+            last_generated_game_state.actor_states.push_back(new_actor_state);
+            new_actor_state.id = actor->id;
+            new_actor_state.type = actor->type;
+        }
+    }
+}
 #endif
 
 int TGLBase::init()

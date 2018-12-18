@@ -15,7 +15,8 @@
 #include "TGLPlayer.h"
 #include "TGLPhysicsEngine.h"
 #include "TGLHudElement.h"
-
+#include "TGLUDPInterface.h"
+#include "TGLGameState.h"
 
 
 
@@ -26,6 +27,10 @@ class TGLBase
 
 #ifdef _TGL_CLIENT
 	GLFWwindow* window;
+    TGLGameState last_received_game_state;
+#else
+    TGLUDPInterface udp_interface;
+    TGLGameState last_generated_game_state;
 #endif
 
 	std::vector <TGLMesh*> meshes;
@@ -39,6 +44,7 @@ class TGLBase
 	std::chrono::steady_clock::time_point begin;
 	double time_sum;
 	int time_count;
+
 
 	GLuint default_shader_program;
 
@@ -58,6 +64,9 @@ public:
 	void add_hud_element(TGLHudElement * in_element);
 	void load_model(float * vertices);
 	void load_shader(char * vertex_shader, char * fragment_shader);
+#else
+    void generate_game_state(bool full);
+    void send_game_state_to_all();
 #endif
 
 	

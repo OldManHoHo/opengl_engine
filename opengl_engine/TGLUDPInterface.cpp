@@ -1,4 +1,6 @@
 #include "TGLUDPInterface.h"
+
+
 TGLUDPInterface::TGLUDPInterface()
 {
     std::vector <char> proto_buf(1024);
@@ -7,6 +9,7 @@ TGLUDPInterface::TGLUDPInterface()
     buffer_queue.init_memory(10,proto_pair);
     sock = socket(AF_INET, SOCK_DGRAM,0);
 }
+
 int TGLUDPInterface::s_bind(std::string ip, int port)
 {
     my_addr.sin_family = AF_INET;

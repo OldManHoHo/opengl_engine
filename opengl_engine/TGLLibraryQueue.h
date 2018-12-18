@@ -38,8 +38,6 @@ public:
 //
 //
 
-#include "TGLLibraryQueue.h"
-
 template <class T>
 TGLLibraryQueue<T>::TGLLibraryQueue()
 {

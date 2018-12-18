@@ -26,6 +26,7 @@ protected:
 	glm::mat4 transform;
 	std::vector <TGLComponent *> components;
 	int id;
+    int type;
 	
 	
 // NETWORK
@@ -52,6 +53,7 @@ protected:
 	bool transform_calculated;
 	bool on_ground;
 	friend class TGLPhysicsEngine;
+    friend class TGLBase;
 
 public:
 	//flags

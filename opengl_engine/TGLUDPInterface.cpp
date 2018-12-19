@@ -78,7 +78,6 @@ void TGLUDPInterface::receive_loop()
     {
         buffer_queue.check_out_memory(recv_buffer);
         s_recv((*recv_buffer).second, &(recv_buffer->first));
-		int err = WSAGetLastError();
         buffer_queue.push_front(recv_buffer);
     }
 }

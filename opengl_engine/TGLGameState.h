@@ -18,6 +18,12 @@
 
 typedef unsigned int TGLActorType;
 
+enum TGLNetMsgType
+{
+    Heartbeat,
+    GameState
+};
+
 class TGLProperty
 {
 public:
@@ -44,5 +50,22 @@ class TGLGameState
 public:
     std::vector <TGLActorState> actor_states;
 };
+
+
+// char packet_type
+// short num_actors
+//     short actor_id
+//     short actor_type
+//     glm::mat4 transform
+//     short num_int_props
+//         short int_prop_id
+//         int int_prop_val
+//     short num_float_props
+//         short float_prop_id
+//         float int_prop_val
+//     short num_vec3_props
+//         short vec3_prop_id
+//         vec3 vec3_prop_val
+
 
 #endif /* defined(__TGL_Server__TGLGameState__) */

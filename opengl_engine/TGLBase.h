@@ -21,19 +21,28 @@
 
 #include "game_state/game_state.pb.h"
 
+#ifndef _TGL_CLIENT
+class TGLClientStatus
+{
+public:
+	int actor_id;
+	std::chrono::steady_clock::time_point time_of_last_heartbeat;
+};
+#endif
+
 class TGLBase
 {
 	int window_height;
 	int window_width;
 
 	TGLUDPInterface udp_interface;
+	std::vector <char> game_state_buf;
 #ifdef _TGL_CLIENT
 	GLFWwindow* window;
 	game_state::GameState last_received_game_state;
 #else
-    
     game_state::GameState last_generated_game_state;
-    std::map <udp_address, std::chrono::steady_clock::time_point> clients;
+    std::map <udp_address, TGLClientStatus> clients;
     double heartbeat_period;
     double tick_rate;
     std::chrono::steady_clock::time_point time_of_last_send;
@@ -46,6 +55,8 @@ class TGLBase
 	TGLActor * chunks_spawner;
 	TGLPhysicsEngine physics_engine;
 
+	
+
 	std::chrono::steady_clock::time_point end;
 	std::chrono::steady_clock::time_point begin;
 	double time_sum;
@@ -55,6 +66,7 @@ class TGLBase
 	GLuint default_shader_program;
 
 public:
+
 	TGLBase();
 	~TGLBase();
 
@@ -70,7 +82,7 @@ public:
 	void add_hud_element(TGLHudElement * in_element);
 	void load_model(float * vertices);
 	void load_shader(char * vertex_shader, char * fragment_shader);
-	void apply_game_state();
+	void apply_game_state(std::vector <char> * in_state);
 	void process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair);
 #else
     void generate_game_state(bool full);

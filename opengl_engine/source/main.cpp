@@ -9,7 +9,6 @@
 #include "TGLChunkSpawn.h"
 #include "useful_structures.h"
 
-
 //extern std::vector <GLfloat> useful_structures::vertex_data_block_small;
 
 TGLBase gl_base;
@@ -74,11 +73,23 @@ int main()
 
 	//TGLPlayer main_cam;
 	TMCPlayer main_cam;
+	// TMCPlayer p1;
+	// TMCPlayer p2;
+	// TMCPlayer p3;
+	// TMCPlayer p4;
+	// TMCPlayer p5;
+	// TMCPlayer p6;
 	
 	main_cam.set_chunk_spawn(&chunk_spawn);
 	
 	
-	gl_base.add_actor(&main_cam);
+	//gl_base.add_actor(&main_cam);
+	// gl_base.add_actor(&p1);
+	// gl_base.add_actor(&p2);
+	// gl_base.add_actor(&p3);
+	// gl_base.add_actor(&p4);
+	// gl_base.add_actor(&p5);
+	// gl_base.add_actor(&p6);
 	gl_base.add_actor(&chunk_spawn);
 	gl_base.add_actor(&debug_actor);
 #ifdef _TGL_CLIENT

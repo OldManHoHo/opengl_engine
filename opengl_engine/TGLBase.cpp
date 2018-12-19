@@ -12,8 +12,8 @@ TGLBase::TGLBase():
 	heartbeat_period(1.0),
 	tick_rate(20),
 #endif
-	default_shader_program(0)
-
+	default_shader_program(0),
+	game_state_buf(1024,0)
 {
 	
 }
@@ -126,25 +126,89 @@ void TGLBase::load_shader(char * vertex_shader, char * fragment_shader)
 	glDeleteShader(fragmentShader);
 }
 
-void TGLBase::apply_game_state()
+void TGLBase::apply_game_state(std::vector <char> * in_state)
 {
-	for (auto as : last_received_game_state.actors())
+	int offset = 1;
+	short actor_id = *(short*)&(*in_state)[offset];
+	offset += sizeof(short);
+	if( active_camera->id != actor_id )
 	{
-		for (auto actor : actors)
+		for (auto actor :actors)
 		{
-			if (as.id() == actor->id)
+			if (actor->id = actor_id)
 			{
-				memcpy(glm::value_ptr(actor->transform), as.mutable_transform(), sizeof(GLfloat) * 16);
+				active_camera = (TGLCamera*)actor;
 			}
 		}
 	}
+	short num_actors = *(short*)&(*in_state)[offset];
+	offset += sizeof(short);
+	for (int i = 0; i < num_actors; ++i)
+	{
+		short actor_id = *(short*)&(*in_state)[offset];
+		offset += sizeof(short);
+		short actor_type = *(short*)&(*in_state)[offset];
+		offset += sizeof(short);
+		glm::mat4 actor_trans;
+		std::copy(&(*in_state)[offset], &(*in_state)[offset] + 16, glm::value_ptr(actor_trans));
+		offset += sizeof(GLfloat)*16;
+		
+		short num_int_props = *(short*)&(*in_state)[offset];
+		offset += sizeof(short);
+		for(int i = 0; i < num_int_props; ++i)
+		{
+			short int_prop_id = *(short*)&(*in_state)[offset];
+			offset += sizeof(short);
+			int int_prop_val = *(int*)&(*in_state)[offset];
+			offset += sizeof(int);
+		}
+		
+		short num_float_props = *(short*)&(*in_state)[offset];
+		offset += sizeof(short);
+		for(int i = 0; i < num_int_props; ++i)
+		{
+			short int_prop_id = *(short*)&(*in_state)[offset];
+			offset += sizeof(short);
+			float int_prop_val = *(float*)&(*in_state)[offset];
+			offset += sizeof(float);
+		}
+		
+		short num_vec3_props = *(short*)&(*in_state)[offset];
+		offset += sizeof(short);
+		for(int i = 0; i < num_int_props; ++i)
+		{
+			short int_prop_id = *(short*)&(*in_state)[offset];
+			offset += sizeof(short);
+			glm::vec3 vec3_prop_val;
+			std::copy(&(*in_state)[offset], &(*in_state)[offset] + 3, glm::value_ptr(vec3_prop_val));
+			offset += sizeof(GLfloat)*3;
+		}
+		for (auto actor : actors)
+		{
+			if (actor_id == actor->id)
+			{
+				actor->transform = actor_trans;
+			}
+		}
+	}
+	
+	// for (auto as : last_received_game_state.actors())
+	// {
+	// 	for (auto actor : actors)
+	// 	{
+	// 		if (as.id() == actor->id)
+	// 		{
+	// 			memcpy(glm::value_ptr(actor->transform), as.mutable_transform(), sizeof(GLfloat) * 16);
+	// 		}
+	// 	}
+	// }
 }
 
 void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 {
-	std::string message_string(in_pair->second.begin(), in_pair->second.end());
-	last_received_game_state.ParseFromString(message_string);
-	apply_game_state();
+//	std::string message_string(in_pair->second.begin(), in_pair->second.end());
+//	last_received_game_state.ParseFromString(message_string);
+	apply_game_state(&in_pair->second);
 }
 
 #else
@@ -158,18 +222,47 @@ void TGLBase::send_game_state_to_all()
 
 void TGLBase::generate_game_state(bool full)
 {
+	game_state_buf.resize(1024);
+	int offset = 0;
+	game_state_buf[offset] = TGLNetMsgType::GameState;
+	offset += sizeof(char);
+	*(short*)&game_state_buf[offset] = 0;
+    offset += sizeof(short);
+	short * num_actors = (short*)&game_state_buf[offset];
+	*num_actors = 0;
+	offset += sizeof(short);
     for (auto actor : actors)
     {
         if (full)
         {
-            const float * at = glm::value_ptr(actor->get_transform());
-            game_state::GameState::ActorState * as = last_generated_game_state.add_actors();
-            as->set_id(actor->id);
-            as->set_type(actor->type);
-            *(as->mutable_transform()->mutable_val()) = {at, at + 15};
-            //as->transform().add_val();
+        	*num_actors += 1;
+        	*(short*)&game_state_buf[offset] = (short)actor->id;
+        	offset += sizeof(short);
+        	*(short*)&game_state_buf[offset] = (short)actor->type;
+        	offset += sizeof(short);
+        	auto trans_p = glm::value_ptr(actor->get_transform());
+        	std::copy(trans_p, trans_p + 16, &game_state_buf[offset]);
+        	offset += sizeof(GLfloat)*16;
+        	// # int props
+        	*(short*)&game_state_buf[offset] = 0;
+        	offset += sizeof(short);
+        	// # float props
+        	*(short*)&game_state_buf[offset] = 0;
+        	offset += sizeof(short);
+        	// # vec3 props
+        	*(short*)&game_state_buf[offset] = 0;
+        	offset += sizeof(short);
+        	
+        	
+            // const float * at = glm::value_ptr(actor->get_transform());
+            // game_state::GameState::ActorState * as = last_generated_game_state.add_actors();
+            // as->set_id(actor->id);
+            // as->set_type(actor->type);
+            // *(as->mutable_transform()->mutable_val()) = {at, at + 15};
+            // //as->transform().add_val();
         }
     }
+    game_state_buf.resize(offset);
 }
 
 void TGLBase::update_clients()
@@ -180,13 +273,14 @@ void TGLBase::update_clients()
 	{
 		generate_game_state(true);
 		size_t size = last_generated_game_state.ByteSizeLong(); 
-		std::vector<char> buffer(size);
-		last_generated_game_state.SerializeToArray(&buffer[0], size);
+		//std::vector<char> buffer(size);
+		//last_generated_game_state.SerializeToArray(&buffer[0], size);
 		for (auto client : clients)
 		{
-		printf("GLIENCTS %u\n", ntohs(client.first.addr.sin_port));	
-			
-			udp_interface.s_send(buffer, client.first.addr);
+			printf("GLIENCTS %u\n", ntohs(client.first.addr.sin_port));	
+			*(short*)&game_state_buf[1] = 0;
+
+			udp_interface.s_send(game_state_buf, client.first.addr);
 			time_of_last_send = std::chrono::steady_clock::now();
 		}
 	}
@@ -206,9 +300,16 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 {
 	if (in_pair->second[0] == 0)
 	{
-	printf("PROCESS\n");
+		printf("PROCESS\n");
 		in_pair->first.sin_port = htons(12345);
-		clients[in_pair->first] = std::chrono::steady_clock::now();
+		
+		if (clients.find(in_pair->first) != clients.end())
+		{
+			TGLPlayer * new_player = new TGLPlayer;
+			add_actor((TGLActor*)new_player);
+			clients[in_pair->first].actor_id = new_player->id;	
+		}
+		clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();	
 		//udp_interface.s_send(in_pair->second,in_pair->first);
 	}
 }
@@ -334,6 +435,7 @@ void TGLBase::update()
 		//{
 		for (int i = 0; i < actors.size(); ++i)
 		{
+#ifdef _TGL_CLIENT
 			if (actors[i]->is_chunk)
 			{
 				TGLChunk * act_chunk = (TGLChunk*)actors[i];
@@ -344,6 +446,7 @@ void TGLBase::update()
 					continue;
 				}
 			}
+#endif
 			std::vector <TGLComponent*> components = actors[i]->get_components();
 			//std::vector <TGLComponent*> components = (*actor_it)->get_components();
 			for (auto mesh_it = components.begin(); mesh_it != components.end(); ++mesh_it)

@@ -179,14 +179,15 @@ void TGLBase::update_clients()
 	if (time_since*1.0/1000000 > 1.0/tick_rate)
 	{
 		generate_game_state(true);
-	
 		size_t size = last_generated_game_state.ByteSizeLong(); 
 		std::vector<char> buffer(size);
 		last_generated_game_state.SerializeToArray(&buffer[0], size);
-		
 		for (auto client : clients)
 		{
+		printf("GLIENCTS %u\n", ntohs(client.first.addr.sin_port));	
+			
 			udp_interface.s_send(buffer, client.first.addr);
+			time_of_last_send = std::chrono::steady_clock::now();
 		}
 	}
 	
@@ -205,7 +206,10 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 {
 	if (in_pair->second[0] == 0)
 	{
+	printf("PROCESS\n");
+		in_pair->first.sin_port = htons(12345);
 		clients[in_pair->first] = std::chrono::steady_clock::now();
+		//udp_interface.s_send(in_pair->second,in_pair->first);
 	}
 }
 #endif
@@ -252,7 +256,7 @@ int TGLBase::init()
 	default_material->add_shader(&f_shader);
 	default_material->link_shader();
 	default_shader_program = default_material->get_shader_program();
-	udp_interface.s_bind("192.168.1.68",8080);
+	udp_interface.s_bind("192.168.1.68",12345);
 	udp_interface.start_receive_thread();
 
 	std::pair<sockaddr_in, std::vector <char>> * net_msg;
@@ -260,15 +264,16 @@ int TGLBase::init()
 	udp_interface.pop_msg(net_msg);
 	while (net_msg == nullptr)
 	{
-		udp_interface.s_send(handshake, "192.168.1.66", 8080);
+		udp_interface.s_send(handshake, "192.168.1.66", 12345);
 		udp_interface.pop_msg(net_msg);
 		Sleep(1000);
 	}
 	printf("Connected");
 
 #else
-	udp_interface.s_bind("0.0.0.0",8080);
+	udp_interface.s_bind("192.168.1.66",htons(12345));
 	udp_interface.start_receive_thread();
+	time_of_last_send = std::chrono::steady_clock::now();
 #endif
 }
 

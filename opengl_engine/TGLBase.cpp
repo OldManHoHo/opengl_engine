@@ -175,14 +175,15 @@ void TGLBase::generate_game_state(bool full)
 void TGLBase::update_clients()
 {
 	auto now = std::chrono::steady_clock::now();
-	generate_game_state(true);
-	
-	size_t size = last_generated_game_state.ByteSizeLong(); 
-	std::vector<char> buffer(size);
-	last_generated_game_state.SerializeToArray(&buffer[0], size);
 	int time_since = (std::chrono::duration_cast< std::chrono::microseconds> (now - time_of_last_send)).count();
 	if (time_since*1.0/1000000 > 1.0/tick_rate)
 	{
+		generate_game_state(true);
+	
+		size_t size = last_generated_game_state.ByteSizeLong(); 
+		std::vector<char> buffer(size);
+		last_generated_game_state.SerializeToArray(&buffer[0], size);
+		
 		for (auto client : clients)
 		{
 			udp_interface.s_send(buffer, client.first.addr);
@@ -313,7 +314,7 @@ void TGLBase::update()
 		}
 #else
 		// process network messages
-		udpate_clients();
+		update_clients();
 		std::pair<sockaddr_in,std::vector <char>> * net_msg;
 		udp_interface.pop_msg(net_msg);
 		while (net_msg != nullptr)

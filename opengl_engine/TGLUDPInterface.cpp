@@ -29,9 +29,9 @@ TGLUDPInterface::TGLUDPInterface()
 int TGLUDPInterface::s_bind(std::string ip, int port)
 {
     my_recv_addr.sin_family = AF_INET;
-    my_recv_addr.sin_port = port;
+    my_recv_addr.sin_port = htons(port);
 	my_send_addr.sin_family = AF_INET;
-	my_send_addr.sin_port = port + 1;
+	my_send_addr.sin_port = htons(port) + 1;
     //inet_aton(ip.c_str(), &my_addr.sin_addr);
 	inet_pton(AF_INET, ip.c_str(), &my_recv_addr.sin_addr);
 	inet_pton(AF_INET, ip.c_str(), &my_send_addr.sin_addr);
@@ -43,7 +43,7 @@ int TGLUDPInterface::s_send(std::vector <char>& in_msg, std::string ip, int port
 {
     sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_port = port;
+    addr.sin_port = htons(port);
     //inet_aton(ip.c_str(), &addr.sin_addr);
 	inet_pton(AF_INET, ip.c_str(), &addr.sin_addr);
     return sendto(send_sock, &in_msg[0], in_msg.size(), 0, (sockaddr*)&addr, sizeof(addr));
@@ -67,7 +67,9 @@ int TGLUDPInterface::s_recv(std::vector <char>& out_msg, sockaddr_in * from_addr
     socklen_t out_len;
 #endif
 	out_len = sizeof(sockaddr_in);
-    return recvfrom(recv_sock, &out_msg[0], int(out_msg.size()), 0, (sockaddr*)from_addr, &out_len); 	
+    int ret_length = recvfrom(recv_sock, &out_msg[0], int(out_msg.size()), 0, (sockaddr*)from_addr, &out_len);
+    out_msg.resize(ret_length);
+    return ret_length;
 }
 
 void TGLUDPInterface::start_receive_thread()

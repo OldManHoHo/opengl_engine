@@ -9,6 +9,7 @@
 #include <thread>
 #include <ctime>
 #include <algorithm>
+#include <unistd.h>
 
 TGLBase::TGLBase(): 
 #ifndef _TGL_CLIENT
@@ -282,12 +283,14 @@ void TGLBase::update_clients()
 		//last_generated_game_state.SerializeToArray(&buffer[0], size);
 		for (auto client : clients)
 		{
-			printf("GLIENCTS %u\n", ntohs(client.first.addr.sin_port));	
+			//printf("GLIENCTS %u\n", ntohs(client.first.addr.sin_port));	
 			*(short*)&game_state_buf[1] = 0;
 
 			udp_interface.s_send(game_state_buf, client.first.addr);
-			time_of_last_send = std::chrono::steady_clock::now();
+			
+			
 		}
+		time_of_last_send = std::chrono::steady_clock::now();
 	}
 	
 	// for (auto client : clients)
@@ -303,12 +306,17 @@ void TGLBase::update_clients()
 
 void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 {
+	//printf("PROCESS\n");
 	if (in_pair->second[0] == 0)
 	{
-		printf("PROCESS\n");
-		in_pair->first.sin_port = htons(12345);
+		
+		in_pair->first.sin_port = ntohs(12347);
 		
 		if (clients.find(in_pair->first) != clients.end())
+		{
+			clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();
+		}
+		else
 		{
 #ifdef USER_PLAYER_CLASS
 			USER_PLAYER_CLASS * new_player = new USER_PLAYER_CLASS;
@@ -318,7 +326,7 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 			add_actor((TGLActor*)new_player);
 			clients[in_pair->first].actor_id = new_player->id;	
 		}
-		clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();	
+		//clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();	
 		//udp_interface.s_send(in_pair->second,in_pair->first);
 	}
 }
@@ -366,8 +374,7 @@ int TGLBase::init()
 	default_material->add_shader(&f_shader);
 	default_material->link_shader();
 	default_shader_program = default_material->get_shader_program();
-<<<<<<< HEAD
-	udp_interface.s_bind("192.168.1.68",htons(12345));
+	udp_interface.s_bind("192.168.1.68",12345);
 	udp_interface.start_receive_thread();
 
 	std::pair<sockaddr_in, std::vector <char>> * net_msg;
@@ -375,7 +382,7 @@ int TGLBase::init()
 	udp_interface.pop_msg(net_msg);
 	while (net_msg == nullptr)
 	{
-		udp_interface.s_send(handshake, "192.168.1.66", htons(12345));
+		udp_interface.s_send(handshake, "192.168.1.66", 12345);
 		udp_interface.pop_msg(net_msg);
 		Sleep(1000);
 	}
@@ -383,7 +390,7 @@ int TGLBase::init()
 	ray_bounce.init();
 
 #else
-	udp_interface.s_bind("192.168.1.66",htons(12345));
+	udp_interface.s_bind("127.0.0.1",12345);
 	udp_interface.start_receive_thread();
 	time_of_last_send = std::chrono::steady_clock::now();
 #endif
@@ -407,7 +414,7 @@ void TGLBase::update()
 
 	int shadow_map_interval = 20;
 	
-	if (time_count % 60 == 0)
+	if (time_sum > 1)
 	{
 		printf("%f\n",(time_count/time_sum));
 		time_count = 0;
@@ -725,10 +732,14 @@ void TGLBase::update()
 
 #endif
 	}
+	#ifndef _TGL_CLIENT
+	end = std::chrono::steady_clock::now();
+	usleep(1000000/tick_rate - std::chrono::duration_cast<std::chrono::microseconds> (end - begin).count());
+	#endif
 
 	end = std::chrono::steady_clock::now();
+
 	/*
-	if (std::chrono::duration_cast<std::chrono::microseconds> (end - begin).count() / 1000000.0 == 0.0)
 	{
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(5us);

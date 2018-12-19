@@ -46,6 +46,8 @@ void TGLPlayer::tick(double time_delta)
 	
 	double xpos, ypos;
 	static float debug_rot = 0.0;
+	static float time_passed = 0.0;
+	time_passed += time_delta;
 	debug_rot +=  5;
 	
 	glm::vec3 up_vector(0.0, 1.0, 0.0);
@@ -80,9 +82,10 @@ void TGLPlayer::tick(double time_delta)
 	rotate(-x_angle, glm::vec3(0.0, 0.0, 1.0));
 
 	x_vector = glm::mat3(get_rot())*x_vector;
-	
-	if (int(debug_rot) % 1000 == 0)
+
+	if (time_passed > 0.5)
 	{
+		time_passed = 0;
 		debug_rot = 0;
 		std::cout << "Y POS " << pos.y << ", " << "X POS" << pos.x << ", " << "Z POS" << pos.z << "\n";
 	}

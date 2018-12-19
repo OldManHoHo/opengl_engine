@@ -45,11 +45,14 @@ public:
     
     TGLLibraryQueue<std::pair<sockaddr_in,std::vector<char>>> buffer_queue;
 
-	sockaddr_in my_addr;
+	sockaddr_in my_send_addr;
+	sockaddr_in my_recv_addr;
 #ifdef _TGL_CLIENT
-	SOCKET sock;
+	SOCKET send_sock;
+	SOCKET recv_sock;
 #else
-	int sock;
+	int send_sock;
+	int recv_sock;
 #endif
 	TGLUDPInterface();
 	int s_bind(std::string ip, int port);

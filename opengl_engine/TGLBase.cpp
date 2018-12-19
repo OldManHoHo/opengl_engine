@@ -251,8 +251,20 @@ int TGLBase::init()
 	default_material->add_shader(&f_shader);
 	default_material->link_shader();
 	default_shader_program = default_material->get_shader_program();
-	udp_interface.s_bind("0.0.0.0",8080);
+	udp_interface.s_bind("192.168.1.68",8080);
 	udp_interface.start_receive_thread();
+
+	std::pair<sockaddr_in, std::vector <char>> * net_msg;
+	std::vector<char>handshake(1, 0);
+	udp_interface.pop_msg(net_msg);
+	while (net_msg == nullptr)
+	{
+		udp_interface.s_send(handshake, "192.168.1.66", 8080);
+		udp_interface.pop_msg(net_msg);
+		Sleep(1000);
+	}
+	printf("Connected");
+
 #else
 	udp_interface.s_bind("0.0.0.0",8080);
 	udp_interface.start_receive_thread();

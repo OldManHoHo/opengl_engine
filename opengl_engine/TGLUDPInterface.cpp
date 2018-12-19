@@ -22,16 +22,21 @@ TGLUDPInterface::TGLUDPInterface()
     sockaddr_in proto_addr;
     std::pair<sockaddr_in, std::vector <char>> proto_pair(proto_addr, proto_buf);
     buffer_queue.init_memory(10,proto_pair);
-    sock = socket(AF_INET, SOCK_DGRAM,0);
+    send_sock = socket(AF_INET, SOCK_DGRAM,0);
+	recv_sock = socket(AF_INET, SOCK_DGRAM, 0);
 }
 
 int TGLUDPInterface::s_bind(std::string ip, int port)
 {
-    my_addr.sin_family = AF_INET;
-    my_addr.sin_port = port;
+    my_recv_addr.sin_family = AF_INET;
+    my_recv_addr.sin_port = port;
+	my_send_addr.sin_family = AF_INET;
+	my_send_addr.sin_port = port + 1;
     //inet_aton(ip.c_str(), &my_addr.sin_addr);
-	inet_pton(AF_INET, ip.c_str(), &my_addr.sin_addr);
-    return bind(sock, (sockaddr*)&my_addr, sizeof(my_addr));
+	inet_pton(AF_INET, ip.c_str(), &my_recv_addr.sin_addr);
+	inet_pton(AF_INET, ip.c_str(), &my_send_addr.sin_addr);
+	bind(recv_sock, (sockaddr*)&my_recv_addr, sizeof(my_recv_addr));
+    return bind(send_sock, (sockaddr*)&my_send_addr, sizeof(my_send_addr));
 }
 
 int TGLUDPInterface::s_send(std::vector <char>& in_msg, std::string ip, int port)
@@ -41,12 +46,12 @@ int TGLUDPInterface::s_send(std::vector <char>& in_msg, std::string ip, int port
     addr.sin_port = port;
     //inet_aton(ip.c_str(), &addr.sin_addr);
 	inet_pton(AF_INET, ip.c_str(), &addr.sin_addr);
-    return sendto(sock, &in_msg[0], in_msg.size(), 0, (sockaddr*)&addr, sizeof(addr));
+    return sendto(send_sock, &in_msg[0], in_msg.size(), 0, (sockaddr*)&addr, sizeof(addr));
 }
 
 int TGLUDPInterface::s_send(std::vector <char>& in_msg, sockaddr_in in_addr)
 {
-    return sendto(sock, &in_msg[0], in_msg.size(), 0, (sockaddr*)&in_addr, sizeof(in_addr));
+    return sendto(send_sock, &in_msg[0], in_msg.size(), 0, (sockaddr*)&in_addr, sizeof(in_addr));
 }
 
 void TGLUDPInterface::send_to_all(std::vector <char>& in_msg)
@@ -62,7 +67,7 @@ int TGLUDPInterface::s_recv(std::vector <char>& out_msg, sockaddr_in * from_addr
     socklen_t out_len;
 #endif
 	out_len = sizeof(sockaddr_in);
-    return recvfrom(sock, &out_msg[0], int(out_msg.size()), 0, (sockaddr*)from_addr, &out_len); 	
+    return recvfrom(recv_sock, &out_msg[0], int(out_msg.size()), 0, (sockaddr*)from_addr, &out_len); 	
 }
 
 void TGLUDPInterface::start_receive_thread()

@@ -18,6 +18,7 @@
 #include "TGLHudElement.h"
 #include "TGLUDPInterface.h"
 #include "TGLGameState.h"
+#include "TGL_USER_CLASSES.h"
 
 #include "game_state/game_state.pb.h"
 

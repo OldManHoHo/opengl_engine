@@ -305,7 +305,11 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 		
 		if (clients.find(in_pair->first) != clients.end())
 		{
+#ifdef USER_PLAYER_CLASS
+			USER_PLAYER_CLASS * new_player = new USER_PLAYER_CLASS;
+#else
 			TGLPlayer * new_player = new TGLPlayer;
+#endif
 			add_actor((TGLActor*)new_player);
 			clients[in_pair->first].actor_id = new_player->id;	
 		}

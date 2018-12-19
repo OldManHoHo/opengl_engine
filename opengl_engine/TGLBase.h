@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <unordered_map>
 
 #include "TGLMesh.h"
 #include "TGLCamera.h"
@@ -18,7 +19,7 @@
 #include "TGLUDPInterface.h"
 #include "TGLGameState.h"
 
-
+#include "game_state/game_state.pb.h"
 
 class TGLBase
 {
@@ -30,7 +31,11 @@ class TGLBase
     TGLGameState last_received_game_state;
 #else
     TGLUDPInterface udp_interface;
-    TGLGameState last_generated_game_state;
+    game_state::GameState last_generated_game_state;
+    std::map <udp_address, std::chrono::steady_clock::time_point> clients;
+    double heartbeat_period;
+    double tick_rate;
+    std::chrono::steady_clock::time_point time_of_last_send;
 #endif
 
 	std::vector <TGLMesh*> meshes;
@@ -67,6 +72,8 @@ public:
 #else
     void generate_game_state(bool full);
     void send_game_state_to_all();
+    void update_clients();
+    void process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair);
 #endif
 
 	

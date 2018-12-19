@@ -25,6 +25,8 @@ set (SRC ${top}/source/main.cpp
 	${top}/TGLComponent.cpp
     ${top}/TGLUDPInterface.cpp
 	${top}/TMCDroppedItem.cpp
+	${top}/TGLLibraryQueue.cpp
+	${top}/TGLGameState.cpp
 	${top}/Simplex.cpp
 	${top}/WhiteNoise.cpp
 	${top}/FastNoiseSIMD/FastNoiseSIMD.cpp
@@ -32,6 +34,7 @@ set (SRC ${top}/source/main.cpp
 	${top}/FastNoiseSIMD/FastNoiseSIMD_sse2.cpp
 	${top}/FastNoiseSIMD/FastNoiseSIMD_sse41.cpp
 	${top}/Generator.cpp
+	${top}/game_state/game_state.pb.cc
 	)
 
 #	${top}/FastNoiseSIMD/FastNoiseSIMD_avx2.cpp
@@ -40,5 +43,16 @@ set (SRC ${top}/source/main.cpp
 add_compile_options(-std=c++11)
 add_compile_options(-D_EXCLUDE_TMC_DROPPED_ITEM)
 
+
 add_executable(tgl_server ${SRC})
 
+
+find_library(libprotobuf protobuf)
+target_link_libraries(tgl_server ${libprotobuf})
+find_package(Threads REQUIRED)
+if(THREADS_HAVE_PTHREAD_ARG)
+  target_compile_options(tgl_server PUBLIC "-pthread")
+endif()
+if(CMAKE_THREAD_LIBS_INIT)
+  target_link_libraries(tgl_server "${CMAKE_THREAD_LIBS_INIT}")
+endif()

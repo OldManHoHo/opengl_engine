@@ -74,8 +74,15 @@ template <class T>
 void TGLLibraryQueue<T>::pop_back(T *& out_item)
 {
     std::lock_guard<std::mutex> Lock(item_queue_lock);
-    out_item = item_queue.back();
-    item_queue.pop_back();
+    if (item_queue.size())
+    {
+        out_item = item_queue.back();
+        item_queue.pop_back();
+    }
+    else
+    {
+        out_item = nullptr;
+    }
 }
 
 template <class T>

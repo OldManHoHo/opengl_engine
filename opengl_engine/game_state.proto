@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package game_state;
+
+message GameState {
+  message Vec3 {
+    required float x = 1;
+    required float y = 2;
+    required float z = 3;
+  }
+  
+  message Mat4 {
+    repeated float val = 1;
+  }
+
+  message ActorState {
+    required int32 id = 1;
+    required int32 type = 2;
+    required Mat4 transform = 3;
+    repeated int32 int_props = 4;
+    repeated float float_props = 5;
+    repeated Vec3 vec3_props = 6;
+  }
+
+  repeated ActorState actors = 1;
+  
+}

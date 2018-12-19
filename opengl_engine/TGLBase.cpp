@@ -7,7 +7,13 @@
 #include <stdio.h>
 #include <thread>
 
-TGLBase::TGLBase(): default_shader_program(0)
+TGLBase::TGLBase(): 
+#ifndef _TGL_CLIENT
+	heartbeat_period(1.0),
+	tick_rate(20),
+#endif
+	default_shader_program(0)
+
 {
 	
 }
@@ -120,25 +126,64 @@ void TGLBase::load_shader(char * vertex_shader, char * fragment_shader)
 	glDeleteShader(fragmentShader);
 }
 #else
+
+
 void TGLBase::send_game_state_to_all()
 {
-    udp_interface.send_to_all(
+	std::vector <char> test;
+    udp_interface.send_to_all(test);
 }
 
 void TGLBase::generate_game_state(bool full)
 {
-    last_generated_game_state.actor_states.clear();
     for (auto actor : actors)
     {
         if (full)
         {
-            TGLActorState new_actor_state;
-            new_actor_state.transform = actor->get_transform();
-            last_generated_game_state.actor_states.push_back(new_actor_state);
-            new_actor_state.id = actor->id;
-            new_actor_state.type = actor->type;
+            const float * at = glm::value_ptr(actor->get_transform());
+            game_state::GameState::ActorState * as = last_generated_game_state.add_actors();
+            as->set_id(actor->id);
+            as->set_type(actor->type);
+            *(as->mutable_transform()->mutable_val()) = {at, at + 15};
+            //as->transform().add_val();
         }
     }
+}
+
+void TGLBase::update_clients()
+{
+	auto now = std::chrono::steady_clock::now();
+	generate_game_state(true);
+	
+	size_t size = last_generated_game_state.ByteSizeLong(); 
+	std::vector<char> buffer(size);
+	last_generated_game_state.SerializeToArray(&buffer[0], size);
+	int time_since = (std::chrono::duration_cast< std::chrono::microseconds> (now - time_of_last_send)).count();
+	if (time_since*1.0/1000000 > 1.0/tick_rate)
+	{
+		for (auto client : clients)
+		{
+			udp_interface.s_send(buffer, client.first.addr);
+		}
+	}
+	
+	// for (auto client : clients)
+	// {
+	// 	int time_since = (std::chrono::duration_cast< std::chrono::microseconds> (now - client.second)).count();
+	// 	if (time_since*1.0/1000000 > heartbeat_period)
+	// 	{
+	// 		std::vector <char> heartbeat(1,0);
+	// 		udp_interface.s_send(buffer, client.first.addr);
+	// 	}
+	// }
+}
+
+void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
+{
+	if (in_pair->second[0] == 0)
+	{
+		clients[in_pair->first] = std::chrono::steady_clock::now();
+	}
 }
 #endif
 
@@ -184,11 +229,19 @@ int TGLBase::init()
 	default_material->add_shader(&f_shader);
 	default_material->link_shader();
 	default_shader_program = default_material->get_shader_program();
+	udp_interface.s_bind("0.0.0.0",8080);
+	udp_interface.start_receive_thread();
+#else
+	udp_interface.s_bind("0.0.0.0",8080);
+	udp_interface.start_receive_thread();
 #endif
 }
 
 void TGLBase::update()
 {
+	
+	
+	
 	// render loop
 	//while (!glfwWindowShouldClose(window))
 	auto duration = std::chrono::duration_cast< std::chrono::microseconds> (end - begin);
@@ -213,6 +266,17 @@ void TGLBase::update()
 		glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glm::mat4 cam_view = active_camera->get_view();
+#else
+		// process network messages
+		std::pair<sockaddr_in,std::vector <char>> * net_msg;
+		udp_interface.pop_msg(net_msg);
+		while (net_msg != nullptr)
+		{
+			process_msg(net_msg);
+			udp_interface.return_msg(net_msg);
+			udp_interface.pop_msg(net_msg);
+		}
+	
 #endif
 		//for (auto actor_it = actors.begin(); actor_it != actors.end(); ++actor_it)
 		//{

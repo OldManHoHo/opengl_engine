@@ -125,6 +125,28 @@ void TGLBase::load_shader(char * vertex_shader, char * fragment_shader)
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 }
+
+void TGLBase::apply_game_state()
+{
+	for (auto as : last_received_game_state.actors())
+	{
+		for (auto actor : actors)
+		{
+			if (as.id() == actor->id)
+			{
+				memcpy(glm::value_ptr(actor->transform), as.mutable_transform(), sizeof(GLfloat) * 16);
+			}
+		}
+	}
+}
+
+void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
+{
+	std::string message_string(in_pair->second.begin(), in_pair->second.end());
+	last_received_game_state.ParseFromString(message_string);
+	apply_game_state();
+}
+
 #else
 
 
@@ -267,8 +289,19 @@ void TGLBase::update()
 		glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glm::mat4 cam_view = active_camera->get_view();
+
+		// process network messages
+		std::pair<sockaddr_in, std::vector <char>> * net_msg;
+		udp_interface.pop_msg(net_msg);
+		while (net_msg != nullptr)
+		{
+			process_msg(net_msg);
+			udp_interface.return_msg(net_msg);
+			udp_interface.pop_msg(net_msg);
+		}
 #else
 		// process network messages
+		udpate_clients();
 		std::pair<sockaddr_in,std::vector <char>> * net_msg;
 		udp_interface.pop_msg(net_msg);
 		while (net_msg != nullptr)
@@ -277,7 +310,7 @@ void TGLBase::update()
 			udp_interface.return_msg(net_msg);
 			udp_interface.pop_msg(net_msg);
 		}
-	
+		
 #endif
 		//for (auto actor_it = actors.begin(); actor_it != actors.end(); ++actor_it)
 		//{
@@ -419,7 +452,9 @@ void TGLBase::update()
 			}
 		}
 #endif
+#ifndef _TGL_CLIENT
 		physics_engine.tick(time_delta, actors, (TGLChunkSpawn*)chunks_spawner);
+#endif
 			// check and call events and swap the buffers
 #ifdef _TGL_CLIENT
 		glfwPollEvents();

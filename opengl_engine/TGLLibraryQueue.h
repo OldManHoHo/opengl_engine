@@ -58,7 +58,7 @@ template <class T>
 void TGLLibraryQueue<T>::check_out_memory(T *& out_item)
 {
     std::lock_guard<std::mutex> Lock(memory_queue_lock);
-    out_item = memory_queue.back();
+    out_item = memory_queue.front();
     memory_queue.pop_front();
 }
 

@@ -26,11 +26,12 @@ class TGLBase
 	int window_height;
 	int window_width;
 
+	TGLUDPInterface udp_interface;
 #ifdef _TGL_CLIENT
 	GLFWwindow* window;
-    TGLGameState last_received_game_state;
+	game_state::GameState last_received_game_state;
 #else
-    TGLUDPInterface udp_interface;
+    
     game_state::GameState last_generated_game_state;
     std::map <udp_address, std::chrono::steady_clock::time_point> clients;
     double heartbeat_period;
@@ -69,6 +70,8 @@ public:
 	void add_hud_element(TGLHudElement * in_element);
 	void load_model(float * vertices);
 	void load_shader(char * vertex_shader, char * fragment_shader);
+	void apply_game_state();
+	void process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair);
 #else
     void generate_game_state(bool full);
     void send_game_state_to_all();

@@ -21,7 +21,10 @@
   <ItemGroup>
     <ClInclude Include="..\tmc\TMCPlayer.h" />
     <ClInclude Include="BlockGenerator.h" />
+    <ClInclude Include="game_state\game_state.pb.h" />
     <ClInclude Include="TGLInputHandler.h" />
+    <ClInclude Include="TGLLibraryQueue.h" />
+    <ClInclude Include="TGLUDPInterface.h" />
     <ClInclude Include="tgl_gl.h" />
     <ClInclude Include="TMCDroppedItem.h" />
     <ClInclude Include="useful_structures.h" />
@@ -64,6 +67,7 @@
     <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_neon.cpp" />
     <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_sse2.cpp" />
     <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_sse41.cpp" />
+    <ClCompile Include="game_state\game_state.pb.cc" />
     <ClCompile Include="Generator.cpp" />
     <ClCompile Include="Simplex.cpp" />
     <ClCompile Include="TGLBounds.cpp" />
@@ -79,6 +83,7 @@
     <ClCompile Include="TGLHudElement.cpp" />
     <ClCompile Include="TGLInputHandler.cpp" />
     <ClCompile Include="TGLInventory.cpp" />
+    <ClCompile Include="TGLLibraryQueue.cpp" />
     <ClCompile Include="TGLMaterial.cpp" />
     <ClCompile Include="TGLMesh.cpp" />
     <ClCompile Include="TGLMeshVertices.cpp" />
@@ -86,6 +91,7 @@
     <ClCompile Include="TGLPlayer.cpp" />
     <ClCompile Include="TGLShader.cpp" />
     <ClCompile Include="TGLTexture.cpp" />
+    <ClCompile Include="TGLUDPInterface.cpp" />
     <ClCompile Include="TMCDroppedItem.cpp" />
     <ClCompile Include="useful_structures.cpp" />
     <ClCompile Include="WhiteNoise.cpp" />
@@ -197,18 +203,18 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\;.\include;.\opengl_engine\include;C:\Users\teddy\Source\Repos\opengl_engine\glfw-3.2.1\include;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\FastNoiseSIMD;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\glm-0.9.9-a2;C:\Users\teddy\Source\Repos\opengl_engine\tmc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\teddy\vcpkg\packages\protobuf_x64-windows\include;.\;.\include;.\opengl_engine\include;C:\Users\teddy\Source\Repos\opengl_engine\glfw-3.2.1\include;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\FastNoiseSIMD;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\glm-0.9.9-a2;C:\Users\teddy\Source\Repos\opengl_engine\tmc</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_TGL_CLIENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\teddy\Source\Repos\opengl_engine\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\teddy\Source\Repos\opengl_engine\lib64;C:\Users\teddy\vcpkg\packages\protobuf_x64-windows\lib;C:\Users\teddy\vcpkg\packages\protobuf_x64-windows\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -123,6 +123,15 @@
     <ClInclude Include="TGLInputHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TGLLibraryQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TGLUDPInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_state\game_state.pb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\glad.c">
@@ -228,6 +237,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TGLInputHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TGLLibraryQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TGLUDPInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_state\game_state.pb.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

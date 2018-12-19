@@ -1,9 +1,14 @@
 
 #include <sys/types.h>          /* See NOTES */
+#ifdef _TGL_CLIENT
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#else
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#endif
 #include <iostream>
 #include <vector>
 #include <thread>
@@ -41,7 +46,11 @@ public:
     TGLLibraryQueue<std::pair<sockaddr_in,std::vector<char>>> buffer_queue;
 
 	sockaddr_in my_addr;
+#ifdef _TGL_CLIENT
+	SOCKET sock;
+#else
 	int sock;
+#endif
 	TGLUDPInterface();
 	int s_bind(std::string ip, int port);
 	int s_send(std::vector <char>& in_msg, std::string ip, int port);

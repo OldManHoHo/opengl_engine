@@ -15,12 +15,13 @@
 class TGLPlayer : public TGLCamera
 {
 	TGLMesh * debug_block;
+	TGLInventoryItem blank_item;
 	
 protected:
 	TGLInputHandler input_handler;
 
 public:
-
+	glm::vec3 forward_vec;
 	double multi_press_threshold;
 	std::vector <TGLHudElement*> hud;
 

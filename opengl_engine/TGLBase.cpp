@@ -247,6 +247,7 @@ void TGLBase::update()
 	auto duration = std::chrono::duration_cast< std::chrono::microseconds> (end - begin);
 	time_count++;
 	double time_delta = duration.count() / 1000000.0;
+	//time_delta = 1.0 / 1000;
 	time_sum += time_delta;
 	begin = std::chrono::steady_clock::now();
 	
@@ -282,6 +283,16 @@ void TGLBase::update()
 		//{
 		for (int i = 0; i < actors.size(); ++i)
 		{
+			if (actors[i]->is_chunk)
+			{
+				TGLChunk * act_chunk = (TGLChunk*)actors[i];
+				int chunk_x, chunk_y;
+				((TGLChunkSpawn*)chunks_spawner)->get_chunk_of_point(act_chunk->get_pos() + glm::vec3(1, 0, 1), chunk_x, chunk_y);
+				if (!((TGLChunkSpawn*)chunks_spawner)->chunk_in_fov(chunk_x, chunk_y, active_camera->get_pos(), ((TGLPlayer*)active_camera)->forward_vec))
+				{
+					continue;
+				}
+			}
 			std::vector <TGLComponent*> components = actors[i]->get_components();
 			//std::vector <TGLComponent*> components = (*actor_it)->get_components();
 			for (auto mesh_it = components.begin(); mesh_it != components.end(); ++mesh_it)

@@ -58,6 +58,7 @@ protected:
 public:
 	//flags
 	bool static_physics;
+	bool is_chunk;
 
 	TGLActor();
 	~TGLActor();

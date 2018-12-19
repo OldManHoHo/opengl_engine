@@ -108,6 +108,10 @@ TGLMesh::TGLMesh(TGLMeshVertices const* in_vertices)
 
 TGLMesh::~TGLMesh()
 {
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &normal_VBO);
+	glDeleteBuffers(1, &instance_VBO);
 }
 
 GLuint TGLMesh::new_attrib()
@@ -305,8 +309,9 @@ int TGLMesh::add_instance(glm::vec3 loc)
 	{
 		
 		glBufferSubData(GL_ARRAY_BUFFER, instance_count * 3 * sizeof(GLfloat), 3 * sizeof(GLfloat), data);
-		refresh_instances();
+		
 		instance_count += 1;
+		refresh_instances();
 		GLenum err;
 		while ((err = glGetError()) != GL_NO_ERROR)
 		{
@@ -324,6 +329,7 @@ int TGLMesh::add_instance(glm::vec3 loc)
 		buffer_size = instance_count + 50;
 		instance_count += 1;
 		glBufferData(GL_ARRAY_BUFFER, (instance_count + 50) * 3 * sizeof(GLfloat), &local_vbo_mem[0], GL_DYNAMIC_DRAW);
+		refresh_instances();
 		return instance_count - 1;
 		printf("TOO MANY INSTANCES\n");
 	}

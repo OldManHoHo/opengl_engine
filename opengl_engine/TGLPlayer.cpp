@@ -10,9 +10,10 @@
 //extern std::vector <GLfloat> vertex_data_block_small;
 extern TGLBase gl_base;
 
-TGLPlayer::TGLPlayer():
+TGLPlayer::TGLPlayer() :
 	inventory(10, 10),
-	multi_press_threshold(0.25)
+	multi_press_threshold(0.25),
+	blank_item(none, 0)
 {
 #ifdef _TGL_CLIENT
 	glfwSetInputMode(gl_base.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -24,7 +25,7 @@ TGLPlayer::TGLPlayer():
 			glm::vec3(0.0f, 5.0f, -5.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f)));
 
-	TGLBounds * new_bounds = new TGLBlockBounds(0.9, 3.2, 0.9);
+	TGLBounds * new_bounds = new TGLBlockBounds(0.925, 1.85, 0.925);
 	set_bounds(new_bounds);
 	mass = 68;
 	hitting = glm::vec3(0,300,0);
@@ -94,6 +95,7 @@ void TGLPlayer::tick(double time_delta)
 	glm::vec3 forward_vector_crosshair(1.0, 0.0, 0.0);
 
 	forward_vector_crosshair = glm::mat3(get_rot())*forward_vector_crosshair;
+	forward_vec = forward_vector_crosshair;
 	//forward_vector += pos;
 	//forward_vector += glm::vec3(0.0, 0.5, 0);
 
@@ -132,6 +134,10 @@ void TGLPlayer::tick(double time_delta)
 		if (get_on_ground())
 		{
 			vel.y += 5;
+			if (vel.y > 5)
+			{
+				vel.y = 5;
+			}
 		}
 	}
 
@@ -155,7 +161,14 @@ void TGLPlayer::add_hud(TGLHudElement * in_hud)
 
 TGLInventoryItem& TGLPlayer::get_equipped()
 {
-	return *equipped_item;
+	if (equipped_item != nullptr)
+	{
+		return *equipped_item;
+	}
+	else
+	{
+		return blank_item;
+	}
 }
 
 bool TGLPlayer::change_inventory_amount(TGLItemId item_type, int in_amount)

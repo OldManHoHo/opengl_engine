@@ -76,18 +76,21 @@ void TMCPlayer::tick(double time_delta)
 			set_hitting(forward_vector);
 			e_block_type hit_type;
 			glm::vec3 block_to_add;
-			glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(get_pos(), forward_vector, max_hit_distance, hit_type, block_to_add);
+			glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(eye_loc, forward_vector, max_hit_distance, hit_type, block_to_add);
 
 
 			if (chunk_spawn != nullptr)
 			{
-				hit_properties props = get_equipped().get_hit_properties();
-				block_hit hit_to_post;
-				hit_to_post.loc = hit_block;
-				hit_to_post.props = props;
-				hit_to_post.type = item_id_to_block_type(get_equipped().type);
-				chunk_spawn->post_hit(hit_to_post);
-
+				TGLInventoryItem& check = get_equipped();
+				if (check.type != none)
+				{
+					hit_properties props = get_equipped().get_hit_properties();
+					block_hit hit_to_post;
+					hit_to_post.loc = hit_block;
+					hit_to_post.props = props;
+					hit_to_post.type = item_id_to_block_type(get_equipped().type);
+					chunk_spawn->post_hit(hit_to_post);
+				}
 			}
 			time_since_last_left = 0;
 		}
@@ -105,16 +108,19 @@ void TMCPlayer::tick(double time_delta)
 			set_hitting(forward_vector);
 			e_block_type hit_type;
 			glm::vec3 block_to_add;
-			glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(get_pos(), forward_vector, max_hit_distance, hit_type, block_to_add);
-
+			glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(eye_loc, forward_vector, max_hit_distance, hit_type, block_to_add);
 
 			if (chunk_spawn != nullptr)
 			{
-				e_block_type type_to_add = item_id_to_block_type(get_equipped().type);
-				if (type_to_add != bt_invalid)
+				TGLInventoryItem& check = get_equipped();
+				if (check.type != none)
 				{
-					chunk_spawn->post_placement(block_def(block_to_add.x, block_to_add.y, block_to_add.z, type_to_add));
-					change_inventory_amount(get_equipped().type, -1);
+					e_block_type type_to_add = item_id_to_block_type(get_equipped().type);
+					if (type_to_add != bt_invalid)
+					{
+						chunk_spawn->post_placement(block_def(block_to_add.x, block_to_add.y, block_to_add.z, type_to_add));
+						change_inventory_amount(get_equipped().type, -1);
+					}
 				}
 			}
 		}

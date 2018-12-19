@@ -335,7 +335,7 @@ glm::vec3 TGLChunkSpawn::get_block_pointed_at(glm::vec3 origin, glm::vec3 pointi
 		e_block_type block_type_crosshair = bt_air;
 		glm::vec3 next_block_crosshair = origin;
 		glm::vec3 prev_block_crosshair = next_block_crosshair;
-		while (block_type_crosshair == bt_air && glm::length(origin - next_block_crosshair) < max_distance)
+		while ((block_type_crosshair == bt_water || block_type_crosshair == bt_air) && glm::length(origin - next_block_crosshair) < max_distance)
 		{
 			prev_block_crosshair = next_block_crosshair;
 			next_block_crosshair = ray_cast_block_finder(origin, pointing_vector, origin + next_ray_crosshair*1.01f, next_ray_crosshair);
@@ -489,9 +489,51 @@ void TGLChunkSpawn::tick(double time_delta)
 			second_angle = temp;
 		}
 
-		chunks_to_load = get_chunks(-int(player->get_pos().x/16), -int(player->get_pos().z/16), 10, first_angle, second_angle);
+		int chunk_x, chunk_y;
+		get_chunk_of_point(player->get_pos(), chunk_x, chunk_y);
+		glm::vec3 chunk_pos(chunk_x, 0, chunk_y);
 
+		chunks_to_load.clear();
+		int load_radius = 10;
+		for (int i = 0; i < load_radius; ++i)
+		{
+			for (int j = -i; j < i; ++j)
+			{
+				chunks_to_load.push_back(chunk_coord(chunk_x + i, chunk_y + j));
+				chunks_to_load.push_back(chunk_coord(chunk_x + j, chunk_y + i));
+				chunks_to_load.push_back(chunk_coord(chunk_x + -i, chunk_y + j));
+				chunks_to_load.push_back(chunk_coord(chunk_x + j, chunk_y + -i));
+			}
+		}
+
+		glm::vec3 chunk_angle = glm::vec3(player->forward_vec.x,0, player->forward_vec.z)/glm::length(glm::vec3(player->forward_vec.x,0, player->forward_vec.z));
+		glm::vec3 next_start_point = chunk_pos + chunk_angle*0.1f;
+		glm::vec3 next_ray_chunk;
+		glm::vec3 out_chunk;
+		
+		while (glm::length(next_start_point - chunk_pos) < 10)
+		{
+			out_chunk = ray_cast_block_finder(chunk_pos, chunk_angle, next_start_point, next_ray_chunk);
+			next_start_point = chunk_pos + next_ray_chunk*1.01f;
+			chunks_to_load.push_back(chunk_coord(out_chunk.x, out_chunk.z));
+		}
+		
+		/*
+		glm::vec3 next_ray_crosshair = player->crosshair*0.01f;
+		e_block_type block_type_crosshair = bt_air;
+		glm::vec3 next_block_crosshair = player->get_pos();
+		glm::vec3 prev_block_crosshair = next_block_crosshair;
+		while (block_type_crosshair == bt_air && glm::length(player->get_pos() - next_block_crosshair) < 5)
+		{
+			prev_block_crosshair = next_block_crosshair;
+			next_block_crosshair = ray_cast_block_finder(player->get_pos(), player->crosshair, player->get_pos() + next_ray_crosshair*1.01f, next_ray_crosshair);
+			block_type_crosshair = block_generator->get_point(next_block_crosshair.x, next_block_crosshair.z, next_block_crosshair.y);
+		}
+		chunks_to_load = get_chunks(chunk_x, chunk_y, 10, first_angle, second_angle);
+		*/
 #ifdef _TGL_CLIENT
+		if (chunks.size() < 400)
+		{
 		for (auto it = chunks_to_load.begin(); it != chunks_to_load.end(); ++it)
 		{
 			if (chunks.find((*it)) == chunks.end())
@@ -499,8 +541,19 @@ void TGLChunkSpawn::tick(double time_delta)
 				//printf("Spawning %d, %d\n", (*it).x, (*it).y);
 
 				//client_request_chunk((*it).x, (*it).y);
-				spawn_chunk((*it).x, (*it).y);
+				
+					spawn_chunk((*it).x, (*it).y);
+				
 				break;
+			}
+		}
+		}
+		for (auto it = chunks.begin(); it != chunks.end(); ++it)
+		{
+			double distance = glm::length(glm::vec3((*it).first.x,0, (*it).first.y) - chunk_pos);
+			if (distance > 15)
+			{
+				despawn_chunk((*it).first.x, (*it).first.y);
 			}
 		}
 #else
@@ -553,7 +606,7 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 				instances[tp].push_back(180);
 				instances[tp].push_back(j-1);
 			}
-			else if (chunk_x == 0 && chunk_y == 0)
+			else if (chunk_x == 0 && chunk_y == 0 && 0)
 			{
 				for (int k = 150; k < 256; k++)
 				{
@@ -562,7 +615,7 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 					instances[bt_dirt_with_grass - 1].push_back(j - 1);
 				}
 			}
-			else if (chunk_x == 5 && chunk_y == 0)
+			else if (chunk_x == 5 && chunk_y == 0 && 0)
 			{
 				for (int k = 150; k < 256; k++)
 				{
@@ -571,7 +624,7 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 					instances[bt_dirt - 1].push_back(j - 1);
 				}
 			}
-			else if (chunk_x == 0 && chunk_y == 5)
+			else if (chunk_x == 0 && chunk_y == 5 && 0)
 			{
 				for (int k = 150; k < 256; k++)
 				{
@@ -595,7 +648,7 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 					//{
 					//	printf("FART\n");
 					//}
-					if (block_type > 0 && block_generator->is_visible(i, j, k) && k > 150)
+					if (block_type > 0 && block_generator->is_visible(i, j, k) && k > 100)
 					{
 						instances[block_type - 1].push_back(i-1);
 						instances[block_type - 1].push_back(k);
@@ -610,6 +663,15 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 	chunks[chunk_coord(chunk_x, chunk_y)]->translate(glm::vec3(16 * chunk_x, 0, 16 * chunk_y));
 #endif
 	gl_base.add_actor(chunks[chunk_coord(chunk_x, chunk_y)]);
+}
+
+void TGLChunkSpawn::despawn_chunk(int chunk_x, int chunk_y)
+{
+#ifdef _TGL_CLIENT
+	gl_base.remove_actor(chunks[chunk_coord(chunk_x, chunk_y)]);
+	delete chunks[chunk_coord(chunk_x, chunk_y)];
+	chunks.erase(chunk_coord(chunk_x, chunk_y));
+#endif
 }
 
 std::vector <GLfloat> TGLChunkSpawn::create_uv_map(std::vector <face_map_pair> pairs)
@@ -837,4 +899,27 @@ void TGLChunkSpawn::server_send_chunk_mods(int chunk_x, int chunk_y)
 {
 	//void * chunk_mods = create_chunk_mod_message(chunk_x, chunk_y);
 	//queue_network_message(chunk_mods);
+}
+
+bool TGLChunkSpawn::chunk_in_fov(int chunk_x, int chunk_y, glm::vec3 player, glm::vec3 player_forward)
+{
+	glm::vec3 chunk_angle = glm::vec3(player_forward.x, 0, player_forward.z) / glm::length(glm::vec3(player_forward.x, 0, player_forward.z));
+
+	glm::vec3 between_vec = glm::normalize(glm::vec3(chunk_x * 16, player.y, chunk_y * 16) - player);
+	double angle_between = acos(glm::dot(chunk_angle, between_vec));
+	int p_chunk_x, p_chunk_y;
+	get_chunk_of_point(player, p_chunk_x, p_chunk_y);
+	double chunk_distance = glm::length(glm::vec2(p_chunk_x, p_chunk_y) - glm::vec2(chunk_x, chunk_y));
+	if (chunk_distance < 2)
+	{
+		return true;
+	}
+	if (angle_between > 3.14159 / 2.25)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }

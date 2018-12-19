@@ -113,7 +113,7 @@ public:
 	e_block_type check_for_mod(int in_x, int in_y, int in_z);
 	e_block_type index(int in_x, int in_y, int in_z);
 	bool is_visible(int in_x, int in_y, int in_z);
-	void get_tree(float * in_noise, e_block_type * in_blocks, int in_x, int in_y, int in_z);
+	void get_tree(float * in_noise, e_block_type * in_blocks, int in_x, int in_y, int in_z, int chunk_x = 0, int chunk_y = 0);
 
 };
 

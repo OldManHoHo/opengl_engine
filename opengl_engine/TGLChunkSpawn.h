@@ -89,6 +89,9 @@ public:
 	void client_request_chunk(int chunk_x, int chunk_y);
 	void server_send_chunk_mods(int chunk_x, int chunk_y);
 	bool chunk_in_fov(int chunk_x, int chunk_y, glm::vec3 player, glm::vec3 player_forward);
+#ifdef _TGL_CLIENT
+	std::vector <GLshort> TGLChunkSpawn::get_block_light_value(int in_x, int in_y, int in_z);
+#endif
 };
 
 #endif

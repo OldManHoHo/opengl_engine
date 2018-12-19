@@ -8,7 +8,7 @@
 BlockGenerator::BlockGenerator(bool tester):test_gen(tester)
 {
 	auto timet = std::chrono::system_clock::now();
-	seed = std::chrono::duration_cast<std::chrono::seconds>(timet.time_since_epoch()).count() % 1000;
+	seed = 0;// std::chrono::duration_cast<std::chrono::seconds>(timet.time_since_epoch()).count() % 1000;
 	height = new Simplex(10 + seed, 1);
 	height2 = new Simplex(11 + seed, 4);
 	height3 = new Simplex(13 + seed, 0.1);
@@ -121,7 +121,6 @@ e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 			{
 				block = bt_dirt_with_grass;
 			}
-
 
 		}
 		else if (in_z < height_draw - 5 || mountain_draw > 0.3)
@@ -251,7 +250,9 @@ e_block_type * BlockGenerator::get_points(int in_x, int in_y, int in_z, int divi
 
 							if (abs(trees_noise[counter]) + abs(noises[j*division + k])*0.1 < 0.04)
 							{
-								get_tree(trees_noise, blocks, j, k, i);
+								int chunk_x = floor((in_x) / 16.0);
+								int chunk_y = floor((in_y) / 16.0);
+								get_tree(trees_noise, blocks, j, k, i, chunk_x, chunk_y);
 							}
 						}
 						else if (i < height_draw - 5 || mountain_draw > 0.3)
@@ -361,17 +362,17 @@ e_block_type BlockGenerator::index(int in_x, int in_y, int in_z)
 
 bool BlockGenerator::is_visible(int in_x, int in_y, int in_z)
 {
-	if (index(in_x, in_y, in_z + 1) != 0 && index(in_x, in_y, in_z + 1) != 5 && index(in_x, in_y, in_z + 1) != 6 )
+	if (index(in_x, in_y, in_z + 1) != bt_air && index(in_x, in_y, in_z + 1) != bt_water && index(in_x, in_y, in_z + 1) != bt_leaves)// && index(in_x, in_y, in_z + 1) != 5 && index(in_x, in_y, in_z + 1) != 6 )
 	{
-		if (index(in_x, in_y, in_z - 1) != 0 && index(in_x, in_y, in_z - 1) != 5 && index(in_x, in_y, in_z - 1) != 6 )
+		if (index(in_x, in_y, in_z - 1) != bt_air && index(in_x, in_y, in_z - 1) != bt_water && index(in_x, in_y, in_z - 1) != bt_leaves)// && index(in_x, in_y, in_z - 1) != 5 && index(in_x, in_y, in_z - 1) != 6 )
 		{
-			if (index(in_x, in_y + 1, in_z) != 0 && index(in_x, in_y + 1, in_z) != 5 && index(in_x, in_y + 1, in_z) != 6 )
+			if (index(in_x, in_y + 1, in_z) != bt_air && index(in_x, in_y + 1, in_z) != bt_water && index(in_x, in_y + 1, in_z) != bt_leaves)// && index(in_x, in_y + 1, in_z) != 5 && index(in_x, in_y + 1, in_z) != 6 )
 			{
-				if (index(in_x, in_y - 1, in_z) != 0 && index(in_x, in_y - 1, in_z) != 5 && index(in_x, in_y - 1, in_z) != 6 )
+				if (index(in_x, in_y - 1, in_z) != bt_air && index(in_x, in_y - 1, in_z) != bt_water && index(in_x, in_y - 1, in_z) != bt_leaves)// && index(in_x, in_y - 1, in_z) != 5 && index(in_x, in_y - 1, in_z) != 6 )
 				{
-					if (index(in_x + 1, in_y, in_z) != 0 && index(in_x + 1, in_y, in_z) != 5 && index(in_x + 1, in_y, in_z) != 6 )
+					if (index(in_x + 1, in_y, in_z) != bt_air && index(in_x + 1, in_y, in_z) != bt_water && index(in_x + 1, in_y, in_z) != bt_leaves)// && index(in_x + 1, in_y, in_z) != 5 && index(in_x + 1, in_y, in_z) != 6 )
 					{
-						if (index(in_x - 1, in_y, in_z) != 0 && index(in_x - 1, in_y, in_z) != 5 && index(in_x - 1, in_y, in_z) != 6)
+						if (index(in_x - 1, in_y, in_z) != bt_air && index(in_x - 1, in_y, in_z) != bt_water && index(in_x - 1, in_y, in_z) != bt_leaves)// && index(in_x - 1, in_y, in_z) != 5 && index(in_x - 1, in_y, in_z) != 6)
 						{
 							return 0;
 						}
@@ -386,7 +387,7 @@ bool BlockGenerator::is_visible(int in_x, int in_y, int in_z)
 	return retval;
 }
 
-void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in_x, int in_y, int in_z)
+void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in_x, int in_y, int in_z, int chunk_x, int chunk_y)
 {
 	int count = 1;
 	float prob = 0.99;
@@ -399,38 +400,43 @@ void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in
 		{
 			break;
 		}
-		in_blocks[in_x * 18 * 256 + in_y * 256 + in_z + count] = bt_tree;
+		in_blocks[in_x * size_x * 256 + in_y * 256 + in_z + count] = bt_tree;
+		set_point(bt_tree, chunk_x * 16 + in_x, chunk_y * 16 + in_y, in_z + count);
 		if (count > 2)
 		{
-			if (in_y + 1 <= 17)
+			if (in_y + 1 <= 15)
 			{
-				if (abs(in_noise[in_x * 18 * 256 + (in_y + 1) * 256 + in_z + count]) > branch_prob)
+				if (abs(in_noise[in_x * size_x * 256 + (in_y + 1) * 256 + in_z + count]) > branch_prob)
 				{
-					in_blocks[in_x * 18 * 256 + (in_y + 1) * 256 + in_z + count] = bt_leaves;
+					in_blocks[in_x * size_x * 256 + (in_y + 1) * 256 + in_z + count] = bt_leaves;
+					set_point(bt_leaves, chunk_x*16 + in_x, chunk_y * 16 + in_y + 1, in_z + count);
 				}
 			}
 			if (in_y - 1 >= 0)
 			{
-				if (abs(in_noise[in_x * 18 * 256 + (in_y - 1) * 256 + in_z + count]) > branch_prob)
+				if (abs(in_noise[in_x * size_x * 256 + (in_y - 1) * 256 + in_z + count]) > branch_prob)
 				{
-					in_blocks[in_x * 18 * 256 + (in_y - 1) * 256 + in_z + count] = bt_leaves;
+					in_blocks[in_x * size_x * 256 + (in_y - 1) * 256 + in_z + count] = bt_leaves;
+					set_point(bt_leaves, chunk_x * 16 + in_x, chunk_y * 16 + in_y - 1, in_z + count);
 				}
 			}
-			if (in_x + 1 <= 17)
+			if (in_x + 1 <= 15)
 			{
-				if (abs(in_noise[(in_x + 1) * 18 * 256 + in_y * 256 + in_z + count]) > branch_prob)
+				if (abs(in_noise[(in_x + 1) * size_x * 256 + in_y * 256 + in_z + count]) > branch_prob)
 				{
-					in_blocks[(in_x + 1) * 18 * 256 + in_y * 256 + in_z + count] = bt_leaves;
+					in_blocks[(in_x + 1) * size_x * 256 + in_y * 256 + in_z + count] = bt_leaves;
+					set_point(bt_leaves, chunk_x * 16 + in_x + 1, chunk_y * 16 + in_y, in_z + count);
 				}
 			}
 			if (in_x - 1 >= 0)
 			{
-				if (abs(in_noise[(in_x - 1) * 18 * 256 + in_y * 256 + in_z + count]) > branch_prob)
+				if (abs(in_noise[(in_x - 1) * size_x * 256 + in_y * 256 + in_z + count]) > branch_prob)
 				{
-					in_blocks[(in_x - 1) * 18 * 256 + in_y * 256 + in_z + count] = bt_leaves;
+					in_blocks[(in_x - 1) * size_x * 256 + in_y * 256 + in_z + count] = bt_leaves;
+					set_point(bt_leaves, chunk_x * 16 + in_x - 1, chunk_y * 16 + in_y, in_z + count);
 				}
 			}
-			if (in_noise[in_x * 18 * 256 + in_y * 256 + in_z + count] > prob)
+			if (in_noise[in_x * size_x * 256 + in_y * 256 + in_z + count] > prob)
 			{
 				break;
 			}

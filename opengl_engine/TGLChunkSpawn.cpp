@@ -963,3 +963,98 @@ bool TGLChunkSpawn::chunk_in_fov(int chunk_x, int chunk_y, glm::vec3 player, glm
 		return true;
 	}
 }
+
+
+void TGLChunkSpawn::recalculate_light(int in_chunk_x, int in_chunk_y, glm::vec3 sun_dir)
+{
+	int ray_grid_width = 64;
+	int secondary_bounces = 8;
+	
+	int chunk_x, chunk_y;
+	
+	std::vector<glm::vec3> secondary_lights;
+	
+	for (int i = 0; i < ray_grid_width; ++i)
+	{
+		for (int j = 0; j < ray_grid_width; ++j)
+		{
+			glm::vec3 light_origin = glm::vec3(16*in_chunk_x + i, 16*in_chunk_y + j, 150) + sun_dir*30.0f;
+			glm::vec3 light_dir = sun_dir*-1.0f;
+			e_block_type hit_type;
+			glm::vec3 prev_block;
+			glm::vec3 pointed_at = get_block_pointed_at(light_origin, light_dir, 50, hit_type, prev_block);
+			
+			get_chunk_of_point(pointed_at, chunk_x, chunk_y);
+			chunk_coord chunk_loc(chunk_x,chunk_y);
+			
+			if(light_calcs.find(chunk_loc) == light_calcs.end())
+			{
+				light_calcs[chunk_loc] = std::map<block_coord,unsigned char>();
+			}
+			light_calcs[chunk_loc][pointed_at] = 128;
+			if (glm::length(pointed_at) < 1000)
+			{
+				secondary_lights.push_back(pointed_at);
+			}
+		}
+	}
+
+	for (auto light : secondary_lights)
+	{
+		glm::vec3 light_origin = light;
+		for (int i = 0; i < secondary_bounces; ++i)
+		{
+			float theta = 2*3.1415926*rand()/RAND_MAX;
+			float phi = 3.1415926*rand()/RAND_MAX;
+			float x = cos(theta);
+			float z = sin(theta);
+			float y = sin(phi);
+			glm::vec3 ray = glm::normalize(glm::vec3(x,z,y));
+			
+			glm::vec3 light_dir = ray;
+			e_block_type hit_type;
+			glm::vec3 prev_block;
+			glm::vec3 pointed_at = get_block_pointed_at(light_origin, light_dir, 16, hit_type, prev_block);
+			
+			get_chunk_of_point(pointed_at, chunk_x, chunk_y);
+			chunk_coord chunk_loc(chunk_x,chunk_y);
+			
+			float dist = glm::length(light_origin - pointed_at);
+			
+			if(light_calcs.find(chunk_loc) == light_calcs.end())
+			{
+				light_calcs[chunk_loc] = std::map<block_coord,unsigned char>();
+			}
+			light_calcs[chunk_loc][pointed_at] = (unsigned char)(256.0/(dist*dist));
+		}
+	}
+	for (auto chunk : light_calcs)
+	{
+		if (chunks.find(chunk.first) == chunks.end())
+		{
+			continue;
+		}
+		TGLChunk * cur_chunk = chunks[chunk.first];
+		
+		for (auto comp : cur_chunk->get_components())
+		{
+			TGLMesh * mesh = (TGLMesh*)comp;
+			std::vector <unsigned char> light_vals(mesh->local_vbo_mem.size()/3);
+			
+			for (int i = 0; i < mesh->local_vbo_mem.size(); i += 3)
+			{
+				
+				block_coord bc(mesh->local_vbo_mem[i],mesh->local_vbo_mem[i+1], mesh->local_vbo_mem[i+2]);
+				int light_val_index = i/3;
+				if (light_calcs[chunk.first].find(bc) != light_calcs[chunk.first].end())
+				{
+					light_vals[light_val_index] = light_calcs[chunk.first][bc];
+				}
+				else
+				{
+					light_vals[light_val_index] = 1;
+				}
+			}
+		}
+	}
+}

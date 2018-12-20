@@ -64,6 +64,8 @@ class TGLChunkSpawn : public TGLActor
 	std::deque <block_def> posted_placements;
 	//td::unordered_map <chunk_coord, std::vector<TGLActor*>> dropped_items;
 	chunk_searcher<chunk_coord, TGLActor*> dropped_items;
+	
+	std::map <chunk_coord, std::map<block_coord,unsigned char>> light_calcs;
 
 	bool test_chunk;
 	static e_block_type pointed_at;
@@ -92,6 +94,7 @@ public:
 #ifdef _TGL_CLIENT
 	std::vector <GLshort> TGLChunkSpawn::get_block_light_value(int in_x, int in_y, int in_z);
 #endif
+	void recalculate_light(int in_chunk_x, int in_chunk_y, glm::vec3 sun_dir);
 };
 
 #endif

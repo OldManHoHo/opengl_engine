@@ -74,6 +74,8 @@ class TGLBase
 	glm::vec3 sun_pos;
 	glm::vec3 sun_intensity;
 	glm::vec3 sun_dir;
+	
+	std::map <chunk_coord, std::map<block_coord,unsigned char>> light_calcs;
 
 public:
 

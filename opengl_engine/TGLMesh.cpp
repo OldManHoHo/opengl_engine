@@ -347,3 +347,19 @@ void TGLMesh::refresh_instances()
 	local_vbo_mem.resize(instance_count * 3);
 	glGetBufferSubData(GL_ARRAY_BUFFER, 0, instance_count * 3 * sizeof(GLfloat), &local_vbo_mem[0]);
 }
+
+void TGLMesh::enable_light_data(std::map<chunk_coord,std::map<block_coord,unsigned char>>& light_vals)
+{
+	glBindVertexArray(VAO);
+	glGenBuffers(1, &light_VBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
+	
+	glBufferData(GL_ARRAY_BUFFER, local_vbo_mem.size() * 3 * sizeof(GLfloat), instance_locations, GL_DYNAMIC_DRAW);
+	
+	light_attrib = new_attrib();
+	glVertexAttribPointer(light_attrib, 3, GL_UNSIGNED_BYTE, GL_FALSE, 3 * sizeof(GLbyte), (void*)0);
+	glEnableVertexAttribArray(light_attrib);
+	glVertexAttribDivisor(light_attrib, 1);
+	refresh_instances();
+}

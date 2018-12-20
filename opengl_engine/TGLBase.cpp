@@ -369,7 +369,7 @@ void TGLBase::update()
 	while(1)
 	{
 		auto light_begin = std::chrono::steady_clock::now();
-		recalculate_light(0,0);
+		((TGLChunkSpawn*)chunks_spawner)->recalculate_light(0,0,sun_dir);
 		auto light_end = std::chrono::steady_clock::now();
 		int u_sec = std::chrono::duration_cast<std::chrono::microseconds> (light_end - light_begin).count();
 		std::cout << "light time " << u_sec << "\n";
@@ -835,8 +835,10 @@ void TGLBase::update_sun(double time_delta)
 
 void TGLBase::recalculate_light(int in_chunk_x, int in_chunk_y)
 {
-	int ray_grid_width = 256;
-	int secondary_bounces = 16;
+	int ray_grid_width = 64;
+	int secondary_bounces = 8;
+	
+	int chunk_x, chunk_y;
 	
 	std::vector<glm::vec3> secondary_lights;
 	
@@ -849,6 +851,15 @@ void TGLBase::recalculate_light(int in_chunk_x, int in_chunk_y)
 			e_block_type hit_type;
 			glm::vec3 prev_block;
 			glm::vec3 pointed_at = ((TGLChunkSpawn*)chunks_spawner)->get_block_pointed_at(light_origin, light_dir, 50, hit_type, prev_block);
+			
+			((TGLChunkSpawn*)chunks_spawner)->get_chunk_of_point(pointed_at, chunk_x, chunk_y);
+			chunk_coord chunk_loc(chunk_x,chunk_y);
+			
+			if(light_calcs.find(chunk_loc) == light_calcs.end())
+			{
+				light_calcs[chunk_loc] = std::map<block_coord,unsigned char>();
+			}
+			light_calcs[chunk_loc][pointed_at] = 128;
 			if (glm::length(pointed_at) < 1000)
 			{
 				secondary_lights.push_back(pointed_at);
@@ -871,7 +882,19 @@ void TGLBase::recalculate_light(int in_chunk_x, int in_chunk_y)
 			glm::vec3 light_dir = ray;
 			e_block_type hit_type;
 			glm::vec3 prev_block;
-			glm::vec3 pointed_at = ((TGLChunkSpawn*)chunks_spawner)->get_block_pointed_at(light_origin, light_dir, 50, hit_type, prev_block);
+			glm::vec3 pointed_at = ((TGLChunkSpawn*)chunks_spawner)->get_block_pointed_at(light_origin, light_dir, 16, hit_type, prev_block);
+			
+			((TGLChunkSpawn*)chunks_spawner)->get_chunk_of_point(pointed_at, chunk_x, chunk_y);
+			chunk_coord chunk_loc(chunk_x,chunk_y);
+			
+			float dist = glm::length(light_origin - pointed_at);
+			
+			if(light_calcs.find(chunk_loc) == light_calcs.end())
+			{
+				light_calcs[chunk_loc] = std::map<block_coord,unsigned char>();
+			}
+			light_calcs[chunk_loc][pointed_at] = (unsigned char)(256.0/(dist*dist));
 		}
 	}
+
 }

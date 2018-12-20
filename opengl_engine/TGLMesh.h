@@ -26,18 +26,20 @@ class TGLMesh : public TGLComponent
 	GLuint VBO;
 	GLuint normal_VBO;
 	GLuint instance_VBO;
+	GLuint light_VBO;
 	GLuint shader_program;
 
 	bool instance_flag;
 	GLuint instance_count;
 	GLuint buffer_size;
 	GLfloat * vbo_mem;
-	std::vector <GLfloat> local_vbo_mem;
+	
 
 	GLuint vertex_position_attrib;
 	GLuint vertex_normal_attrib;
 	GLuint uv_attrib;
 	GLuint instance_attrib;
+	GLuint light_attrib;
 	std::vector <GLuint> attribs;
 	std::vector <TGLShader *> shaders;
 	std::vector <TGLTexture *> textures;
@@ -50,6 +52,8 @@ class TGLMesh : public TGLComponent
 	GLuint new_attrib();
 
 public:
+	std::vector <GLfloat> local_vbo_mem;
+
 	TGLMesh(GLfloat * vertices, int length);
 	TGLMesh(TGLMeshVertices const* in_vertices);
 	~TGLMesh();
@@ -72,6 +76,8 @@ public:
 	int add_instance(glm::vec3 loc);
 	std::vector <GLfloat>& get_instances();
 	void refresh_instances();
+	
+	void enable_light_data();
 };
 
 #endif

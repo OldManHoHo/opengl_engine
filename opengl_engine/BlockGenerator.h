@@ -41,6 +41,7 @@ struct chunk_coord
 struct block_coord
 {
 	block_coord() {}
+	block_coord(glm::vec3 in_vec) {x = in_vec.x; y = in_vec.y; z = in_vec.z;}
 	block_coord(int in_x, int in_y, int in_z) {
 		x = in_x; y = in_y; z = in_z;
 	}

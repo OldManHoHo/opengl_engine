@@ -9,7 +9,9 @@
 #include <thread>
 #include <ctime>
 #include <algorithm>
+#ifndef _TGL_CLIENT
 #include <unistd.h>
+#endif
 
 TGLBase::TGLBase(): 
 #ifndef _TGL_CLIENT
@@ -152,12 +154,21 @@ void TGLBase::apply_game_state(std::vector <char> * in_state)
 	offset += sizeof(short);
 	for (int i = 0; i < num_actors; ++i)
 	{
+		TGLActor * cur_actor = nullptr;
 		short actor_id = *(short*)&(*in_state)[offset];
 		offset += sizeof(short);
+		for (auto actor : actors)
+		{
+			if (actor->id = actor_id)
+			{
+				cur_actor = actor;
+			}
+		}
 		short actor_type = *(short*)&(*in_state)[offset];
 		offset += sizeof(short);
 		glm::mat4 actor_trans;
 		std::copy(&(*in_state)[offset], &(*in_state)[offset] + 16, glm::value_ptr(actor_trans));
+		cur_actor->transform = actor_trans;
 		offset += sizeof(GLfloat)*16;
 		
 		short num_int_props = *(short*)&(*in_state)[offset];
@@ -382,7 +393,7 @@ int TGLBase::init()
 	udp_interface.pop_msg(net_msg);
 	while (net_msg == nullptr)
 	{
-		udp_interface.s_send(handshake, "192.168.1.66", 12345);
+		udp_interface.s_send(handshake, "192.168.1.66", 12347);
 		udp_interface.pop_msg(net_msg);
 		Sleep(1000);
 	}

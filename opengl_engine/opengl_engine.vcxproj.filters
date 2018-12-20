@@ -123,7 +123,6 @@
     <ClInclude Include="TGLInputHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="TGLLibraryQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -131,15 +130,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_state\game_state.pb.h">
-=======
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="TGLRayBounce.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ray_bounce_vertex.glsl">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ray_bounce_fragment.glsl">
->>>>>>> master
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -228,9 +221,6 @@
     <ClCompile Include="TGLBounds.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TGLHud.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TGLInventory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -249,17 +239,13 @@
     <ClCompile Include="TGLInputHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-<<<<<<< HEAD
     <ClCompile Include="TGLLibraryQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TGLUDPInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_state\game_state.pb.cc">
-=======
     <ClCompile Include="TGLRayBounce.cpp">
->>>>>>> master
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

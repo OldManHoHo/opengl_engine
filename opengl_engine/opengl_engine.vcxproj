@@ -21,17 +21,11 @@
   <ItemGroup>
     <ClInclude Include="..\tmc\TMCPlayer.h" />
     <ClInclude Include="BlockGenerator.h" />
-<<<<<<< HEAD
     <ClInclude Include="game_state\game_state.pb.h" />
     <ClInclude Include="TGLInputHandler.h" />
     <ClInclude Include="TGLLibraryQueue.h" />
-    <ClInclude Include="TGLUDPInterface.h" />
-=======
-    <ClInclude Include="ray_bounce_fragment.glsl" />
-    <ClInclude Include="ray_bounce_vertex.glsl" />
-    <ClInclude Include="TGLInputHandler.h" />
     <ClInclude Include="TGLRayBounce.h" />
->>>>>>> master
+    <ClInclude Include="TGLUDPInterface.h" />
     <ClInclude Include="tgl_gl.h" />
     <ClInclude Include="TMCDroppedItem.h" />
     <ClInclude Include="useful_structures.h" />
@@ -74,7 +68,6 @@
     <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_neon.cpp" />
     <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_sse2.cpp" />
     <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_sse41.cpp" />
-    <ClCompile Include="game_state\game_state.pb.cc" />
     <ClCompile Include="Generator.cpp" />
     <ClCompile Include="Simplex.cpp" />
     <ClCompile Include="TGLBounds.cpp" />
@@ -86,7 +79,6 @@
     <ClCompile Include="TGLBase.cpp" />
     <ClCompile Include="TGLCamera.cpp" />
     <ClCompile Include="TGLComponent.cpp" />
-    <ClCompile Include="TGLHud.cpp" />
     <ClCompile Include="TGLHudElement.cpp" />
     <ClCompile Include="TGLInputHandler.cpp" />
     <ClCompile Include="TGLInventory.cpp" />
@@ -187,8 +179,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\include;.\;C:\Users\teddy\Source\Repos\opengl_engine\glfw-3.2.1\include;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\FastNoiseSIMD;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\glm-0.9.9-a2</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\include;.\;C:\Users\teddy\Source\Repos\opengl_engine\glfw-3.2.1\include;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\FastNoiseSIMD;..\tmc;C:\Users\teddy\Source\Repos\opengl_engine\opengl_engine\glm-0.9.9-a2</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN64;_TGL_CLIENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\Users\teddy\Source\Repos\opengl_engine\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -211,7 +203,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>

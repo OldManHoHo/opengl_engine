@@ -49,6 +49,10 @@ struct block_coord
 		return (in_coord.x == x && in_coord.y == y && in_coord.z == z);
 	}
 
+	const bool operator < (const block_coord &r) const {
+		return (x < r.x) || (x == r.x && y < r.y) || (x == r.x && y == r.y && z < r.z);
+	}
+
 	glm::vec3 get_vec() { return glm::vec3(x, y, z); }
 	int x;
 	int y;
@@ -94,7 +98,7 @@ class BlockGenerator
 
 	bool test_gen;
 
-	std::map <chunk_coord, std::vector<block_def>> world_mods;
+	std::map <chunk_coord, std::map<block_coord,block_def>> world_mods;
 
 public:
 	//BlockStore block_file;

@@ -315,14 +315,17 @@ void BlockGenerator::set_point(e_block_type in_block_type, int in_x, int in_y, i
 		block_def def;
 		def.loc = block_coord(in_x - chunk_x * 16, in_y - chunk_y * 16, in_z);
 		def.type = in_block_type;
-		auto ind = std::find(world_mods[chunk_loc].begin(), world_mods[chunk_loc].end(), def);
-		if (ind != world_mods[chunk_loc].end())
+		//auto ind = std::find(world_mods[chunk_loc].begin(), world_mods[chunk_loc].end(), def);
+
+		if (world_mods[chunk_loc].find(def.loc) != world_mods[chunk_loc].end())
 		{
-			(*ind).type = in_block_type;
+			//(*ind).type = in_block_type;
+			world_mods[chunk_loc][def.loc].type = in_block_type;
 		}
 		else
 		{
-			world_mods[chunk_loc].push_back(def);
+			//world_mods[chunk_loc].push_back(def);
+			world_mods[chunk_loc][def.loc] = def;
 		}
 	}
 	else
@@ -330,8 +333,8 @@ void BlockGenerator::set_point(e_block_type in_block_type, int in_x, int in_y, i
 		block_def def;
 		def.loc = block_coord(in_x - chunk_x * 16, in_y - chunk_y * 16, in_z);
 		def.type = in_block_type;
-		world_mods[chunk_loc] = std::vector<block_def>();
-		world_mods[chunk_loc].push_back(def);
+		world_mods[chunk_loc] = std::map<block_coord,block_def>();
+		world_mods[chunk_loc][def.loc] = def;
 	}
 }
 
@@ -344,11 +347,14 @@ e_block_type BlockGenerator::check_for_mod(int in_x, int in_y, int in_z)
 	{
 		block_def def;
 		def.loc = block_coord(in_x - chunk_x * 16, in_y - chunk_y * 16, in_z);
-		
-		auto ind = std::find(world_mods[chunk_loc].begin(), world_mods[chunk_loc].end(), def);
-		if (ind != world_mods[chunk_loc].end())
+		if (world_mods[chunk_loc].size())
 		{
-			return (*ind).type;
+			//auto ind = std::find(world_mods[chunk_loc].begin(), world_mods[chunk_loc].end(), def);
+			if (world_mods[chunk_loc].find(def.loc) != world_mods[chunk_loc].end())
+			{
+				//return (*ind).type;
+				return world_mods[chunk_loc][def.loc].type;
+			}
 		}
 	}
 	return bt_invalid;

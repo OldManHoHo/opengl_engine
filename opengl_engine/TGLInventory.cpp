@@ -183,4 +183,5 @@ int main_inventory()
 	test_inventory.print_inventory();
 	test_inventory.change_quantity(iid_stone_block, 4);
 	test_inventory.print_inventory();
+	return 1;
 }

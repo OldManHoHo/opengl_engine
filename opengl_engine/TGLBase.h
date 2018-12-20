@@ -38,7 +38,6 @@ class TGLBase
 	int window_height;
 	int window_width;
 	
-
 	TGLUDPInterface udp_interface;
 	std::vector <char> game_state_buf;
 #ifdef _TGL_CLIENT
@@ -57,13 +56,10 @@ class TGLBase
 	TGLActor * chunks_spawner;
 	TGLPhysicsEngine physics_engine;
 
-	
-
 	std::chrono::steady_clock::time_point end;
 	std::chrono::steady_clock::time_point begin;
 	double time_sum;
 	int time_count;
-
 
 	GLuint default_shader_program;
 
@@ -77,12 +73,12 @@ class TGLBase
 	bool shadow_maps_enabled;
 	glm::vec3 sun_pos;
 	glm::vec3 sun_intensity;
+	glm::vec3 sun_dir;
 
 public:
 
 	TGLBase();
 	~TGLBase();
-
 
 #ifdef _TGL_CLIENT
 	TGLRayBounce ray_bounce;
@@ -93,8 +89,6 @@ public:
 	GLFWwindow * get_window();
 	void add_camera(TGLCamera * in_camera);
 	void add_hud_element(TGLHudElement * in_element);
-	void load_model(float * vertices);
-	void load_shader(char * vertex_shader, char * fragment_shader);
 	void apply_game_state(std::vector <char> * in_state);
 	void process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair);
 #else
@@ -116,6 +110,8 @@ public:
 	void set_world_actor(TGLActor * in_actor);
 	void get_game_state();
 	void update_sun(double time_delta);
+	
+	void recalculate_light(int in_chunk_x, int in_chunk_y);
 };
 
 

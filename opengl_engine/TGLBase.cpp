@@ -9,9 +9,11 @@
 #include <thread>
 #include <ctime>
 #include <algorithm>
+#include <stdlib.h>
 #ifndef _TGL_CLIENT
 #include <unistd.h>
 #endif
+
 
 TGLBase::TGLBase(): 
 #ifndef _TGL_CLIENT
@@ -22,9 +24,8 @@ TGLBase::TGLBase():
 	game_state_buf(1024,0),
 	shadow_maps_enabled(true)
 {
-	
+	srand(0);
 }
-
 
 TGLBase::~TGLBase()
 {
@@ -43,8 +44,6 @@ bool TGLBase::gl_init()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	
-
 	return true;
 }
 
@@ -84,55 +83,14 @@ GLFWwindow * TGLBase::get_window()
 	return window;
 }
 
-
 void TGLBase::add_camera(TGLCamera * in_camera)
 {
 	active_camera = in_camera;
 }
 
-
 void TGLBase::add_hud_element(TGLHudElement * in_element)
 {
 	HUD_elements.push_back(in_element);
-}
-
-
-void TGLBase::load_model(float * vertices)
-{
-
-	unsigned int VBO;
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-
-}
-
-void TGLBase::load_shader(char * vertex_shader, char * fragment_shader)
-{
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-	glShaderSource(vertexShader, 1, &vertex_shader, NULL);
-	glCompileShader(vertexShader);
-
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragment_shader, NULL);
-	glCompileShader(fragmentShader);
-
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	glUseProgram(shaderProgram);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
 }
 
 void TGLBase::apply_game_state(std::vector <char> * in_state)
@@ -230,7 +188,6 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 }
 
 #else
-
 
 void TGLBase::send_game_state_to_all()
 {
@@ -409,9 +366,14 @@ int TGLBase::init()
 
 void TGLBase::update()
 {
-	
-	
-	
+	while(1)
+	{
+		auto light_begin = std::chrono::steady_clock::now();
+		recalculate_light(0,0);
+		auto light_end = std::chrono::steady_clock::now();
+		int u_sec = std::chrono::duration_cast<std::chrono::microseconds> (light_end - light_begin).count();
+		std::cout << "light time " << u_sec << "\n";
+	}
 	// render loop
 	//while (!glfwWindowShouldClose(window))
 	auto duration = std::chrono::duration_cast< std::chrono::microseconds> (end - begin);
@@ -467,7 +429,10 @@ void TGLBase::update()
 		
 #endif
 
+
 #ifdef _TGL_CLIENT
+///////////////////////////////////////////
+// SHADOW MAP DRAWING
 		if (shadow_maps_enabled && time_count % shadow_map_interval == 0)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, ray_bounce.get_framebuffer());
@@ -541,6 +506,8 @@ void TGLBase::update()
 		glViewport(0, 0, window_width, window_height);
 #endif
 
+///////////////////////////////////////////
+// ACTOR DRAWING AND TICKING
 		//for (auto actor_it = actors.begin(); actor_it != actors.end(); ++actor_it)
 		//{
 		for (int i = 0; i < actors.size(); ++i)
@@ -663,6 +630,9 @@ void TGLBase::update()
 			
 			//(*actor_it)->tick(time_delta);
 		}
+
+///////////////////////////////////////////
+// HUD DRAWING
 #ifdef _TGL_CLIENT
 		for (int i = 0; i < HUD_elements.size(); ++i)
 		{
@@ -725,6 +695,9 @@ void TGLBase::update()
 			}
 		}
 #endif
+
+///////////////////////////////////////////
+// PHYSICS UPDATE
 #ifndef _TGL_CLIENT
 		physics_engine.tick(time_delta, actors, (TGLChunkSpawn*)chunks_spawner);
 #endif
@@ -733,6 +706,8 @@ void TGLBase::update()
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 
+///////////////////////////////////////////
+// SHADOW MAP BUFFER SWAPPING
 		if (shadow_maps_enabled && time_count % shadow_map_interval == 0)
 		{
 			ray_bounce.swap_buffers();
@@ -744,11 +719,19 @@ void TGLBase::update()
 #endif
 	}
 	#ifndef _TGL_CLIENT
+	
+
+	
 	end = std::chrono::steady_clock::now();
-	usleep(1000000/tick_rate - std::chrono::duration_cast<std::chrono::microseconds> (end - begin).count());
+	int time_taken = std::chrono::duration_cast<std::chrono::microseconds> (end - begin).count();
+	if (1000000/tick_rate > time_taken)
+	{
+		usleep(1000000/tick_rate - time_taken);
+	}
 	#endif
 
 	end = std::chrono::steady_clock::now();
+	
 
 	/*
 	{
@@ -781,7 +764,6 @@ void TGLBase::remove_actor(TGLActor * in_actor)
 		}
 	}
 }
-
 
 TGLPlayer * TGLBase::get_player()
 {
@@ -845,7 +827,51 @@ void TGLBase::update_sun(double time_delta)
 	//out_vec = glm::vec3(cos(sun_degrees), sin(sun_degrees), 0)*std::max(float(0), float(1 - sin(sun_degrees))) + glm::vec3(-1, -1, 0)*std::max(float(0), float(-sin(sun_degrees)));
 	out_vec = glm::vec3(cos(sun_degrees), sin(sun_degrees), 0);
 	sun_pos = out_vec * 50.0f + active_camera->get_pos();
+	sun_dir = out_vec;
 	mult += 0.002*time_delta;
 	//sun_pos = glm::vec3(0, 50, 0) + active_camera->get_pos();
 	return;
+}
+
+void TGLBase::recalculate_light(int in_chunk_x, int in_chunk_y)
+{
+	int ray_grid_width = 256;
+	int secondary_bounces = 16;
+	
+	std::vector<glm::vec3> secondary_lights;
+	
+	for (int i = 0; i < ray_grid_width; ++i)
+	{
+		for (int j = 0; j < ray_grid_width; ++j)
+		{
+			glm::vec3 light_origin = glm::vec3(16*in_chunk_x + i, 16*in_chunk_y + j, 150) + sun_dir*30.0f;
+			glm::vec3 light_dir = sun_dir*-1.0f;
+			e_block_type hit_type;
+			glm::vec3 prev_block;
+			glm::vec3 pointed_at = ((TGLChunkSpawn*)chunks_spawner)->get_block_pointed_at(light_origin, light_dir, 50, hit_type, prev_block);
+			if (glm::length(pointed_at) < 1000)
+			{
+				secondary_lights.push_back(pointed_at);
+			}
+		}
+	}
+
+	for (auto light : secondary_lights)
+	{
+		glm::vec3 light_origin = light;
+		for (int i = 0; i < secondary_bounces; ++i)
+		{
+			float theta = 2*3.1415926*rand()/RAND_MAX;
+			float phi = 3.1415926*rand()/RAND_MAX;
+			float x = cos(theta);
+			float z = sin(theta);
+			float y = sin(phi);
+			glm::vec3 ray = glm::normalize(glm::vec3(x,z,y));
+			
+			glm::vec3 light_dir = ray;
+			e_block_type hit_type;
+			glm::vec3 prev_block;
+			glm::vec3 pointed_at = ((TGLChunkSpawn*)chunks_spawner)->get_block_pointed_at(light_origin, light_dir, 50, hit_type, prev_block);
+		}
+	}
 }

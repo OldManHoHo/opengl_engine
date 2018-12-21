@@ -52,6 +52,10 @@ class TGLBase
 	std::string server_ip_address;
 	std::string client_ip_address;
 	
+	bool debug_console_enabled;
+	std::mutex console_mutex;
+	std::deque <std::string> console_queue;
+	
 	std::vector <char> game_state_buf;
 #ifdef _TGL_CLIENT
 	GLFWwindow* window;
@@ -156,7 +160,9 @@ public:
 
 	
 	int init();
+	bool set_conf_value(std::string conf_var_name, std::string conf_var_value, bool only_print = false);
 	void read_conf();
+	void debug_console_loop();
 	void start_tasks();
 	void update();
 	void add_mesh(TGLMesh * in_mesh);

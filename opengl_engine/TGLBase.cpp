@@ -303,6 +303,10 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 		//clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();	
 		//udp_interface.s_send(in_pair->second,in_pair->first);
 	}
+	else if(in_pair->second[0] == 'x')
+	{
+		
+	}
 }
 #endif
 
@@ -372,6 +376,59 @@ int TGLBase::init()
 #endif
 }
 
+bool TGLBase::set_conf_value(std::string conf_var_name, std::string conf_var_value_str, bool only_print)
+{
+	bool found = true;
+	if (conf_float_values.find(conf_var_name) != conf_float_values.end())
+	{
+		if (only_print)
+		{
+			std::cout << conf_var_name << ": " << conf_float_values[conf_var_name] << "\n";
+			return false;
+		}
+		float conf_var_value = std::stof(conf_var_value_str);
+		*conf_float_values[conf_var_name] = conf_var_value;
+	}
+	else if (conf_bool_values.find(conf_var_name) != conf_bool_values.end())
+	{
+		if (only_print)
+		{
+			std::cout << conf_var_name << ": " << conf_bool_values[conf_var_name] << "\n";
+			return false;
+		}
+		bool conf_var_value = std::stoi(conf_var_value_str);
+		*conf_bool_values[conf_var_name] = conf_var_value;
+	}
+	else if (conf_string_values.find(conf_var_name) != conf_string_values.end())
+	{
+		if (only_print)
+		{
+			std::cout << conf_var_name << ": " << conf_string_values[conf_var_name] << "\n";
+			return false;
+		}
+		std::string conf_var_value = conf_var_value_str;
+		*conf_string_values[conf_var_name] = conf_var_value;
+	}
+	else if (conf_int_values.find(conf_var_name) != conf_int_values.end())
+	{
+		if (only_print)
+		{
+			std::cout << conf_var_name << ": " << conf_int_values[conf_var_name] << "\n";
+			return false;
+		}
+		bool conf_var_value = std::stoi(conf_var_value_str);
+		*conf_int_values[conf_var_name] = conf_var_value;
+	}
+	else
+	{
+		std::cout << "Configuration value " << conf_var_name << " found in global.conf not a valid configuration value." << "\n";
+		found = false;
+	}
+	if (found)
+	{
+		std::cout << "CONF: " << conf_var_name << " set to:\t" << conf_var_value_str << "\n";
+	}
+}
 
 void TGLBase::read_conf()
 {
@@ -415,6 +472,7 @@ void TGLBase::read_conf()
 	conf_int_values["max_loaded_chunks"] =& max_loaded_chunks;
 	conf_float_values["cpu_light_bounce_multiplier"] = &cpu_light_bounce_multiplier;
 	conf_float_values["water_speed_multiplier"] = &water_speed_multiplier;
+	conf_bool_values["debug_console_enabled"] = &debug_console_enabled;
 	
 	*conf_double_values["heartbeat_period"] = 1.0;
 	*conf_double_values["tick_rate"] = 30;
@@ -455,6 +513,7 @@ void TGLBase::read_conf()
 	*conf_int_values["max_loaded_chunks"] = 400;
 	*conf_float_values["cpu_light_bounce_multiplier"] = 1.0;
 	*conf_float_values["water_speed_multiplier"] = 0.25;
+	*conf_bool_values["debug_console_enabled"] = false;
 	
 	std::ifstream infile("global.conf");
 	std::string line;
@@ -466,46 +525,44 @@ void TGLBase::read_conf()
 	    {
 	    	bool found = true;
 	    	std::string conf_var_name = line.substr(0, line.find("="));
-	    	
-	    	if (conf_float_values.find(conf_var_name) != conf_float_values.end())
-	    	{
-	    		float conf_var_value = std::stof(line.substr(line.find("=")+1, line.size()));
-	    		*conf_float_values[conf_var_name] = conf_var_value;
-	    	}
-	    	else if (conf_bool_values.find(conf_var_name) != conf_bool_values.end())
-	    	{
-	    		bool conf_var_value = std::stoi(line.substr(line.find("=")+1, line.size()));
-	    		*conf_bool_values[conf_var_name] = conf_var_value;
-	    	}
-	    	else if (conf_string_values.find(conf_var_name) != conf_string_values.end())
-	    	{
-	    		std::string conf_var_value = line.substr(line.find("=")+1, line.size());
-	    		*conf_string_values[conf_var_name] = conf_var_value;
-	    	}
-	    	else if (conf_int_values.find(conf_var_name) != conf_int_values.end())
-	    	{
-	    		bool conf_var_value = std::stoi(line.substr(line.find("=")+1, line.size()));
-	    		*conf_int_values[conf_var_name] = conf_var_value;
-	    	}
-	    	else
-	    	{
-	    		std::cout << "Configuration value " << conf_var_name << " found in global.conf not a valid configuration value." << "\n";
-	    		found = false;
-	    	}
-	    	if (found)
-	    	{
-	    		std::cout << "CONF: " << conf_var_name << " set to:\t" << line.substr(line.find("=")+1, line.size()) << "\n";
-	    	}
+	    	std::string conf_var_value = line.substr(line.find("=")+1, line.size());
+	    	set_conf_value(conf_var_name, conf_var_value);
 	    }
 	}
 }
 
+void TGLBase::debug_console_loop()
+{
+	std::cout << "Started debug console" << "\n";
+	while(1)
+	{
+		std::lock_guard<std::mutex> Lock(console_mutex);
+		std::string console_command = console_queue.back();
+		console_queue.pop_back();
+		
+		std::string command = console_command.substr(0, console_command.find(" "));
+		std::string arg = console_command.substr(console_command.find(" ") + 1, console_command.size());
+		
+		if (command == "print")
+		{
+			set_conf_value(arg,"",true);
+		}
+	}
+	
+}
+
 void TGLBase::start_tasks()
 {
-	if (conf_bool_values["cpu_lighting_enabled"])
+	if (cpu_lighting_enabled)
 	{
 		std::thread * light_thread;
 		light_thread = new std::thread([&](TGLChunkSpawn * cs) { cs->recalculate_light(); }, (TGLChunkSpawn*)chunks_spawner);
+	}
+	if (debug_console_enabled)
+	{
+		std::thread * console_thread;
+		console_mutex.lock();
+		console_thread = new std::thread([&]() { debug_console_loop(); });
 	}
 }
 
@@ -522,6 +579,7 @@ void TGLBase::update()
 	{
 		time_delta = constant_time_delta;
 	}
+	
 	
 	/////////////////////////////////
 	// Update interval counters

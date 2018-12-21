@@ -35,8 +35,13 @@ TGLPhysicsEngine::~TGLPhysicsEngine()
 {
 }
 
-void TGLPhysicsEngine::tick(double time_delta, std::vector <TGLActor*> const & actors, TGLChunkSpawn * chunks_spawner)
+void TGLPhysicsEngine::tick(double time_delta, std::vector <TGLActor*> const & actors, TGLChunkSpawn * chunks_spawner, bool gravity_enabled)
 {
+	float gravity = 9.81;
+	if (!gravity_enabled)
+	{
+		gravity = 0;
+	}
 	for (auto it = actors.begin(); it != actors.end(); ++it)
 	{
 		if ((*it)->get_bounds() != nullptr)
@@ -55,7 +60,7 @@ void TGLPhysicsEngine::tick(double time_delta, std::vector <TGLActor*> const & a
 				e_block_type in_type = chunks_spawner->get_point(round(feet.x), round(feet.z), round(feet.y));
 
 				(*it)->set_on_ground(false);
-				(*it)->vel += float(time_delta)*(*it)->accel + float(time_delta*9.81)*glm::vec3(0, -1.0, 0);
+				(*it)->vel += float(time_delta)*(*it)->accel + float(time_delta*gravity)*glm::vec3(0, -1.0, 0);
 
 				if (in_type == bt_water)
 				{

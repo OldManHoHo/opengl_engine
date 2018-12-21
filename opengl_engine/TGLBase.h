@@ -35,10 +35,23 @@ public:
 
 class TGLBase
 {
+	std::map <std::string,float*> conf_float_values;
+	std::map <std::string,double*> conf_double_values;
+	std::map <std::string,std::string*> conf_string_values;
+	std::map <std::string,int*> conf_int_values;
+	std::map <std::string,bool*> conf_bool_values;
+	
 	int window_height;
 	int window_width;
 	
 	TGLUDPInterface udp_interface;
+	int client_udp_receive_port;
+	int client_udp_send_port;
+	int server_udp_receive_port;
+	int server_udp_send_port;
+	std::string server_ip_address;
+	std::string client_ip_address;
+	
 	std::vector <char> game_state_buf;
 #ifdef _TGL_CLIENT
 	GLFWwindow* window;
@@ -53,11 +66,37 @@ class TGLBase
 	std::vector <TGLActor*> actors;
 	std::vector <TGLHudElement*> HUD_elements;
 	TGLCamera * active_camera;
+	float player_fov;
+	float player_start_pos_x;
+	float player_start_pos_y;
+	float player_speed;
 	TGLActor * chunks_spawner;
+	float chunk_spawn_tick_interval;
+	float chunk_despawn_distance;
+	int max_loaded_chunks;
 	TGLPhysicsEngine physics_engine;
+	bool gravity_enabled;
+	float water_speed_multiplier;
 
 	std::chrono::steady_clock::time_point end;
 	std::chrono::steady_clock::time_point begin;
+	
+	float constant_time_delta;
+	bool max_framerate_enabled;
+	float max_framerate;
+	
+	//////////////////////////////
+	// Interval counters
+	
+	// Counters used for shadow map update
+	double shadow_map_counter;
+	double shadow_map_interval;
+	
+	// CPU lighting counters
+	double cpu_lighting_counter;
+	double cpu_lighting_interval;
+	bool cpu_lighting_enabled;
+	
 	double time_sum;
 	int time_count;
 
@@ -71,6 +110,21 @@ class TGLBase
 	glm::vec3 sun_pos_buf2;
 
 	bool shadow_maps_enabled;
+	float shadow_map_box_start_distance;
+	float shadow_map_box_end_distance;
+	float shadow_map_box_height;
+	float shadow_map_box_width;
+	
+	bool day_night_cycle_enabled;
+	float start_time_of_day;
+	float time_of_day_multiplier;
+	float cpu_light_ray_grid_division;
+	float cpu_light_ray_grid_width;
+	float cpu_light_second_bounce_radius;
+	float cpu_light_first_hit_distance;
+	int cpu_light_num_secondary_bounces;
+	float cpu_light_bounce_multiplier;
+	
 	glm::vec3 sun_pos;
 	glm::vec3 sun_intensity;
 	glm::vec3 sun_dir;
@@ -102,6 +156,8 @@ public:
 
 	
 	int init();
+	void read_conf();
+	void start_tasks();
 	void update();
 	void add_mesh(TGLMesh * in_mesh);
 	void add_actor(TGLActor * in_actor);

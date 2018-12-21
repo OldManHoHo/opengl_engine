@@ -16,7 +16,7 @@ public:
 	TGLPhysicsEngine();
 	~TGLPhysicsEngine();
 
-	void tick(double time_delta, std::vector <TGLActor*> const & actors, TGLChunkSpawn * chunks_spawner);
+	void tick(double time_delta, std::vector <TGLActor*> const & actors, TGLChunkSpawn * chunks_spawner, bool gravity_enabled = true);
 	std::vector <glm::vec3> get_world_blocks(TGLActor * in_actor, TGLChunkSpawn * chunks_spawner);
 	void collide_aligned_block_and_block(TGLActor * in_actor, glm::vec3 in_block);
 	void move(double time_delta, TGLActor * in_player, std::vector <glm::vec3>  in_blocks, double in_speed_mult);

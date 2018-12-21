@@ -106,6 +106,7 @@ int main()
 	gl_base.add_hud_element(&depth_buffer_display2);
 #endif
 	//debug_actor.set_pos(glm::vec3(0, 185, 0));
+	gl_base.start_tasks();
 	while (1)
 	{
 		gl_base.update();

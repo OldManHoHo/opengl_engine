@@ -1,4 +1,7 @@
 #include <algorithm>
+#ifdef __linux__
+#include <unistd.h>
+#endif
 
 #include "TGLChunkSpawn.h"
 #include "TGLBase.h"
@@ -1044,7 +1047,11 @@ void TGLChunkSpawn::recalculate_light()
 			}
 
 		light_calcs_mutex.unlock();
+#ifdef __linux__
+		usleep(50000);
+#else
 		Sleep(50);
+#endif
 		std::lock_guard<std::mutex>light_lock(sun_dir_mutex);
 		in_sun_dir = sun_dir;
 	}
@@ -1056,6 +1063,7 @@ void TGLChunkSpawn::update_lights()
 	{
 		for (auto chunk : light_calcs)
 		{
+#ifdef _TGL_CLIENT
 			if (chunks.find(chunk.first) == chunks.end())
 			{
 				continue;
@@ -1083,34 +1091,11 @@ void TGLChunkSpawn::update_lights()
 				}
 				mesh->refresh_light_data(light_vals);
 			}
+#endif
 		}
 		light_calcs_mutex.unlock();
 	}
 	return;
-	for (auto chunk : chunks)
-	{
-		if (chunks.find(chunk.first) == chunks.end())
-		{
-			continue;
-		}
-		TGLChunk * cur_chunk = chunks[chunk.first];
-
-		for (auto comp : cur_chunk->get_components())
-		{
-			TGLMesh * mesh = (TGLMesh*)comp;
-			std::vector <unsigned char> light_vals(mesh->local_vbo_mem.size() / 3);
-
-			for (int i = 0; i < mesh->local_vbo_mem.size(); i += 3)
-			{
-
-				block_coord bc(mesh->local_vbo_mem[i] + chunk.first.x * 16, mesh->local_vbo_mem[i + 1], mesh->local_vbo_mem[i + 2] + chunk.first.y * 16);
-				int light_val_index = i / 3;
-
-				light_vals[light_val_index] = 256*(mesh->local_vbo_mem[i + 1]-100)/156.0;
-			}
-			mesh->refresh_light_data(light_vals);
-		}
-	}
 }
 
 void TGLChunkSpawn::set_sun_dir(glm::vec3 in_dir)

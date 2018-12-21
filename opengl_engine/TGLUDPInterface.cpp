@@ -21,17 +21,17 @@ TGLUDPInterface::TGLUDPInterface()
     std::vector <char> proto_buf(1024);
     sockaddr_in proto_addr;
     std::pair<sockaddr_in, std::vector <char>> proto_pair(proto_addr, proto_buf);
-    buffer_queue.init_memory(500,proto_pair);
+    buffer_queue.init_memory(10,proto_pair);
     send_sock = socket(AF_INET, SOCK_DGRAM,0);
 	recv_sock = socket(AF_INET, SOCK_DGRAM, 0);
 }
 
-int TGLUDPInterface::s_bind(std::string ip, int port)
+int TGLUDPInterface::s_bind(std::string ip, int receive_port, int send_port)
 {
     my_recv_addr.sin_family = AF_INET;
-    my_recv_addr.sin_port = htons(port);
+    my_recv_addr.sin_port = htons(receive_port);
 	my_send_addr.sin_family = AF_INET;
-	my_send_addr.sin_port = htons(port) + 1;
+	my_send_addr.sin_port = htons(send_port) + 1;
     //inet_aton(ip.c_str(), &my_addr.sin_addr);
 	inet_pton(AF_INET, ip.c_str(), &my_recv_addr.sin_addr);
 	inet_pton(AF_INET, ip.c_str(), &my_send_addr.sin_addr);

@@ -55,7 +55,7 @@ public:
 	int recv_sock;
 #endif
 	TGLUDPInterface();
-	int s_bind(std::string ip, int port);
+	int s_bind(std::string ip, int receive_port, int send_port);
 	int s_send(std::vector <char>& in_msg, std::string ip, int port);
 	int s_send(std::vector <char>& in_msg, sockaddr_in in_addr);
 	void send_to_all(std::vector <char>& in_msg);

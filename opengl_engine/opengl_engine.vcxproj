@@ -102,10 +102,12 @@
     <None Include="fragment_shader_glyph.glsl" />
     <None Include="fragment_shader_HUD.glsl" />
     <None Include="fragment_shader_HUD_tex.glsl" />
+    <None Include="fragment_shader_light.glsl" />
     <None Include="vertex_shader_default.glsl" />
     <None Include="vertex_shader_glyph.glsl" />
     <None Include="vertex_shader_HUD.glsl" />
     <None Include="vertex_shader_HUD_tex.glsl" />
+    <None Include="vertex_shader_light.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

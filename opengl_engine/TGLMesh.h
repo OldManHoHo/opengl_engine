@@ -13,6 +13,7 @@
 #include "TGLTexture.h"
 #include "TGLMeshVertices.h"
 #include "TGLMaterial.h"
+#include "BlockGenerator.h"
 
 struct texture_objects
 {
@@ -30,6 +31,7 @@ class TGLMesh : public TGLComponent
 	GLuint shader_program;
 
 	bool instance_flag;
+	bool light_data_enabled;
 	GLuint instance_count;
 	GLuint buffer_size;
 	GLfloat * vbo_mem;
@@ -54,6 +56,9 @@ class TGLMesh : public TGLComponent
 public:
 	std::vector <GLfloat> local_vbo_mem;
 
+	std::vector <unsigned char> local_light_mem;
+	int refreshes;
+
 	TGLMesh(GLfloat * vertices, int length);
 	TGLMesh(TGLMeshVertices const* in_vertices);
 	~TGLMesh();
@@ -77,7 +82,8 @@ public:
 	std::vector <GLfloat>& get_instances();
 	void refresh_instances();
 	
-	void enable_light_data();
+	void enable_light_data(int unused);
+	void refresh_light_data(std::vector <unsigned char>& in_data);
 };
 
 #endif

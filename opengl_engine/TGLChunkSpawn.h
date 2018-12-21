@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <deque>
+#include <mutex>
 
 #include "TGLActor.h"
 #include "TGLChunk.h"
@@ -66,6 +67,9 @@ class TGLChunkSpawn : public TGLActor
 	chunk_searcher<chunk_coord, TGLActor*> dropped_items;
 	
 	std::map <chunk_coord, std::map<block_coord,unsigned char>> light_calcs;
+	std::mutex light_calcs_mutex;
+	glm::vec3 sun_dir;
+	std::mutex sun_dir_mutex;
 
 	bool test_chunk;
 	static e_block_type pointed_at;
@@ -94,7 +98,9 @@ public:
 #ifdef _TGL_CLIENT
 	std::vector <GLshort> TGLChunkSpawn::get_block_light_value(int in_x, int in_y, int in_z);
 #endif
-	void recalculate_light(int in_chunk_x, int in_chunk_y, glm::vec3 sun_dir);
+	void recalculate_light();
+	void update_lights();
+	void set_sun_dir(glm::vec3 in_dir);
 };
 
 #endif

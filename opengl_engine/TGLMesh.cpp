@@ -57,6 +57,7 @@ TGLMesh::TGLMesh(GLfloat * vertices, int in_length)
 	draw_flag = true;
 	instance_flag = false;
 	instance_count = 0;
+	light_data_enabled = false;
 
 	length = in_length;
 	glGenBuffers(1, &VBO);
@@ -71,6 +72,8 @@ TGLMesh::TGLMesh(GLfloat * vertices, int in_length)
 	glEnableVertexAttribArray(vertex_position_attrib);
 
 	calculate_mesh_normals(vertices, in_length);
+
+	refreshes = 0;
 }
 
 TGLMesh::TGLMesh(TGLMeshVertices const* in_vertices)
@@ -79,6 +82,7 @@ TGLMesh::TGLMesh(TGLMeshVertices const* in_vertices)
 	draw_flag = true;
 	instance_flag = false;
 	instance_count = 0;
+	light_data_enabled = false;
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR)
 	{
@@ -262,6 +266,7 @@ void TGLMesh::enable_instancing(GLfloat * instance_locations, int in_instance_co
 	glVertexAttribDivisor(instance_attrib, 1);
 	refresh_instances();
 
+	enable_light_data(in_unused_count);
 }
 
 bool TGLMesh::get_instanced_flag()
@@ -283,16 +288,26 @@ void TGLMesh::remove_instance(int index)
 	GLfloat * temp_buf = new GLfloat[(instance_count-1) * 3 * sizeof(GLfloat) - index * 3 * sizeof(GLfloat)];
 	glGetBufferSubData(GL_ARRAY_BUFFER, (index+1) * 3 * sizeof(GLfloat), (instance_count-1) * 3 * sizeof(GLfloat) - (index) * 3 * sizeof(GLfloat), temp_buf);
 	glBufferSubData(GL_ARRAY_BUFFER, (index) * 3 * sizeof(GLfloat), (instance_count-1) * 3 * sizeof(GLfloat) - (index) * 3 * sizeof(GLfloat), temp_buf);
-
+	delete[] temp_buf;
 	//glGetBufferSubData(GL_ARRAY_BUFFER, 0, (instance_count - 1) * 3 * sizeof(GLfloat) - (index) * 3 * sizeof(GLfloat), temp_buf);
 	//glBufferSubData(GL_ARRAY_BUFFER, (index) * 3 * sizeof(GLfloat), (instance_count - 1) * 3 * sizeof(GLfloat) - (index) * 3 * sizeof(GLfloat), temp_buf);
 
 	//memmove(&vbo_mem[index * 3], &vbo_mem[(index + 1) * 3], instance_count * 3 * sizeof(GLfloat) - index * 3 * sizeof(GLfloat));
 	//glUnmapBuffer(GL_ARRAY_BUFFER);
 	refresh_instances();
+
+	if (light_data_enabled)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
+		unsigned char * temp_c = new unsigned char[(instance_count - 1) * sizeof(GLbyte) - index * sizeof(GLbyte)];
+		glGetBufferSubData(GL_ARRAY_BUFFER, (index + 1) * sizeof(GLbyte), (instance_count - 1) * sizeof(GLbyte) - (index) * sizeof(GLbyte), temp_c);
+		glBufferSubData(GL_ARRAY_BUFFER, (index) * sizeof(GLbyte), (instance_count - 1) * sizeof(GLbyte) - (index) * sizeof(GLbyte), temp_c);
+		delete[] temp_c;
+	}
+
 	//glCopyBufferSubData(GL_ARRAY_BUFFER, GL_ARRAY_BUFFER, (index + 1) * 3 * sizeof(GLfloat), (index) * 3 * sizeof(GLfloat), instance_count * 3 * sizeof(GLfloat) - index * 3 * sizeof(GLfloat));
 	//glBufferSubData(GL_ARRAY_BUFFER, (index)*3*sizeof(GLfloat), 3 * sizeof(GLfloat), zero);
-	unused_instances.insert(index);
+	//unused_instances.insert(index);
 	instance_count -= 1;
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR)
@@ -303,16 +318,30 @@ void TGLMesh::remove_instance(int index)
 
 int TGLMesh::add_instance(glm::vec3 loc)
 {
+	GLenum err;
 	GLfloat data[3] = { loc.x,loc.y,loc.z };
 	glBindBuffer(GL_ARRAY_BUFFER, instance_VBO);
 	if (instance_count < buffer_size - 1)
 	{
-		
 		glBufferSubData(GL_ARRAY_BUFFER, instance_count * 3 * sizeof(GLfloat), 3 * sizeof(GLfloat), data);
-		
+		while ((err = glGetError()) != GL_NO_ERROR)
+		{
+			printf("GL ERROR: %d\n", err);
+		}
 		instance_count += 1;
 		refresh_instances();
-		GLenum err;
+		unsigned char c_data[1] = { 128 };
+		if (light_data_enabled)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
+			while ((err = glGetError()) != GL_NO_ERROR)
+			{
+				printf("GL ERROR: %d\n", err);
+			}
+			glBufferSubData(GL_ARRAY_BUFFER, instance_count*sizeof(GLbyte), sizeof(GLbyte), c_data);
+		}
+
+		
 		while ((err = glGetError()) != GL_NO_ERROR)
 		{
 			printf("GL ERROR: %d\n", err);
@@ -330,6 +359,16 @@ int TGLMesh::add_instance(glm::vec3 loc)
 		instance_count += 1;
 		glBufferData(GL_ARRAY_BUFFER, (instance_count + 50) * 3 * sizeof(GLfloat), &local_vbo_mem[0], GL_DYNAMIC_DRAW);
 		refresh_instances();
+
+		if (light_data_enabled)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
+			local_light_mem.resize((instance_count + 50), 128);
+			local_light_mem[instance_count] = 128;
+			buffer_size = instance_count + 50;
+			glBufferData(GL_ARRAY_BUFFER, (instance_count - 1 + 50) * sizeof(GLbyte), &local_light_mem[0], GL_DYNAMIC_DRAW);
+		}
+
 		return instance_count - 1;
 		printf("TOO MANY INSTANCES\n");
 	}
@@ -348,18 +387,49 @@ void TGLMesh::refresh_instances()
 	glGetBufferSubData(GL_ARRAY_BUFFER, 0, instance_count * 3 * sizeof(GLfloat), &local_vbo_mem[0]);
 }
 
-void TGLMesh::enable_light_data(std::map<chunk_coord,std::map<block_coord,unsigned char>>& light_vals)
+void TGLMesh::enable_light_data(int unused)
 {
+	light_data_enabled = true;
 	glBindVertexArray(VAO);
 	glGenBuffers(1, &light_VBO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
-	
-	glBufferData(GL_ARRAY_BUFFER, local_vbo_mem.size() * 3 * sizeof(GLfloat), instance_locations, GL_DYNAMIC_DRAW);
-	
+
+	std::vector<GLbyte> zeroes(instance_count + unused,128);
+
+	glBufferData(GL_ARRAY_BUFFER, (instance_count + unused) * sizeof(GLbyte), &zeroes[0], GL_DYNAMIC_DRAW);
+
 	light_attrib = new_attrib();
-	glVertexAttribPointer(light_attrib, 3, GL_UNSIGNED_BYTE, GL_FALSE, 3 * sizeof(GLbyte), (void*)0);
+	glVertexAttribPointer(light_attrib, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(GLbyte), (void*)0);
 	glEnableVertexAttribArray(light_attrib);
 	glVertexAttribDivisor(light_attrib, 1);
 	refresh_instances();
 }
+
+void TGLMesh::refresh_light_data(std::vector <unsigned char>& in_data)
+{
+	if (local_vbo_mem.size())
+	{
+		glBindVertexArray(VAO);
+		int err;
+		glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
+		//std::vector<GLfloat> zeroes(local_vbo_mem.size()/3, 0);
+		local_light_mem.resize(instance_count);
+		glGetBufferSubData(GL_ARRAY_BUFFER, 0, instance_count * sizeof(GLbyte), &local_light_mem[0]);
+		if (1)
+		{
+			for (int i = 0; i < local_light_mem.size(); ++i)
+			{
+				in_data[i] = (local_light_mem[i] + in_data[i]) / (2);
+			}
+		}
+		glBufferData(GL_ARRAY_BUFFER, (local_vbo_mem.size() / 3) * sizeof(GLbyte), &in_data[0], GL_DYNAMIC_DRAW);
+		while ((err = glGetError()) != GL_NO_ERROR)
+		{
+			printf("GL ERROR: %d\n", err);
+		}
+		refresh_instances();
+		refreshes += 1;
+	}
+}
+

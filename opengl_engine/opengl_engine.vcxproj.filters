@@ -277,5 +277,7 @@
     <None Include="vertex_shader_HUD_tex.glsl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="fragment_shader_light.glsl" />
+    <None Include="vertex_shader_light.glsl" />
   </ItemGroup>
 </Project>

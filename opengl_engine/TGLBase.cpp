@@ -347,16 +347,16 @@ int TGLBase::init()
 
 	std::pair<sockaddr_in, std::vector <char>> * net_msg;
 	std::vector<char>handshake(1, 0);
-	udp_interface.pop_msg(net_msg);
-	while (net_msg == nullptr)
-	{
-		udp_interface.s_send(handshake, "192.168.1.66", 12347);
-		udp_interface.pop_msg(net_msg);
-		Sleep(1000);
-	}
+	//udp_interface.pop_msg(net_msg);
+	//while (net_msg == nullptr)
+	//{
+	//	udp_interface.s_send(handshake, "192.168.1.66", 12347);
+	//	udp_interface.pop_msg(net_msg);
+	//	Sleep(1000);
+	//}
 	printf("Connected");
 	ray_bounce.init();
-
+	
 #else
 	udp_interface.s_bind("127.0.0.1",12345);
 	udp_interface.start_receive_thread();
@@ -366,32 +366,43 @@ int TGLBase::init()
 
 void TGLBase::update()
 {
-	while(1)
+	static bool first_time = true;
+	//while(1)
 	{
-		auto light_begin = std::chrono::steady_clock::now();
-		((TGLChunkSpawn*)chunks_spawner)->recalculate_light(0,0,sun_dir);
-		auto light_end = std::chrono::steady_clock::now();
-		int u_sec = std::chrono::duration_cast<std::chrono::microseconds> (light_end - light_begin).count();
-		std::cout << "light time " << u_sec << "\n";
+	//	auto light_begin = std::chrono::steady_clock::now();
+	//	((TGLChunkSpawn*)chunks_spawner)->recalculate_light(0,0,sun_dir);
+	//	auto light_end = std::chrono::steady_clock::now();
+	//	int u_sec = std::chrono::duration_cast<std::chrono::microseconds> (light_end - light_begin).count();
+	//	std::cout << "light time " << u_sec << "\n";
 	}
 	// render loop
 	//while (!glfwWindowShouldClose(window))
 	auto duration = std::chrono::duration_cast< std::chrono::microseconds> (end - begin);
 	time_count++;
-	double time_delta = duration.count() / 1000000.0;
-	//time_delta = 1.0 / 1000;
+	//double time_delta = duration.count() / 1000000.0;
+	double time_delta = 1.0 / 60;
 	time_sum += time_delta;
 	begin = std::chrono::steady_clock::now();
+	std::thread * light_thread;
 
+	if (first_time)
+	{
+		light_thread = new std::thread([&](TGLChunkSpawn * cs) { cs->recalculate_light(); }, (TGLChunkSpawn*)chunks_spawner);
+		//std::thread light_thread([&]() {  });
+		first_time = false;
+	}
 	
 
 	int shadow_map_interval = 20;
 	
-	if (time_sum > 1)
+	if (time_sum > 0.01)
 	{
-		printf("%f\n",(time_count/time_sum));
+		//printf("%f\n",(time_count/time_sum));
 		time_count = 0;
 		time_sum = 0;
+
+		((TGLChunkSpawn*)chunks_spawner)->update_lights();
+		((TGLChunkSpawn*)chunks_spawner)->set_sun_dir(sun_dir);
 	}
 	{
 #ifdef _TGL_CLIENT
@@ -698,9 +709,9 @@ void TGLBase::update()
 
 ///////////////////////////////////////////
 // PHYSICS UPDATE
-#ifndef _TGL_CLIENT
+//#ifndef _TGL_CLIENT
 		physics_engine.tick(time_delta, actors, (TGLChunkSpawn*)chunks_spawner);
-#endif
+//#endif
 			// check and call events and swap the buffers
 #ifdef _TGL_CLIENT
 		glfwPollEvents();
@@ -790,7 +801,7 @@ void TGLBase::get_game_state()
 
 void TGLBase::update_sun(double time_delta)
 {
-	static double mult = 0;
+	static double mult = 100;
 	std::time_t now_time = time(NULL);
 	struct tm * aTime = std::localtime(&now_time);
 	double ssy = aTime->tm_yday * 24 * 60 * 60 + aTime->tm_hour * 60 * 60 + aTime->tm_sec;
@@ -806,7 +817,7 @@ void TGLBase::update_sun(double time_delta)
 
 	double sun_degrees = 3.1415926 * 2 * ssm / full_day - 3.1415926 / 2;
 
-	sun_degrees = mult * 3.141592654 * 2;
+	sun_degrees = mult * 3.141592654 * 2 + 3.1415926/2;
 
 	glm::vec3 out_vec;
 	//dir = glm::vec3(1, 0, 0);
@@ -828,7 +839,7 @@ void TGLBase::update_sun(double time_delta)
 	out_vec = glm::vec3(cos(sun_degrees), sin(sun_degrees), 0);
 	sun_pos = out_vec * 50.0f + active_camera->get_pos();
 	sun_dir = out_vec;
-	mult += 0.002*time_delta;
+	mult += 0.0002*time_delta;
 	//sun_pos = glm::vec3(0, 50, 0) + active_camera->get_pos();
 	return;
 }

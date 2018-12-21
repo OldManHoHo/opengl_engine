@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <vector>
+#include <mutex>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -100,6 +101,8 @@ class BlockGenerator
 	bool test_gen;
 
 	std::map <chunk_coord, std::map<block_coord,block_def>> world_mods;
+
+	std::recursive_mutex access_mutex;
 
 public:
 	//BlockStore block_file;

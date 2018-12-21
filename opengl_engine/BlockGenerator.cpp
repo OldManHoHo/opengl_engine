@@ -32,7 +32,7 @@ BlockGenerator::~BlockGenerator()
 
 e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 {
-	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	if (test_gen)
 	{
 		e_block_type type = static_cast<e_block_type>((abs(int(floor(in_x / 16.0) + floor(in_z / 16.0)))) % 6);
@@ -153,7 +153,7 @@ e_block_type BlockGenerator::get_point_2d(int in_x, int in_y)
 
 e_block_type * BlockGenerator::get_points(int in_x, int in_y, int in_z, int division)
 {
-	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	if (blocks != nullptr)
 	{
 		delete[] blocks;
@@ -309,7 +309,7 @@ e_block_type * BlockGenerator::get_points_2d(int in_x, int in_y, int division)
 
 void BlockGenerator::set_point(e_block_type in_block_type, int in_x, int in_y, int in_z)
 {
-	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	int chunk_x = floor(in_x / 16.0);
 	int chunk_y = floor(in_y / 16.0);
 	chunk_coord chunk_loc(chunk_x, chunk_y);
@@ -343,7 +343,7 @@ void BlockGenerator::set_point(e_block_type in_block_type, int in_x, int in_y, i
 
 e_block_type BlockGenerator::check_for_mod(int in_x, int in_y, int in_z)
 {
-	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	int chunk_x = floor(in_x / 16.0);
 	int chunk_y = floor(in_y / 16.0);
 	chunk_coord chunk_loc(chunk_x, chunk_y);
@@ -366,14 +366,14 @@ e_block_type BlockGenerator::check_for_mod(int in_x, int in_y, int in_z)
 
 e_block_type BlockGenerator::index(int in_x, int in_y, int in_z)
 {
-	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	e_block_type retval = blocks[(size_x*256*in_x) + (256*in_y) + in_z];
 	return retval;
 }
 
 bool BlockGenerator::is_visible(int in_x, int in_y, int in_z)
 {
-	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	if (index(in_x, in_y, in_z + 1) != bt_air && index(in_x, in_y, in_z + 1) != bt_water && index(in_x, in_y, in_z + 1) != bt_leaves)// && index(in_x, in_y, in_z + 1) != 5 && index(in_x, in_y, in_z + 1) != 6 )
 	{
 		if (index(in_x, in_y, in_z - 1) != bt_air && index(in_x, in_y, in_z - 1) != bt_water && index(in_x, in_y, in_z - 1) != bt_leaves)// && index(in_x, in_y, in_z - 1) != 5 && index(in_x, in_y, in_z - 1) != 6 )
@@ -401,7 +401,7 @@ bool BlockGenerator::is_visible(int in_x, int in_y, int in_z)
 
 void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in_x, int in_y, int in_z, int chunk_x, int chunk_y)
 {
-	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	int count = 1;
 	float prob = 0.99;
 	float branch_prob = 0.9;

@@ -11,11 +11,11 @@ TGLChunk::TGLChunk(TGLMeshVertices * mesh_vertices, TGLMaterial * block_material
 	{
 		TGLMesh * temp_mesh = new TGLMesh(mesh_vertices);
 		temp_mesh->set_material(block_material, i);
-		if (instances[i].size())
-		{
-			instances[i].resize(instances[i].size() + 50*3, -0.5);
-			temp_mesh->enable_instancing(&(instances[i][0]), (instances[i].size() / 3) - 50, 50);
-		}
+		//if (instances[i].size())
+		//{
+		instances[i].resize(instances[i].size() + 50*3, -0.5);
+		temp_mesh->enable_instancing(&(instances[i][0]), (instances[i].size() / 3) - 50, 50);
+		//}
 		add_component(temp_mesh);
 	}
 }

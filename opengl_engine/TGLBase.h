@@ -61,10 +61,11 @@ class TGLBase
 	GLFWwindow* window;
 #else
     std::map <udp_address, TGLClientStatus> clients;
+#endif
     double heartbeat_period;
     double tick_rate;
     std::chrono::steady_clock::time_point time_of_last_send;
-#endif
+
 
 	std::vector <TGLMesh*> meshes;
 	std::vector <TGLActor*> actors;

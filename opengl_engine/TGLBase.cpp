@@ -10,9 +10,10 @@
 #include <ctime>
 #include <algorithm>
 #include <stdlib.h>
+#include <fstream>
 #ifndef _TGL_CLIENT
 #include <unistd.h>
-#include <fstream>
+
 #include <cctype>
 #endif
 
@@ -416,7 +417,7 @@ bool TGLBase::set_conf_value(std::string conf_var_name, std::string conf_var_val
 			std::cout << conf_var_name << ": " << conf_int_values[conf_var_name] << "\n";
 			return false;
 		}
-		bool conf_var_value = std::stoi(conf_var_value_str);
+		int conf_var_value = std::stoi(conf_var_value_str);
 		*conf_int_values[conf_var_name] = conf_var_value;
 	}
 	else
@@ -675,9 +676,10 @@ void TGLBase::update()
 				}
 				std::vector <TGLComponent*> components = actors[i]->get_components();
 				//std::vector <TGLComponent*> components = (*actor_it)->get_components();
+				//for (auto mesh_it = components.begin(); mesh_it != components.end(); ++mesh_it)
 				for (auto mesh_it = components.end() - 1; mesh_it != components.begin() - 1; --mesh_it)
 				{
-
+					int err;
 					if ((*mesh_it)->get_draw_flag())
 					{
 						TGLMesh * mesh_comp = (TGLMesh*)(*mesh_it);
@@ -709,10 +711,18 @@ void TGLBase::update()
 							if (mesh_comp->get_instanced_flag())
 							{
 								glDrawArraysInstanced(GL_TRIANGLES, 0, mesh_comp->get_length(), mesh_comp->get_instance_count());
+								while ((err = glGetError()) != GL_NO_ERROR)
+								{
+									printf("GL ERROR: %d\n", err);
+								}
 							}
 							else
 							{
 								glDrawArrays(GL_TRIANGLES, 0, mesh_comp->get_length());
+								while ((err = glGetError()) != GL_NO_ERROR)
+								{
+									printf("GL ERROR: %d\n", err);
+								}
 							}
 						}
 
@@ -956,7 +966,7 @@ void TGLBase::update()
 	int time_taken = std::chrono::duration_cast<std::chrono::microseconds> (end - begin).count();
 	if (1000000/max_framerate > time_taken && max_framerate_enabled)
 	{
-		usleep(1000000/max_framerate - time_taken);
+		Sleep(1000/max_framerate - time_taken/1000);
 	}
 	#endif
 
@@ -1020,7 +1030,7 @@ void TGLBase::get_game_state()
 
 void TGLBase::update_sun(double time_delta)
 {
-	static double mult = 100;
+	static double mult = 0;
 	std::time_t now_time = time(NULL);
 	struct tm * aTime = std::localtime(&now_time);
 	double ssy = aTime->tm_yday * 24 * 60 * 60 + aTime->tm_hour * 60 * 60 + aTime->tm_sec;
@@ -1058,7 +1068,7 @@ void TGLBase::update_sun(double time_delta)
 	out_vec = glm::vec3(cos(sun_degrees), sin(sun_degrees), 0);
 	sun_pos = out_vec * 50.0f + active_camera->get_pos();
 	sun_dir = out_vec;
-	mult += time_of_day_multiplier*0.000002*time_delta;
+	//mult += time_of_day_multiplier*0.000002*time_delta;
 	//sun_pos = glm::vec3(0, 50, 0) + active_camera->get_pos();
 	return;
 }

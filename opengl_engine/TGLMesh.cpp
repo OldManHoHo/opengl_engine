@@ -249,6 +249,7 @@ void TGLMesh::calculate_mesh_normals(GLfloat * vertices, int in_length)
 
 void TGLMesh::enable_instancing(GLfloat * instance_locations, int in_instance_count, int in_unused_count)
 {
+	int err;
 	instance_flag = true;
 	instance_count = in_instance_count;
 	buffer_size = instance_count + in_unused_count;
@@ -260,13 +261,18 @@ void TGLMesh::enable_instancing(GLfloat * instance_locations, int in_instance_co
 	
 	glBufferData(GL_ARRAY_BUFFER, (instance_count + in_unused_count) * 3 * sizeof(GLfloat), instance_locations, GL_DYNAMIC_DRAW);
 	
+	while ((err = glGetError()) != GL_NO_ERROR)
+	{
+		printf("GL ERROR: %d\n", err);
+	}
+
 	instance_attrib = new_attrib();
 	glVertexAttribPointer(instance_attrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(instance_attrib);
 	glVertexAttribDivisor(instance_attrib, 1);
 	refresh_instances();
 
-	enable_light_data(in_unused_count);
+	//enable_light_data(in_unused_count);
 }
 
 bool TGLMesh::get_instanced_flag()

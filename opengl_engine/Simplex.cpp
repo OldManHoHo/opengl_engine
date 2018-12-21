@@ -33,7 +33,7 @@ float * Simplex::get_points(int in_x, int in_y, int in_z, int division)
 		FastNoiseSIMD::FreeNoiseSet(noiseSet);
 	}
 	//myNoise->SetAxisScales(1.0, 1.0, 16.0 / 256);
-	if (division == 1)
+	if (division == 1 && 0)
 	{
 		noiseSet = myNoise->GetSimplexSet(in_x, in_y, in_z, division, division, 1, scale);
 	}

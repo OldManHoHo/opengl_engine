@@ -202,6 +202,8 @@ TGLChunkSpawn::TGLChunkSpawn():
 
 	block_mesh_vertices = new TGLMeshVertices(useful_structures::vertex_data_block_small);
 	
+	//TGLShader v_shader("vertex_shader_light.glsl", GL_VERTEX_SHADER);
+	//TGLShader f_shader("fragment_shader_light.glsl", GL_FRAGMENT_SHADER);
 	TGLShader v_shader("vertex_shader_light.glsl", GL_VERTEX_SHADER);
 	TGLShader f_shader("fragment_shader_light.glsl", GL_FRAGMENT_SHADER);
 

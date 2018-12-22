@@ -978,7 +978,7 @@ bool TGLChunkSpawn::chunk_in_fov(int chunk_x, int chunk_y, glm::vec3 player, glm
 void TGLChunkSpawn::recalculate_light()
 {
 	int ray_grid_width = 128;
-	int secondary_bounces = 4;
+	int secondary_bounces = 16;
 
 	int chunk_x, chunk_y;
 	sun_dir_mutex.lock();
@@ -1011,6 +1011,18 @@ void TGLChunkSpawn::recalculate_light()
 					if (glm::length(pointed_at) < 1000)
 					{
 						secondary_lights.push_back(pointed_at);
+					}
+					if (light_calcs_vec.find(chunk_loc) == light_calcs_vec.end())
+					{
+						light_calcs[chunk_loc] = std::map<block_coord, unsigned char>();
+					}
+					if (glm::length(pointed_at) < 1000)
+					{
+						light_calcs_vec[chunk_loc][pointed_at] = glm::normalize(pointed_at - light_origin);
+						if (glm::length(pointed_at) < 1000)
+						{
+							secondary_lights.push_back(pointed_at);
+						}
 					}
 				}
 			}
@@ -1048,6 +1060,18 @@ void TGLChunkSpawn::recalculate_light()
 							light_calcs[chunk_loc][pointed_at] += unsigned int((unsigned char)(128.0 / (dist*dist)));
 							light_calcs[chunk_loc][pointed_at] = std::max(75,std::min(255, int(light_calcs[chunk_loc][pointed_at])));
 						}
+
+						if (light_calcs_vec.find(chunk_loc) == light_calcs_vec.end())
+						{
+							light_calcs_vec[chunk_loc] = std::map<block_coord, glm::vec3>();
+						}
+
+						light_calcs_vec[chunk_loc][pointed_at] += glm::normalize(pointed_at - light_origin)*0.0000001f/(dist*dist);
+						if (glm::length(light_calcs_vec[chunk_loc][pointed_at]) > 1)
+						{
+							light_calcs_vec[chunk_loc][pointed_at] = glm::normalize(light_calcs_vec[chunk_loc][pointed_at]);
+						}
+
 					}
 				}
 			}
@@ -1080,6 +1104,7 @@ void TGLChunkSpawn::update_lights()
 			{
 				TGLMesh * mesh = (TGLMesh*)comp;
 				std::vector <unsigned char> light_vals(mesh->local_vbo_mem.size() / 3);
+				std::vector <GLfloat> light_vals_vec(mesh->local_vbo_mem.size());
 
 				for (int i = 0; i < mesh->local_vbo_mem.size(); i += 3)
 				{
@@ -1089,13 +1114,28 @@ void TGLChunkSpawn::update_lights()
 					if (light_calcs[chunk.first].find(bc) != light_calcs[chunk.first].end())
 					{
 						light_vals[light_val_index] = light_calcs[chunk.first][bc];
+
 					}
 					else
 					{
 						light_vals[light_val_index] = 100;
 					}
+					
+					if (light_calcs_vec[chunk.first].find(bc) != light_calcs_vec[chunk.first].end())
+					{
+						light_vals_vec[i] = light_calcs_vec[chunk.first][bc].x;
+						light_vals_vec[i + 1] = light_calcs_vec[chunk.first][bc].y;
+						light_vals_vec[i + 2] =  light_calcs_vec[chunk.first][bc].z;
+					}
+					else
+					{
+						light_vals_vec[i] = 1;
+						light_vals_vec[i+1] = 1;
+						light_vals_vec[i+2] = 1;
+					}
 				}
-				mesh->refresh_light_data(light_vals);
+				//mesh->refresh_light_data(light_vals);
+				mesh->refresh_light_data_vec(light_vals_vec);
 			}
 #endif
 		}

@@ -395,21 +395,42 @@ void TGLMesh::refresh_instances()
 
 void TGLMesh::enable_light_data(int unused)
 {
-	light_data_enabled = true;
-	glBindVertexArray(VAO);
-	glGenBuffers(1, &light_VBO);
+	if (0)
+	{
+		light_data_enabled = true;
+		glBindVertexArray(VAO);
+		glGenBuffers(1, &light_VBO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
 
-	std::vector<GLbyte> zeroes(instance_count + unused,128);
+		std::vector<GLbyte> zeroes(instance_count + unused, 128);
 
-	glBufferData(GL_ARRAY_BUFFER, (instance_count + unused) * sizeof(GLbyte), &zeroes[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, (instance_count + unused) * sizeof(GLbyte), &zeroes[0], GL_DYNAMIC_DRAW);
 
-	light_attrib = new_attrib();
-	glVertexAttribPointer(light_attrib, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(GLbyte), (void*)0);
-	glEnableVertexAttribArray(light_attrib);
-	glVertexAttribDivisor(light_attrib, 1);
-	refresh_instances();
+		light_attrib = new_attrib();
+		glVertexAttribPointer(light_attrib, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(GLbyte), (void*)0);
+		glEnableVertexAttribArray(light_attrib);
+		glVertexAttribDivisor(light_attrib, 1);
+		refresh_instances();
+	}
+	else
+	{
+		light_data_enabled = true;
+		glBindVertexArray(VAO);
+		glGenBuffers(1, &light_VBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
+
+		std::vector<GLfloat> zeroes((instance_count + unused)*3, 0.5);
+
+		glBufferData(GL_ARRAY_BUFFER, (instance_count + unused)*3 * sizeof(GLfloat), &zeroes[0], GL_DYNAMIC_DRAW);
+
+		light_attrib = new_attrib();
+		glVertexAttribPointer(light_attrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (void*)0);
+		glEnableVertexAttribArray(light_attrib);
+		glVertexAttribDivisor(light_attrib, 1);
+		refresh_instances();
+	}
 }
 
 void TGLMesh::refresh_light_data(std::vector <unsigned char>& in_data)
@@ -429,12 +450,39 @@ void TGLMesh::refresh_light_data(std::vector <unsigned char>& in_data)
 				in_data[i] = (local_light_mem[i] + in_data[i]) / (2);
 			}
 		}
-		glBufferData(GL_ARRAY_BUFFER, (local_vbo_mem.size() / 3) * sizeof(GLbyte), &in_data[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, (local_vbo_mem.size()/3) * sizeof(GLbyte), &in_data[0], GL_DYNAMIC_DRAW);
 		while ((err = glGetError()) != GL_NO_ERROR)
 		{
 			printf("GL ERROR: %d\n", err);
 		}
 		refresh_instances();
+		refreshes += 1;
+	}
+}
+
+void TGLMesh::refresh_light_data_vec(std::vector <GLfloat>& in_data)
+{
+	if (local_vbo_mem.size())
+	{
+		glBindVertexArray(VAO);
+		int err;
+		glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
+		//std::vector<GLfloat> zeroes(local_vbo_mem.size()/3, 0);
+		local_light_mem_vec.resize(instance_count*3);
+		glGetBufferSubData(GL_ARRAY_BUFFER, 0, instance_count*3 *sizeof(GLfloat), &local_light_mem_vec[0]);
+		if (0)
+		{
+			for (int i = 0; i < local_light_mem_vec.size(); ++i)
+			{
+				in_data[i] = (local_light_mem_vec[i] + in_data[i])*0.5f;
+			}
+		}
+		glBufferData(GL_ARRAY_BUFFER, (local_vbo_mem.size()) * sizeof(GLfloat), &in_data[0], GL_DYNAMIC_DRAW);
+		while ((err = glGetError()) != GL_NO_ERROR)
+		{
+			printf("GL ERROR: %d\n", err);
+		}
+ 		refresh_instances();
 		refreshes += 1;
 	}
 }

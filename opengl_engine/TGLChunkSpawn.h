@@ -67,6 +67,7 @@ class TGLChunkSpawn : public TGLActor
 	chunk_searcher<chunk_coord, TGLActor*> dropped_items;
 	
 	std::map <chunk_coord, std::map<block_coord,unsigned char>> light_calcs;
+	std::map <chunk_coord, std::map<block_coord, glm::vec3>> light_calcs_vec;
 	std::mutex light_calcs_mutex;
 	glm::vec3 sun_dir;
 	std::mutex sun_dir_mutex;

@@ -57,6 +57,7 @@ public:
 	std::vector <GLfloat> local_vbo_mem;
 
 	std::vector <unsigned char> local_light_mem;
+	std::vector <GLfloat> local_light_mem_vec;
 	int refreshes;
 
 	TGLMesh(GLfloat * vertices, int length);
@@ -84,6 +85,7 @@ public:
 	
 	void enable_light_data(int unused);
 	void refresh_light_data(std::vector <unsigned char>& in_data);
+	void refresh_light_data_vec(std::vector <GLfloat>& in_data);
 };
 
 #endif

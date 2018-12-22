@@ -8,7 +8,7 @@
 BlockGenerator::BlockGenerator(bool tester):test_gen(tester)
 {
 	auto timet = std::chrono::system_clock::now();
-	seed = 7;// std::chrono::duration_cast<std::chrono::seconds>(timet.time_since_epoch()).count() % 1000;
+	seed = 10;// std::chrono::duration_cast<std::chrono::seconds>(timet.time_since_epoch()).count() % 1000;
 	height = new Simplex(10 + seed, 1);
 	height2 = new Simplex(11 + seed, 4);
 	height3 = new Simplex(13 + seed, 0.1);
@@ -32,7 +32,7 @@ BlockGenerator::~BlockGenerator()
 
 e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 {
-	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	if (test_gen)
 	{
 		e_block_type type = static_cast<e_block_type>((abs(int(floor(in_x / 16.0) + floor(in_z / 16.0)))) % 6);
@@ -153,7 +153,7 @@ e_block_type BlockGenerator::get_point_2d(int in_x, int in_y)
 
 e_block_type * BlockGenerator::get_points(int in_x, int in_y, int in_z, int division)
 {
-	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	if (blocks != nullptr)
 	{
 		delete[] blocks;
@@ -250,10 +250,10 @@ e_block_type * BlockGenerator::get_points(int in_x, int in_y, int in_z, int divi
 								blocks[counter] = bt_dirt_with_grass;
 							}
 
-							if (abs(trees_noise[counter]) + abs(noises[j*division + k])*0.1 < 0.04)
+							if (abs(trees_noise[counter]) + abs(noises[j*division + k])*0.1 < 0.04 && k > 0 && j > 0 && k < 18 && j < 18)
 							{
-								int chunk_x = floor((in_x) / 16.0);
-								int chunk_y = floor((in_y) / 16.0);
+								int chunk_x = floor((in_x + 1) / 16.0);
+								int chunk_y = floor((in_y + 1) / 16.0);
 								get_tree(trees_noise, blocks, j, k, i, chunk_x, chunk_y);
 							}
 						}
@@ -309,7 +309,7 @@ e_block_type * BlockGenerator::get_points_2d(int in_x, int in_y, int division)
 
 void BlockGenerator::set_point(e_block_type in_block_type, int in_x, int in_y, int in_z)
 {
-	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	int chunk_x = floor(in_x / 16.0);
 	int chunk_y = floor(in_y / 16.0);
 	chunk_coord chunk_loc(chunk_x, chunk_y);
@@ -343,7 +343,7 @@ void BlockGenerator::set_point(e_block_type in_block_type, int in_x, int in_y, i
 
 e_block_type BlockGenerator::check_for_mod(int in_x, int in_y, int in_z)
 {
-	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	int chunk_x = floor(in_x / 16.0);
 	int chunk_y = floor(in_y / 16.0);
 	chunk_coord chunk_loc(chunk_x, chunk_y);
@@ -366,14 +366,14 @@ e_block_type BlockGenerator::check_for_mod(int in_x, int in_y, int in_z)
 
 e_block_type BlockGenerator::index(int in_x, int in_y, int in_z)
 {
-	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	e_block_type retval = blocks[(size_x*256*in_x) + (256*in_y) + in_z];
 	return retval;
 }
 
 bool BlockGenerator::is_visible(int in_x, int in_y, int in_z)
 {
-	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	if (index(in_x, in_y, in_z + 1) != bt_air && index(in_x, in_y, in_z + 1) != bt_water && index(in_x, in_y, in_z + 1) != bt_leaves)// && index(in_x, in_y, in_z + 1) != 5 && index(in_x, in_y, in_z + 1) != 6 )
 	{
 		if (index(in_x, in_y, in_z - 1) != bt_air && index(in_x, in_y, in_z - 1) != bt_water && index(in_x, in_y, in_z - 1) != bt_leaves)// && index(in_x, in_y, in_z - 1) != 5 && index(in_x, in_y, in_z - 1) != 6 )
@@ -401,7 +401,12 @@ bool BlockGenerator::is_visible(int in_x, int in_y, int in_z)
 
 void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in_x, int in_y, int in_z, int chunk_x, int chunk_y)
 {
-	//std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+
+	if (in_x == 0 || in_x == 17 || in_y == 0 || in_y == 17)
+	{
+		return;
+	}
 	int count = 1;
 	float prob = 0.99;
 	float branch_prob = 0.9;
@@ -414,15 +419,16 @@ void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in
 			break;
 		}
 		in_blocks[in_x * size_x * 256 + in_y * 256 + in_z + count] = bt_tree;
-		set_point(bt_tree, chunk_x * 16 + in_x, chunk_y * 16 + in_y, in_z + count);
+		
+		set_point(bt_tree, chunk_x * 16 + in_x - 1, chunk_y * 16 + in_y - 1, in_z + count);
 		if (count > 2)
 		{
-			if (in_y + 1 <= 15)
+			if (in_y + 1 <= size_x - 1)
 			{
 				if (abs(in_noise[in_x * size_x * 256 + (in_y + 1) * 256 + in_z + count]) > branch_prob)
 				{
 					in_blocks[in_x * size_x * 256 + (in_y + 1) * 256 + in_z + count] = bt_leaves;
-					set_point(bt_leaves, chunk_x*16 + in_x, chunk_y * 16 + in_y + 1, in_z + count);
+					set_point(bt_leaves, chunk_x*16 + in_x - 1, chunk_y * 16 + in_y + 1 - 1, in_z + count);
 				}
 			}
 			if (in_y - 1 >= 0)
@@ -430,15 +436,15 @@ void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in
 				if (abs(in_noise[in_x * size_x * 256 + (in_y - 1) * 256 + in_z + count]) > branch_prob)
 				{
 					in_blocks[in_x * size_x * 256 + (in_y - 1) * 256 + in_z + count] = bt_leaves;
-					set_point(bt_leaves, chunk_x * 16 + in_x, chunk_y * 16 + in_y - 1, in_z + count);
+					set_point(bt_leaves, chunk_x * 16 + in_x - 1, chunk_y * 16 + in_y - 1 - 1, in_z + count);
 				}
 			}
-			if (in_x + 1 <= 15)
+			if (in_x + 1 <= size_x - 1)
 			{
 				if (abs(in_noise[(in_x + 1) * size_x * 256 + in_y * 256 + in_z + count]) > branch_prob)
 				{
 					in_blocks[(in_x + 1) * size_x * 256 + in_y * 256 + in_z + count] = bt_leaves;
-					set_point(bt_leaves, chunk_x * 16 + in_x + 1, chunk_y * 16 + in_y, in_z + count);
+					set_point(bt_leaves, chunk_x * 16 + in_x + 1 - 1, chunk_y * 16 + in_y - 1, in_z + count);
 				}
 			}
 			if (in_x - 1 >= 0)
@@ -446,7 +452,7 @@ void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in
 				if (abs(in_noise[(in_x - 1) * size_x * 256 + in_y * 256 + in_z + count]) > branch_prob)
 				{
 					in_blocks[(in_x - 1) * size_x * 256 + in_y * 256 + in_z + count] = bt_leaves;
-					set_point(bt_leaves, chunk_x * 16 + in_x - 1, chunk_y * 16 + in_y, in_z + count);
+					set_point(bt_leaves, chunk_x * 16 + in_x - 1 - 1, chunk_y * 16 + in_y - 1, in_z + count);
 				}
 			}
 			if (in_noise[in_x * size_x * 256 + in_y * 256 + in_z + count] > prob)

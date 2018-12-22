@@ -580,8 +580,7 @@ void TGLBase::update()
 	{
 		time_delta = constant_time_delta;
 	}
-	
-	
+
 	/////////////////////////////////
 	// Update interval counters
 	
@@ -689,15 +688,15 @@ void TGLBase::update()
 
 						if (shadow_maps_enabled)
 						{
-							shadow_pos1 = active_camera->get_pos();
+							shadow_pos1 =  active_camera->get_pos();
 							sun_pos_buf1 = sun_pos;
 							glm::vec3 light_pos(shadow_pos1.x + 10, 200, shadow_pos1.z + 10);
-							glm::vec3 side_vec = glm::cross(shadow_pos1 - sun_pos_buf1, glm::vec3(1, 0, 0) - sun_pos_buf1 - sun_pos_buf1);
+							glm::vec3 side_vec = glm::cross(shadow_pos1 - sun_pos_buf1, glm::vec3(1, 0, 0));
 							double light_dist = glm::length(shadow_pos1 - sun_pos_buf1);
 
 							glm::mat4 depthProjectionMatrix = glm::ortho<float>(-shadow_map_box_width/2.0, shadow_map_box_width/2.0, -shadow_map_box_height/2.0, shadow_map_box_height/2.0, light_dist - shadow_map_box_start_distance, light_dist + shadow_map_box_end_distance);
 
-							glm::mat4 depthViewMatrix = glm::lookAt(sun_pos_buf1, shadow_pos1, glm::cross(side_vec, shadow_pos2 - sun_pos_buf1));
+							glm::mat4 depthViewMatrix = glm::lookAt(sun_pos_buf1, shadow_pos1, glm::cross(side_vec, shadow_pos1 - sun_pos_buf1));
 							//glm::mat4 depthModelMatrix = glm::mat4(1.0);
 							depthMVP1 = depthProjectionMatrix * depthViewMatrix * actors[i]->get_transform() * mesh_comp->get_transform();
 
@@ -815,12 +814,14 @@ void TGLBase::update()
 					if (shadow_maps_enabled)
 					{
 						glm::vec3 light_pos(shadow_pos2.x + 10, 200, shadow_pos2.z + 10);
-						glm::vec3 side_vec = glm::cross(shadow_pos2 - sun_pos_buf2, glm::vec3(1, 0, 0) - sun_pos_buf2);
+						glm::vec3 side_vec = glm::cross(shadow_pos2 - sun_pos_buf2, glm::vec3(1, 0, 0));
 						double light_dist = glm::length(shadow_pos2 - sun_pos_buf2);
 
 						glm::mat4 depthProjectionMatrix = glm::ortho<float>(-shadow_map_box_width/2.0, shadow_map_box_width/2.0, -shadow_map_box_height/2.0, shadow_map_box_height/2.0, light_dist - shadow_map_box_start_distance, light_dist + shadow_map_box_end_distance);
 
-						glm::mat4 depthViewMatrix = glm::lookAt(sun_pos_buf2, shadow_pos2, glm::cross(side_vec, shadow_pos2 - sun_pos_buf2));
+						//glm::mat4 depthViewMatrix = glm::lookAt(sun_pos_buf2, shadow_pos2, glm::cross(side_vec, shadow_pos2 - sun_pos_buf2));
+						//glm::mat4 depthViewMatrix = glm::lookAt(sun_pos_buf2, shadow_pos2, glm::cross(side_vec, shadow_pos2 - sun_pos_buf2));
+						glm::mat4 depthViewMatrix = glm::lookAt(sun_pos_buf2, shadow_pos2, glm::cross(side_vec, shadow_pos1 - sun_pos_buf1));
 						//glm::mat4 depthModelMatrix = glm::mat4(1.0);
 						depthMVP2 = depthProjectionMatrix * depthViewMatrix * actors[i]->get_transform() * mesh_comp->get_transform();
 
@@ -1068,7 +1069,7 @@ void TGLBase::update_sun(double time_delta)
 	out_vec = glm::vec3(cos(sun_degrees), sin(sun_degrees), 0);
 	sun_pos = out_vec * 50.0f + active_camera->get_pos();
 	sun_dir = out_vec;
-	//mult += time_of_day_multiplier*0.000002*time_delta;
+	mult += time_of_day_multiplier*0.000002*time_delta;
 	//sun_pos = glm::vec3(0, 50, 0) + active_camera->get_pos();
 	return;
 }

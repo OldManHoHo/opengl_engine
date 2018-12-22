@@ -272,7 +272,7 @@ void TGLMesh::enable_instancing(GLfloat * instance_locations, int in_instance_co
 	glVertexAttribDivisor(instance_attrib, 1);
 	refresh_instances();
 
-	//enable_light_data(in_unused_count);
+	enable_light_data(in_unused_count);
 }
 
 bool TGLMesh::get_instanced_flag()

@@ -346,6 +346,7 @@ glm::vec3 TGLChunkSpawn::get_block_pointed_at(glm::vec3 origin, glm::vec3 pointi
 		glm::vec3 prev_block_crosshair = next_block_crosshair;
 		int count = 0;
 		while ((block_type_crosshair == bt_water || block_type_crosshair == bt_air) && glm::length(origin - next_block_crosshair) < max_distance && count < int(max_distance))
+		//while ((block_type_crosshair == bt_water || block_type_crosshair == bt_air) && glm::length(origin - next_block_crosshair) < max_distance)
 		{
 			prev_block_crosshair = next_block_crosshair;
 			next_block_crosshair = ray_cast_block_finder(origin, pointing_vector, origin + next_ray_crosshair*1.05f, next_ray_crosshair);
@@ -675,7 +676,7 @@ void TGLChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 	}
 #ifdef _TGL_CLIENT
 	chunks[chunk_coord(chunk_x, chunk_y)] = new TGLChunk(block_mesh_vertices, block_material, block_type_count, instances);
-	chunks[chunk_coord(chunk_x, chunk_y)]->translate(glm::vec3(16 * chunk_x, 0, 16 * chunk_y));
+	chunks[chunk_coord(chunk_x, chunk_y)]->translate(glm::vec3(16 * (chunk_x), 0, 16 * (chunk_y)));
 #endif
 	gl_base.add_actor(chunks[chunk_coord(chunk_x, chunk_y)]);
 }
@@ -983,21 +984,21 @@ void TGLChunkSpawn::recalculate_light()
 	sun_dir_mutex.lock();
 	glm::vec3 in_sun_dir = sun_dir;
 	sun_dir_mutex.unlock();
-	std::vector<glm::vec3> secondary_lights;
+	
 	while (1)
 	{
 		
 		light_calcs_mutex.lock();
-		
+		std::vector<glm::vec3> secondary_lights;
 			for (int i = 0; i < ray_grid_width; ++i)
 			{
 				for (int j = 0; j < ray_grid_width; ++j)
 				{
-					glm::vec3 light_origin = glm::vec3(i / 2.0, 175, j / 2.0) + in_sun_dir * 10.0f;
+					glm::vec3 light_origin = glm::vec3(i / 3.0 + rand()*1.0/RAND_MAX, 175, j / 3.0 + rand()*1.0 / RAND_MAX) + in_sun_dir * 10.0f;
 					glm::vec3 light_dir = in_sun_dir * -1.0f;
 					e_block_type hit_type;
 					glm::vec3 prev_block;
-					glm::vec3 pointed_at = get_block_pointed_at(light_origin, light_dir, 30, hit_type, prev_block);
+					glm::vec3 pointed_at = get_block_pointed_at(light_origin, light_dir, 40, hit_type, prev_block);
 
 					get_chunk_of_point(pointed_at, chunk_x, chunk_y);
 					chunk_coord chunk_loc(chunk_x, chunk_y);
@@ -1036,14 +1037,17 @@ void TGLChunkSpawn::recalculate_light()
 
 					float dist = glm::length(light_origin - pointed_at);
 
-					if (light_calcs.find(chunk_loc) == light_calcs.end())
+					if (dist < 1000)
 					{
-						light_calcs[chunk_loc] = std::map<block_coord, unsigned char>();
-					}
-					if ((unsigned char)(256.0 / (dist*dist)) > light_calcs[chunk_loc][pointed_at])
-					{
-						light_calcs[chunk_loc][pointed_at] += int((unsigned char)(128.0 / (dist*dist)));
-						light_calcs[chunk_loc][pointed_at] = std::min(255, int(light_calcs[chunk_loc][pointed_at]));
+						if (light_calcs.find(chunk_loc) == light_calcs.end())
+						{
+							light_calcs[chunk_loc] = std::map<block_coord, unsigned char>();
+						}
+						if ((unsigned char)(256.0 / (dist*dist)) > light_calcs[chunk_loc][pointed_at])
+						{
+							light_calcs[chunk_loc][pointed_at] += unsigned int((unsigned char)(128.0 / (dist*dist)));
+							light_calcs[chunk_loc][pointed_at] = std::max(75,std::min(255, int(light_calcs[chunk_loc][pointed_at])));
+						}
 					}
 				}
 			}
@@ -1052,7 +1056,7 @@ void TGLChunkSpawn::recalculate_light()
 #ifdef __linux__
 		usleep(50000);
 #else
-		Sleep(50);
+		Sleep(1000);
 #endif
 		std::lock_guard<std::mutex>light_lock(sun_dir_mutex);
 		in_sun_dir = sun_dir;

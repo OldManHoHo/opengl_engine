@@ -79,7 +79,7 @@ public:
 
 	TGLChunkSpawn();
 
-	glm::vec3 get_block_pointed_at(glm::vec3 origin, glm::vec3 pointing_vector, double max_distance, e_block_type& out_block_type, glm::vec3& out_prev_block);
+	glm::vec3 get_block_pointed_at(glm::vec3 origin, glm::vec3 pointing_vector, double max_distance, e_block_type& out_block_type, glm::vec3& out_prev_block, glm::vec3& intersect_point);
 	void tick(double time_delta);
 	void spawn_chunk(int chunk_x, int chunk_y);
 	void despawn_chunk(int chunk_x, int chunk_y);

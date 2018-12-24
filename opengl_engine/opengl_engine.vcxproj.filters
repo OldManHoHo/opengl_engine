@@ -281,5 +281,7 @@
     <None Include="vertex_shader_light.glsl" />
     <None Include="..\global.conf" />
     <None Include="global.conf" />
+    <None Include="ray_bounce_fragment.glsl" />
+    <None Include="ray_bounce_vertex.glsl" />
   </ItemGroup>
 </Project>

@@ -338,7 +338,7 @@ glm::vec3 ray_cast_block_finder(glm::vec3 in_position, glm::vec3 in_ray, glm::ve
 	return intersected_block;
 }
 
-glm::vec3 TGLChunkSpawn::get_block_pointed_at(glm::vec3 origin, glm::vec3 pointing_vector, double max_distance, e_block_type& out_block_type, glm::vec3& out_prev_block)
+glm::vec3 TGLChunkSpawn::get_block_pointed_at(glm::vec3 origin, glm::vec3 pointing_vector, double max_distance, e_block_type& out_block_type, glm::vec3& out_prev_block, glm::vec3& intersect_point)
 {
 		glm::vec3 next_ray_crosshair = pointing_vector*0.01f;
 		e_block_type block_type_crosshair = bt_air;
@@ -358,7 +358,7 @@ glm::vec3 TGLChunkSpawn::get_block_pointed_at(glm::vec3 origin, glm::vec3 pointi
 		{
 			return glm::vec3(-100000,-100000,-100000);
 		}
-		
+		intersect_point = origin + next_ray_crosshair;
 		out_block_type = block_type_crosshair;
 		out_prev_block = prev_block_crosshair;
 		return next_block_crosshair;
@@ -510,6 +510,7 @@ void TGLChunkSpawn::tick(double time_delta)
 		glm::vec3 chunk_pos(chunk_x, 0, chunk_y);
 
 		chunks_to_load.clear();
+
 		int load_radius = 10;
 		for (int i = 0; i < load_radius; ++i)
 		{
@@ -533,7 +534,15 @@ void TGLChunkSpawn::tick(double time_delta)
 			next_start_point = chunk_pos + next_ray_chunk*1.01f;
 			chunks_to_load.push_back(chunk_coord(out_chunk.x, out_chunk.z));
 		}
-		
+
+		/*
+		static int load_count = 0;
+		if (load_count < 100)
+		{
+			spawn_chunk(load_count,0);
+			load_count += 1;
+		}
+		*/
 		/*
 		glm::vec3 next_ray_crosshair = player->crosshair*0.01f;
 		e_block_type block_type_crosshair = bt_air;
@@ -978,7 +987,7 @@ bool TGLChunkSpawn::chunk_in_fov(int chunk_x, int chunk_y, glm::vec3 player, glm
 void TGLChunkSpawn::recalculate_light()
 {
 	int ray_grid_width = 128;
-	int secondary_bounces = 16;
+	int secondary_bounces = 24;
 
 	int chunk_x, chunk_y;
 	sun_dir_mutex.lock();
@@ -989,16 +998,18 @@ void TGLChunkSpawn::recalculate_light()
 	{
 		
 		light_calcs_mutex.lock();
-		std::vector<glm::vec3> secondary_lights;
+		std::vector <glm::vec3> secondary_lights;
+		std::vector<std::pair<glm::vec3,glm::vec3>> secondary_lights_vec;
 			for (int i = 0; i < ray_grid_width; ++i)
 			{
 				for (int j = 0; j < ray_grid_width; ++j)
 				{
-					glm::vec3 light_origin = glm::vec3(i / 3.0 + rand()*1.0/RAND_MAX, 175, j / 3.0 + rand()*1.0 / RAND_MAX) + in_sun_dir * 10.0f;
+					glm::vec3 light_origin = glm::vec3(i / 3.0 + rand()*1.0 / RAND_MAX - 1, 175, j / 3.0 + rand()*1.0 / RAND_MAX - 1) + in_sun_dir * 20.0f;
 					glm::vec3 light_dir = in_sun_dir * -1.0f;
 					e_block_type hit_type;
 					glm::vec3 prev_block;
-					glm::vec3 pointed_at = get_block_pointed_at(light_origin, light_dir, 40, hit_type, prev_block);
+					glm::vec3 intersect_point;
+					glm::vec3 pointed_at = get_block_pointed_at(light_origin, light_dir, 50, hit_type, prev_block, intersect_point);
 
 					get_chunk_of_point(pointed_at, chunk_x, chunk_y);
 					chunk_coord chunk_loc(chunk_x, chunk_y);
@@ -1018,31 +1029,41 @@ void TGLChunkSpawn::recalculate_light()
 					}
 					if (glm::length(pointed_at) < 1000)
 					{
-						light_calcs_vec[chunk_loc][pointed_at] = glm::normalize(pointed_at - light_origin);
+						light_calcs_vec[chunk_loc][pointed_at] = glm::vec3(0, -1, 0);// glm::normalize(pointed_at - light_origin);
 						if (glm::length(pointed_at) < 1000)
 						{
-							secondary_lights.push_back(pointed_at);
+							glm::vec3 normal = prev_block - pointed_at;
+							glm::vec3 reflect = glm::normalize((pointed_at - light_origin) - normal* 2.0f * glm::dot((pointed_at - light_origin), normal));
+							for (int n = 0; n < secondary_bounces; ++n);
+							{
+								float dev_x = rand()*10.0 / RAND_MAX - 5;
+								float dev_y = rand()*10.0 / RAND_MAX - 5;
+								float dev_z = rand()*10.0 / RAND_MAX - 5;
+								glm::vec3 rand_reflect = glm::normalize(reflect + glm::vec3(dev_x, dev_y, dev_z));
+								secondary_lights_vec.push_back(std::pair<glm::vec3,glm::vec3>(intersect_point,rand_reflect));
+							}
 						}
 					}
 				}
 			}
 
-			for (auto light : secondary_lights)
+			for (auto light : secondary_lights_vec)
 			{
-				glm::vec3 light_origin = light;
-				for (int i = 0; i < secondary_bounces; ++i)
+				glm::vec3 light_origin = light.first;
+				//for (int i = 0; i < secondary_bounces; ++i)
 				{
 					float theta = 2 * 3.1415926*rand() / RAND_MAX;
-					float phi = 3.1415926*rand() / RAND_MAX;
+					float phi = 3.1415926*rand() / RAND_MAX - 3.1415926/2;
 					float x = cos(theta);
 					float z = sin(theta);
 					float y = sin(phi);
-					glm::vec3 ray = glm::normalize(glm::vec3(x, z, y));
+					glm::vec3 ray = light.second;// glm::normalize(glm::vec3(x, y, z));
 
 					glm::vec3 light_dir = ray;
 					e_block_type hit_type;
 					glm::vec3 prev_block;
-					glm::vec3 pointed_at = get_block_pointed_at(light_origin, light_dir, 16, hit_type, prev_block);
+					glm::vec3 intersect_point;
+					glm::vec3 pointed_at = get_block_pointed_at(light_origin, light_dir, 16, hit_type, prev_block, intersect_point);
 
 					get_chunk_of_point(pointed_at, chunk_x, chunk_y);
 					chunk_coord chunk_loc(chunk_x, chunk_y);
@@ -1066,10 +1087,10 @@ void TGLChunkSpawn::recalculate_light()
 							light_calcs_vec[chunk_loc] = std::map<block_coord, glm::vec3>();
 						}
 
-						light_calcs_vec[chunk_loc][pointed_at] += glm::normalize(pointed_at - light_origin)*0.0000001f/(dist*dist);
+						light_calcs_vec[chunk_loc][pointed_at] += glm::normalize(pointed_at - light_origin)*0.5f/(dist*dist);
 						if (glm::length(light_calcs_vec[chunk_loc][pointed_at]) > 1)
 						{
-							light_calcs_vec[chunk_loc][pointed_at] = glm::normalize(light_calcs_vec[chunk_loc][pointed_at]);
+							//light_calcs_vec[chunk_loc][pointed_at] = glm::normalize(light_calcs_vec[chunk_loc][pointed_at]);
 						}
 
 					}
@@ -1104,7 +1125,7 @@ void TGLChunkSpawn::update_lights()
 			{
 				TGLMesh * mesh = (TGLMesh*)comp;
 				std::vector <unsigned char> light_vals(mesh->local_vbo_mem.size() / 3);
-				std::vector <GLfloat> light_vals_vec(mesh->local_vbo_mem.size());
+				std::vector <GLfloat> light_vals_vec(mesh->local_vbo_mem.size(),0);
 
 				for (int i = 0; i < mesh->local_vbo_mem.size(); i += 3)
 				{
@@ -1129,9 +1150,9 @@ void TGLChunkSpawn::update_lights()
 					}
 					else
 					{
-						light_vals_vec[i] = 1;
-						light_vals_vec[i+1] = 1;
-						light_vals_vec[i+2] = 1;
+						light_vals_vec[i] = 0;
+						light_vals_vec[i+1] = 0;
+						light_vals_vec[i+2] = 0;
 					}
 				}
 				//mesh->refresh_light_data(light_vals);

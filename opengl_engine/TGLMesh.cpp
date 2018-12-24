@@ -421,7 +421,7 @@ void TGLMesh::enable_light_data(int unused)
 
 		glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
 
-		std::vector<GLfloat> zeroes((instance_count + unused)*3, 0.5);
+		std::vector<GLfloat> zeroes((instance_count + unused)*3, 0.0);
 
 		glBufferData(GL_ARRAY_BUFFER, (instance_count + unused)*3 * sizeof(GLfloat), &zeroes[0], GL_DYNAMIC_DRAW);
 
@@ -470,7 +470,7 @@ void TGLMesh::refresh_light_data_vec(std::vector <GLfloat>& in_data)
 		//std::vector<GLfloat> zeroes(local_vbo_mem.size()/3, 0);
 		local_light_mem_vec.resize(instance_count*3);
 		glGetBufferSubData(GL_ARRAY_BUFFER, 0, instance_count*3 *sizeof(GLfloat), &local_light_mem_vec[0]);
-		if (0)
+		if (1)
 		{
 			for (int i = 0; i < local_light_mem_vec.size(); ++i)
 			{

@@ -662,6 +662,7 @@ void TGLBase::update()
 			glUseProgram(ray_bounce.mat->get_shader_program());
 
 			for (int i = 0; i < actors.size(); ++i)
+			//for (int i = actors.size()-1; i >=0; --i)
 			{
 				if (actors[i]->is_chunk)
 				{
@@ -670,12 +671,13 @@ void TGLBase::update()
 					((TGLChunkSpawn*)chunks_spawner)->get_chunk_of_point(act_chunk->get_pos() + glm::vec3(1, 0, 1), chunk_x, chunk_y);
 					if (!((TGLChunkSpawn*)chunks_spawner)->chunk_in_fov(chunk_x, chunk_y, active_camera->get_pos(), ((TGLPlayer*)active_camera)->forward_vec))
 					{
-						continue;
+						//continue;
 					}
 				}
 				std::vector <TGLComponent*> components = actors[i]->get_components();
 				//std::vector <TGLComponent*> components = (*actor_it)->get_components();
 				//for (auto mesh_it = components.begin(); mesh_it != components.end(); ++mesh_it)
+
 				for (auto mesh_it = components.end() - 1; mesh_it != components.begin() - 1; --mesh_it)
 				{
 					int err;
@@ -688,7 +690,7 @@ void TGLBase::update()
 
 						if (shadow_maps_enabled)
 						{
-							shadow_pos1 =  active_camera->get_pos();
+							shadow_pos1 = active_camera->get_pos();
 							sun_pos_buf1 = sun_pos;
 							glm::vec3 light_pos(shadow_pos1.x + 10, 200, shadow_pos1.z + 10);
 							glm::vec3 side_vec = glm::cross(shadow_pos1 - sun_pos_buf1, glm::vec3(1, 0, 0));
@@ -698,7 +700,7 @@ void TGLBase::update()
 
 							glm::mat4 depthViewMatrix = glm::lookAt(sun_pos_buf1, shadow_pos1, glm::cross(side_vec, shadow_pos1 - sun_pos_buf1));
 							//glm::mat4 depthModelMatrix = glm::mat4(1.0);
-							depthMVP1 = depthProjectionMatrix * depthViewMatrix * actors[i]->get_transform() * mesh_comp->get_transform();
+							depthMVP1 = depthProjectionMatrix * depthViewMatrix * actors[i]->get_transform()*mesh_comp->get_transform();
 
 							GLuint depthMatrixID = glGetUniformLocation(ray_bounce.mat->get_shader_program(), "depthMVP");
 							// Send our transformation to the currently bound shader,
@@ -823,7 +825,7 @@ void TGLBase::update()
 						//glm::mat4 depthViewMatrix = glm::lookAt(sun_pos_buf2, shadow_pos2, glm::cross(side_vec, shadow_pos2 - sun_pos_buf2));
 						glm::mat4 depthViewMatrix = glm::lookAt(sun_pos_buf2, shadow_pos2, glm::cross(side_vec, shadow_pos1 - sun_pos_buf1));
 						//glm::mat4 depthModelMatrix = glm::mat4(1.0);
-						depthMVP2 = depthProjectionMatrix * depthViewMatrix * actors[i]->get_transform() * mesh_comp->get_transform();
+						depthMVP2 = depthProjectionMatrix * depthViewMatrix * actors[i]->get_transform()*mesh_comp->get_transform();
 
 
 						
@@ -1074,68 +1076,3 @@ void TGLBase::update_sun(double time_delta)
 	return;
 }
 
-void TGLBase::recalculate_light(int in_chunk_x, int in_chunk_y)
-{
-	int ray_grid_width = 64;
-	int secondary_bounces = 8;
-	
-	int chunk_x, chunk_y;
-	
-	std::vector<glm::vec3> secondary_lights;
-	
-	for (int i = 0; i < ray_grid_width; ++i)
-	{
-		for (int j = 0; j < ray_grid_width; ++j)
-		{
-			glm::vec3 light_origin = glm::vec3(16*in_chunk_x + i, 16*in_chunk_y + j, 150) + sun_dir*30.0f;
-			glm::vec3 light_dir = sun_dir*-1.0f;
-			e_block_type hit_type;
-			glm::vec3 prev_block;
-			glm::vec3 pointed_at = ((TGLChunkSpawn*)chunks_spawner)->get_block_pointed_at(light_origin, light_dir, 50, hit_type, prev_block);
-			
-			((TGLChunkSpawn*)chunks_spawner)->get_chunk_of_point(pointed_at, chunk_x, chunk_y);
-			chunk_coord chunk_loc(chunk_x,chunk_y);
-			
-			if(light_calcs.find(chunk_loc) == light_calcs.end())
-			{
-				light_calcs[chunk_loc] = std::map<block_coord,unsigned char>();
-			}
-			light_calcs[chunk_loc][pointed_at] = 128;
-			if (glm::length(pointed_at) < 1000)
-			{
-				secondary_lights.push_back(pointed_at);
-			}
-		}
-	}
-
-	for (auto light : secondary_lights)
-	{
-		glm::vec3 light_origin = light;
-		for (int i = 0; i < secondary_bounces; ++i)
-		{
-			float theta = 2*3.1415926*rand()/RAND_MAX;
-			float phi = 3.1415926*rand()/RAND_MAX;
-			float x = cos(theta);
-			float z = sin(theta);
-			float y = sin(phi);
-			glm::vec3 ray = glm::normalize(glm::vec3(x,z,y));
-			
-			glm::vec3 light_dir = ray;
-			e_block_type hit_type;
-			glm::vec3 prev_block;
-			glm::vec3 pointed_at = ((TGLChunkSpawn*)chunks_spawner)->get_block_pointed_at(light_origin, light_dir, 16, hit_type, prev_block);
-			
-			((TGLChunkSpawn*)chunks_spawner)->get_chunk_of_point(pointed_at, chunk_x, chunk_y);
-			chunk_coord chunk_loc(chunk_x,chunk_y);
-			
-			float dist = glm::length(light_origin - pointed_at);
-			
-			if(light_calcs.find(chunk_loc) == light_calcs.end())
-			{
-				light_calcs[chunk_loc] = std::map<block_coord,unsigned char>();
-			}
-			light_calcs[chunk_loc][pointed_at] = (unsigned char)(256.0/(dist*dist));
-		}
-	}
-
-}

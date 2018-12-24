@@ -105,6 +105,8 @@
     <None Include="fragment_shader_HUD_tex.glsl" />
     <None Include="fragment_shader_light.glsl" />
     <None Include="global.conf" />
+    <None Include="ray_bounce_fragment.glsl" />
+    <None Include="ray_bounce_vertex.glsl" />
     <None Include="vertex_shader_default.glsl" />
     <None Include="vertex_shader_glyph.glsl" />
     <None Include="vertex_shader_HUD.glsl" />

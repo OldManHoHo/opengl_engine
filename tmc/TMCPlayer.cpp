@@ -76,7 +76,8 @@ void TMCPlayer::tick(double time_delta)
 			set_hitting(forward_vector);
 			e_block_type hit_type;
 			glm::vec3 block_to_add;
-			glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(eye_loc, forward_vector, max_hit_distance, hit_type, block_to_add);
+			glm::vec3 intersect_point;
+			glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(eye_loc, forward_vector, max_hit_distance, hit_type, block_to_add,intersect_point);
 
 
 			if (chunk_spawn != nullptr)
@@ -108,7 +109,8 @@ void TMCPlayer::tick(double time_delta)
 			set_hitting(forward_vector);
 			e_block_type hit_type;
 			glm::vec3 block_to_add;
-			glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(eye_loc, forward_vector, max_hit_distance, hit_type, block_to_add);
+			glm::vec3 intersect_point;
+			glm::vec3 hit_block = chunk_spawn->get_block_pointed_at(eye_loc, forward_vector, max_hit_distance, hit_type, block_to_add, intersect_point);
 
 			if (chunk_spawn != nullptr)
 			{

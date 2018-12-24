@@ -175,8 +175,7 @@ public:
 	void set_world_actor(TGLActor * in_actor);
 	void get_game_state();
 	void update_sun(double time_delta);
-	
-	void recalculate_light(int in_chunk_x, int in_chunk_y);
+
 };
 
 

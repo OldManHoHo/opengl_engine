@@ -8,14 +8,15 @@ TGLChunk::TGLChunk(TGLMeshVertices * mesh_vertices, TGLMaterial * block_material
 	block_instances = instances;
 	static_physics = true;
 	for (int i = 0; i < type_count; ++i)
+	//for (int i = 0; i < 3; ++i)
 	{
 		TGLMesh * temp_mesh = new TGLMesh(mesh_vertices);
 		temp_mesh->set_material(block_material, i);
-		//if (instances[i].size())
-		//{
+		if (instances[i].size())
+		{
 		instances[i].resize(instances[i].size() + 50*3, -0.5);
 		temp_mesh->enable_instancing(&(instances[i][0]), (instances[i].size() / 3) - 50, 50);
-		//}
+		}
 		add_component(temp_mesh);
 	}
 }

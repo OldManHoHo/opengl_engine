@@ -128,7 +128,7 @@ void TGLBase::apply_game_state(std::vector <char> * in_state)
 		short actor_type = *(short*)&(*in_state)[offset];
 		offset += sizeof(short);
 		glm::mat4 actor_trans;
-		std::copy(&(*in_state)[offset], &(*in_state)[offset] + 16, glm::value_ptr(actor_trans));
+		std::copy(&(*in_state)[offset], &(*in_state)[offset] + sizeof(GLfloat) * 16, glm::value_ptr(actor_trans));
 		cur_actor->transform = actor_trans;
 		offset += sizeof(GLfloat)*16;
 		
@@ -360,13 +360,13 @@ int TGLBase::init()
 
 	std::pair<sockaddr_in, std::vector <char>> * net_msg;
 	std::vector<char>handshake(1, 0);
-	//udp_interface.pop_msg(net_msg);
-	//while (net_msg == nullptr)
-	//{
-	//	udp_interface.s_send(handshake, server_ip_address, server_receive_port);
-	//	udp_interface.pop_msg(net_msg);
-	//	Sleep(1000);
-	//}
+	udp_interface.pop_msg(net_msg);
+	while (net_msg == nullptr)
+	{
+		udp_interface.s_send(handshake, server_ip_address, server_udp_receive_port);
+		udp_interface.pop_msg(net_msg);
+		Sleep(1000);
+	}
 	printf("Connected");
 	ray_bounce.init();
 	
@@ -930,9 +930,9 @@ void TGLBase::update()
 
 ///////////////////////////////////////////
 // PHYSICS UPDATE
-//#ifndef _TGL_CLIENT
+#ifndef _TGL_CLIENT
 		physics_engine.tick(time_delta, actors, (TGLChunkSpawn*)chunks_spawner, gravity_enabled);
-//#endif
+#endif
 
 // check and call events and swap the buffers
 #ifdef _TGL_CLIENT

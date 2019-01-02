@@ -33,6 +33,12 @@ public:
 };
 #endif
 
+enum TGLActorType
+{
+	world_object,
+	player_object
+};
+
 class TGLBase
 {
 	std::map <std::string,float*> conf_float_values;

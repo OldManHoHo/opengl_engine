@@ -41,7 +41,7 @@ set (SRC ${top}/source/main.cpp
 #	${top}/FastNoiseSIMD/FastNoiseSIMD_avx512.cpp
 #	${top}/FastNoiseSIMD/FastNoiseSIMD_neon.cpp
 add_compile_options(-std=c++11 -O3 )
-add_compile_options(-D_UNIT_TEST)
+#add_compile_options(-D_UNIT_TEST)
 #add_compile_options(-D_EXCLUDE_TMC_DROPPED_ITEM)
 
 

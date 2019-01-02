@@ -21,6 +21,8 @@ class TGLLibraryQueue
     std::mutex memory_queue_lock;
     std::mutex item_queue_lock;
 
+    T prototype;
+
 public:
     TGLLibraryQueue();
     void init_memory(int queue_length, T& item_prototype);
@@ -46,6 +48,7 @@ TGLLibraryQueue<T>::TGLLibraryQueue()
 template <class T>
 void TGLLibraryQueue<T>::init_memory(int queue_length, T& item_prototype)
 {
+    prototype = item_prototype;
     for (int i = 0; i < queue_length; ++i)
     {
         T * temp_item = new T;
@@ -58,6 +61,13 @@ template <class T>
 void TGLLibraryQueue<T>::check_out_memory(T *& out_item)
 {
     std::lock_guard<std::mutex> Lock(memory_queue_lock);
+    if (memory_queue.size() == 0)
+    {
+        T * temp_item = new T;
+        *temp_item = prototype;
+        memory_queue.push_back(temp_item);
+	std::cout << "TGLLibraryQueue: Maxed out memory queue. New entry created." << "\n";
+    }
     out_item = memory_queue.front();
     memory_queue.pop_front();
 }

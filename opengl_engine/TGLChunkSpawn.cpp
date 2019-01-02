@@ -1,5 +1,7 @@
 #include <algorithm>
-#ifdef __linux__
+#ifdef __APPLE__
+#include <unistd.h>
+#elif defined(__linux__) 
 #include <unistd.h>
 #endif
 
@@ -931,17 +933,20 @@ std::vector <TGLActor*> TGLChunkSpawn::collect_nearby_dropped_items(glm::vec3 po
 	chunk_coord chnk(0,0);
 	get_chunk_of_point(pos, chnk.x, chnk.y);
 	std::vector <chunk_coord> near_coords = { chnk, chunk_coord(chnk.x + 1,chnk.y), chunk_coord(chnk.x - 1,chnk.y), chunk_coord(chnk.x,chnk.y + 1), chunk_coord(chnk.x,chnk.y - 1) };
-
 	for (auto coord : near_coords)
 	{
-		std::vector <TGLActor*>& chunk_items = dropped_items.listing[coord];
-		for (auto vec_it : chunk_items)
+		if (dropped_items.listing.find(coord) != dropped_items.listing.end())
 		{
-			glm::vec3 item_pos = vec_it->get_pos();
-			if (glm::length(item_pos - pos) < radius)
+			std::cout << "CSDFSDFS"<< "\n";
+			std::vector <TGLActor*>& chunk_items = dropped_items.listing[coord];
+			for (auto vec_it : chunk_items)
 			{
-				dropped_items.remove_item(vec_it, coord);
-				out_items.push_back(vec_it);
+				glm::vec3 item_pos = vec_it->get_pos();
+				if (glm::length(item_pos - pos) < radius)
+				{
+					dropped_items.remove_item(vec_it, coord);
+					out_items.push_back(vec_it);
+				}
 			}
 		}
 	}
@@ -1100,7 +1105,9 @@ void TGLChunkSpawn::recalculate_light()
 			}
 
 		light_calcs_mutex.unlock();
-#ifdef __linux__
+#ifdef __APPLE__ 
+		usleep(50000);
+#elif defined(__linux__) 
 		usleep(50000);
 #else
 		Sleep(1000);

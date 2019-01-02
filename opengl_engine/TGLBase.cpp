@@ -277,10 +277,10 @@ void TGLBase::update_clients()
 
 void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 {
-	//printf("PROCESS\n");
+	printf("PROCESS\n");
 	if (in_pair->second[0] == 0)
 	{
-		
+		std::cout << "Handshake Received" << "\n";	
 		in_pair->first.sin_port = ntohs(client_udp_receive_port);
 		
 		if (clients.find(in_pair->first) != clients.end())
@@ -292,9 +292,11 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 #ifdef USER_PLAYER_CLASS
 			USER_PLAYER_CLASS * new_player = new USER_PLAYER_CLASS;
 			new_player->set_pos(glm::vec3(player_start_pos_x,new_player->get_pos().y,player_start_pos_y));
+			new_player->set_chunk_spawn((TGLChunkSpawn*)chunks_spawner);
 #else
 			TGLPlayer * new_player = new TGLPlayer;
 			new_player->set_pos(glm::vec3(player_start_pos_x,new_player->get_pos().y,player_start_pos_y));
+			new_player->set_chunk_spawn((TGLChunkSpawn*)chunks_spawner);
 #endif
 			add_actor((TGLActor*)new_player);
 			clients[in_pair->first].actor_id = new_player->id;	
@@ -431,6 +433,7 @@ bool TGLBase::set_conf_value(std::string conf_var_name, std::string conf_var_val
 
 void TGLBase::read_conf()
 {
+	std::cout << "Reading conf file..." << "\n";
 	
 	conf_double_values["heartbeat_period"] = &heartbeat_period;
 	conf_double_values["tick_rate"] = &tick_rate;
@@ -992,6 +995,7 @@ void TGLBase::add_mesh(TGLMesh * in_mesh)
 void TGLBase::add_actor(TGLActor * in_actor)
 {
 	actors.push_back(in_actor);
+	std::cout << "Added actor " << in_actor->id << " at " << in_actor->pos.x << ", " << in_actor->pos.y << ", " << in_actor->pos.z <<  "\n";
 }
 
 void TGLBase::remove_actor(TGLActor * in_actor)

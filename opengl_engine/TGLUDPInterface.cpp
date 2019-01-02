@@ -75,6 +75,7 @@ int TGLUDPInterface::s_recv(std::vector <char>& out_msg, sockaddr_in * from_addr
 void TGLUDPInterface::start_receive_thread()
 {
     receive_thread = new std::thread([&] (TGLUDPInterface * player) { player->receive_loop(); }, this);	
+    std::cout << "Started UDPInterface receive thread" << "\n";
 }
 
 void TGLUDPInterface::receive_loop()

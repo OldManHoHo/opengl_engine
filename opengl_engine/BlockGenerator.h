@@ -125,3 +125,7 @@ public:
 
 };
 
+
+#ifdef _UNIT_TEST
+void BlockGenerator_TEST();
+#endif

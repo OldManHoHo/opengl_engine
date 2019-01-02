@@ -13,8 +13,6 @@
 #include <fstream>
 #ifndef _TGL_CLIENT
 #include <unistd.h>
-
-#include <cctype>
 #endif
 
 

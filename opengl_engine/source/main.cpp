@@ -9,6 +9,10 @@
 #include "TGLChunkSpawn.h"
 #include "useful_structures.h"
 
+#ifdef _UNIT_TEST
+#include "Simplex.h"
+#endif
+
 //extern std::vector <GLfloat> useful_structures::vertex_data_block_small;
 
 TGLBase gl_base;
@@ -32,6 +36,10 @@ class rot_actor : public TGLActor
 
 int main()
 {
+#ifdef _UNIT_TEST
+	Simplex_TEST();
+#endif
+	
 	gl_base.init();
 
 #ifdef _TGL_CLIENT

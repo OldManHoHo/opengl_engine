@@ -409,9 +409,11 @@ void TGLChunkSpawn::tick(double time_delta)
 				{
 					block_generator->set_point(bt_air, hit.loc.x, hit.loc.z, hit.loc.y);
 
-#ifndef _EXCLUDE_TMC_DROPPED_ITEM
+#ifndef _EXCLUDE_TMC_DROPPED_ITEM 
 					TMCDroppedItem * added = new TMCDroppedItem(block_type_to_item_id(type_to_remove));
+#ifdef _TGL_CLIENT
 					((TGLMesh*)(added->get_components()[0]))->set_material(block_material, (e_block_type)(type_to_remove - 1));
+#endif
 					added->set_pos(hit.loc);
 					//debug_actor.set_pos(hit_block);
 					gl_base.add_actor((TGLActor*)added);
@@ -1078,7 +1080,7 @@ void TGLChunkSpawn::recalculate_light()
 						}
 						if ((unsigned char)(256.0 / (dist*dist)) > light_calcs[chunk_loc][pointed_at])
 						{
-							light_calcs[chunk_loc][pointed_at] += unsigned int((unsigned char)(128.0 / (dist*dist)));
+							light_calcs[chunk_loc][pointed_at] += (unsigned int)((unsigned char)(128.0 / (dist*dist)));
 							light_calcs[chunk_loc][pointed_at] = std::max(75,std::min(255, int(light_calcs[chunk_loc][pointed_at])));
 						}
 

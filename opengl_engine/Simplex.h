@@ -20,3 +20,6 @@ public:
 	void set_scales(int in_x, int in_y, int in_z);
 };
 
+#ifdef _UNIT_TEST
+void Simplex_TEST();
+#endif

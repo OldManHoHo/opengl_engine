@@ -18,9 +18,9 @@ TGLUDPInterface::TGLUDPInterface()
 		printf("WSAStartup failed: %d\n", iResult);
 	}
 #endif
-    std::vector <char> proto_buf(1024);
+    std::vector <unsigned char> proto_buf(1024);
     sockaddr_in proto_addr;
-    std::pair<sockaddr_in, std::vector <char>> proto_pair(proto_addr, proto_buf);
+    std::pair<sockaddr_in, std::vector <unsigned char>> proto_pair(proto_addr, proto_buf);
     buffer_queue.init_memory(10,proto_pair);
     send_sock = socket(AF_INET, SOCK_DGRAM,0);
 	recv_sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -39,7 +39,7 @@ int TGLUDPInterface::s_bind(std::string ip, int receive_port, int send_port)
     return bind(send_sock, (sockaddr*)&my_send_addr, sizeof(my_send_addr));
 }
 
-int TGLUDPInterface::s_send(std::vector <char>& in_msg, std::string ip, int port)
+int TGLUDPInterface::s_send(std::vector <unsigned char>& in_msg, std::string ip, int port)
 {
     sockaddr_in addr;
     addr.sin_family = AF_INET;
@@ -49,17 +49,17 @@ int TGLUDPInterface::s_send(std::vector <char>& in_msg, std::string ip, int port
     return sendto(send_sock, &in_msg[0], in_msg.size(), 0, (sockaddr*)&addr, sizeof(addr));
 }
 
-int TGLUDPInterface::s_send(std::vector <char>& in_msg, sockaddr_in in_addr)
+int TGLUDPInterface::s_send(std::vector <unsigned char>& in_msg, sockaddr_in in_addr)
 {
     return sendto(send_sock, &in_msg[0], in_msg.size(), 0, (sockaddr*)&in_addr, sizeof(in_addr));
 }
 
-void TGLUDPInterface::send_to_all(std::vector <char>& in_msg)
+void TGLUDPInterface::send_to_all(std::vector <unsigned char>& in_msg)
 {
 	
 }
 
-int TGLUDPInterface::s_recv(std::vector <char>& out_msg, sockaddr_in * from_addr)
+int TGLUDPInterface::s_recv(std::vector <unsigned char>& out_msg, sockaddr_in * from_addr)
 {
 #ifdef _TGL_CLIENT
 	int out_len;
@@ -81,7 +81,7 @@ void TGLUDPInterface::start_receive_thread()
 void TGLUDPInterface::receive_loop()
 {
     //std::vector <char>* recv_buffer;
-    std::pair <sockaddr_in, std::vector <char>>* recv_buffer;
+    std::pair <sockaddr_in, std::vector <unsigned char>>* recv_buffer;
     while(1)
     {
         buffer_queue.check_out_memory(recv_buffer);
@@ -90,12 +90,12 @@ void TGLUDPInterface::receive_loop()
     }
 }
 
-void TGLUDPInterface::pop_msg(std::pair <sockaddr_in,std::vector<char>>*& out_pair)
+void TGLUDPInterface::pop_msg(std::pair <sockaddr_in,std::vector<unsigned char>>*& out_pair)
 {
     buffer_queue.pop_back(out_pair);
 }
 
-void TGLUDPInterface::return_msg(std::pair <sockaddr_in,std::vector<char>>*& in_pair)
+void TGLUDPInterface::return_msg(std::pair <sockaddr_in,std::vector<unsigned char>>*& in_pair)
 {
 	buffer_queue.check_in_memory(in_pair);
 }

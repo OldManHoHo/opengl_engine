@@ -96,7 +96,7 @@ void TGLBase::add_hud_element(TGLHudElement * in_element)
 	HUD_elements.push_back(in_element);
 }
 
-void TGLBase::apply_game_state(std::vector <char> * in_state)
+void TGLBase::apply_game_state(std::vector <unsigned char> * in_state)
 {
 	int offset = 1;
 	TGLActor * cur_actor = nullptr;
@@ -220,7 +220,7 @@ void TGLBase::apply_game_state(std::vector <char> * in_state)
 	// }
 }
 
-void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
+void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<unsigned char>>* in_pair)
 {
 //	std::string message_string(in_pair->second.begin(), in_pair->second.end());
 //	last_received_game_state.ParseFromString(message_string);
@@ -231,7 +231,7 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 
 void TGLBase::send_game_state_to_all()
 {
-	std::vector <char> test;
+	std::vector <unsigned char> test;
     udp_interface.send_to_all(test);
 }
 
@@ -239,7 +239,7 @@ void TGLBase::generate_game_state(bool full)
 {
 	game_state_buf.resize(1024);
 	int offset = 0;
-	game_state_buf[offset] = TGLNetMsgType::GameState;
+	game_state_buf[offset] = (unsigned char)(TGLNetMsgType::GameState);
 	offset += sizeof(char);
 	*(short*)&game_state_buf[offset] = 0;
     offset += sizeof(short);
@@ -259,16 +259,16 @@ void TGLBase::generate_game_state(bool full)
         	auto pos_p = glm::value_ptr(actor->pos);
         	auto rot_p = glm::value_ptr(actor->rot);
         	auto scale_p = glm::value_ptr(actor->scale);
-		//actor->transform[0][0] = 50;
-        	//std::copy(trans_p, trans_p + sizeof(GLfloat)*16, &game_state_buf[offset]);
-		memcpy(&game_state_buf[offset], pos_p, 3*sizeof(GLfloat));
-		offset += 3*sizeof(GLfloat);
-		memcpy(&game_state_buf[offset], rot_p, 16*sizeof(GLfloat));
-		offset += 16*sizeof(GLfloat);
-		memcpy(&game_state_buf[offset], scale_p, 3*sizeof(GLfloat));
-		offset += 3*sizeof(GLfloat);
-		//*(float*)&game_state_buf[offset] = 10;
-		//*(float*)&game_state_buf[offset+4] = 20;
+			//actor->transform[0][0] = 50;
+	        	//std::copy(trans_p, trans_p + sizeof(GLfloat)*16, &game_state_buf[offset]);
+			memcpy(&game_state_buf[offset], pos_p, 3*sizeof(GLfloat));
+			offset += 3*sizeof(GLfloat);
+			memcpy(&game_state_buf[offset], rot_p, 16*sizeof(GLfloat));
+			offset += 16*sizeof(GLfloat);
+			memcpy(&game_state_buf[offset], scale_p, 3*sizeof(GLfloat));
+			offset += 3*sizeof(GLfloat);
+			//*(float*)&game_state_buf[offset] = 10;
+			//*(float*)&game_state_buf[offset+4] = 20;
         	//offset += sizeof(GLfloat)*16;
         	// # int props
         	*(short*)&game_state_buf[offset] = 0;
@@ -307,27 +307,27 @@ void TGLBase::update_clients()
 			*(short*)&game_state_buf[1] = client.second.actor_id;
 
 			udp_interface.s_send(game_state_buf, client.first.addr);
-			
-			
 		}
 		time_of_last_send = std::chrono::steady_clock::now();
 	}
-	
-	// for (auto client : clients)
-	// {
-	// 	int time_since = (std::chrono::duration_cast< std::chrono::microseconds> (now - client.second)).count();
-	// 	if (time_since*1.0/1000000 > heartbeat_period)
-	// 	{
-	// 		std::vector <char> heartbeat(1,0);
-	// 		udp_interface.s_send(buffer, client.first.addr);
-	// 	}
-	// }
 }
 
-void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
+void TGLBase::send_input_update()
+{
+	auto now = std::chrono::steady_clock::now();
+	int time_since = (std::chrono::duration_cast< std::chrono::microseconds> (now - time_of_last_input_send)).count();
+	if (time_since*1.0/1000000 > 1.0/client_input_update_rate)
+	{
+		active_camera->generate_input_msg(player_input_buf);
+		udp_interface.s_send(player_input_buf, server_ip_address, server_udp_receive_port);
+		time_of_last_input_send = std::chrono::steady_clock::now();
+	}
+}
+
+void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<unsigned char>>* in_pair)
 {
 	printf("PROCESS\n");
-	if (in_pair->second[0] == 0)
+	if ((TGLNetMsgType)in_pair->second[0] == TGLNetMsgType::Heartbeat)
 	{
 		std::cout << "Handshake Received" << "\n";	
 		in_pair->first.sin_port = ntohs(client_udp_receive_port);
@@ -352,6 +352,18 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 		}
 		//clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();	
 		//udp_interface.s_send(in_pair->second,in_pair->first);
+	}
+	else if ((TGLNetMsgType)in_pair->second[0] == TGLNetMsgType::PlayerInput)
+	{
+		unsigned int input_actor_id = clients[in_pair->first].actor_id;
+		
+		for (auto actor : actors)
+		{
+			if (actor->id == input_actor_id)
+			{
+				((TGLPlayer*)actor)->apply_input_msg(in_pair->second);
+			}
+		}
 	}
 	else if(in_pair->second[0] == 'x')
 	{
@@ -407,8 +419,8 @@ int TGLBase::init()
 	udp_interface.s_bind(client_ip_address, client_udp_receive_port, client_udp_send_port);
 	udp_interface.start_receive_thread();
 
-	std::pair<sockaddr_in, std::vector <char>> * net_msg;
-	std::vector<char>handshake(1, 0);
+	std::pair<sockaddr_in, std::vector <unsigned char>> * net_msg;
+	std::vector<unsigned char>handshake(1, 0);
 	udp_interface.pop_msg(net_msg);
 	while (net_msg == nullptr)
 	{
@@ -524,6 +536,7 @@ void TGLBase::read_conf()
 	conf_float_values["cpu_light_bounce_multiplier"] = &cpu_light_bounce_multiplier;
 	conf_float_values["water_speed_multiplier"] = &water_speed_multiplier;
 	conf_bool_values["debug_console_enabled"] = &debug_console_enabled;
+	conf_double_values["client_input_update_rate"] = &client_input_update_rate;
 	
 	*conf_double_values["heartbeat_period"] = 1.0;
 	*conf_double_values["tick_rate"] = 30;
@@ -565,6 +578,7 @@ void TGLBase::read_conf()
 	*conf_float_values["cpu_light_bounce_multiplier"] = 1.0;
 	*conf_float_values["water_speed_multiplier"] = 0.25;
 	*conf_bool_values["debug_console_enabled"] = false;
+	*conf_double_values["client_input_update_rate"] = tick_rate;
 	
 	std::ifstream infile("global.conf");
 	std::string line;
@@ -676,7 +690,8 @@ void TGLBase::update()
 // NETWORK MESSAGE PROCESSING
 #ifdef _TGL_CLIENT
 		// process network messages
-		std::pair<sockaddr_in, std::vector <char>> * net_msg;
+		send_input_update();
+		std::pair<sockaddr_in, std::vector <unsigned char>> * net_msg;
 		udp_interface.pop_msg(net_msg);
 		while (net_msg != nullptr)
 		{
@@ -687,7 +702,7 @@ void TGLBase::update()
 #else
 		// process network messages
 		update_clients();
-		std::pair<sockaddr_in,std::vector <char>> * net_msg;
+		std::pair<sockaddr_in,std::vector <unsigned char>> * net_msg;
 		udp_interface.pop_msg(net_msg);
 		while (net_msg != nullptr)
 		{

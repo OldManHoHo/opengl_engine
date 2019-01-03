@@ -178,3 +178,62 @@ bool TGLPlayer::change_inventory_amount(TGLItemId item_type, int in_amount)
 {
 	return inventory.change_quantity(item_type, in_amount);
 }
+
+void TGLPlayer::generate_input_msg(std::vector <unsigned char> & input_msg)
+{
+	//std::vector <unsigned char> input_msg(1024);
+	if (input_msg.size() < 1024)
+	{
+		input_msg.resize(1024);
+	}
+	
+	int offset = 0;
+	
+	input_msg[offset] = (unsigned char)(TGLNetMsgType::PlayerInput);
+	offset += sizeof(unsigned char);
+	
+    auto rot_p = glm::value_ptr(rot);
+	memcpy(&input_msg[offset], rot_p, 16*sizeof(GLfloat));
+	offset += sizeof(GLfloat)*16;
+	
+	unsigned short * key_state_count = (unsigned short*)&input_msg[offset];
+	*key_state_count = 0;
+	offset += sizeof(unsigned short);
+	
+	for (auto key_state : input_handler.key_states)
+	{
+		input_msg[offset] = key_state.first;
+		offset += sizeof(unsigned char);
+		input_msg[offset] = (unsigned char)key_state.second;
+		offset += sizeof(unsigned char);
+		*key_state_count += 1; 
+	}
+}
+
+void TGLPlayer::apply_input_msg(std::vector <unsigned char> & input_msg)
+{
+	int offset = 0;
+	TGLNetMsgType msg_type = (TGLNetMsgType)input_msg[offset];
+	offset += sizeof(unsigned char);
+	
+	glm::mat4 new_rot;
+	memcpy(glm::value_ptr(new_rot), &input_msg[offset], sizeof(GLfloat)*16);
+	offset += sizeof(GLfloat)*16;
+	
+	unsigned short key_state_count = *(unsigned short*)&input_msg[offset];
+	offset += sizeof(unsigned short);
+	
+	for (int i = 0; i < key_state_count; ++i)
+	{
+		char key_type = input_msg[offset];
+		offset += sizeof(unsigned char);
+		bool pressed = (bool)input_msg[offset];
+		offset += sizeof(unsigned char);
+		
+		if (input_handler.key_states.find(key_type) != input_handler.key_states.end())
+		{
+			input_handler.key_states[key_type] = pressed;
+		}
+	}
+}
+

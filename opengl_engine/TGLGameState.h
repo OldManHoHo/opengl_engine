@@ -21,7 +21,8 @@ typedef unsigned int TGLActorType;
 enum TGLNetMsgType
 {
     Heartbeat,
-    GameState
+    GameState,
+    PlayerInput
 };
 
 class TGLProperty

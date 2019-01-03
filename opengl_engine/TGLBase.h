@@ -62,7 +62,8 @@ class TGLBase
 	std::mutex console_mutex;
 	std::deque <std::string> console_queue;
 	
-	std::vector <char> game_state_buf;
+	std::vector <unsigned char> game_state_buf;
+	std::vector <unsigned char> player_input_buf;
 #ifdef _TGL_CLIENT
 	GLFWwindow* window;
 #else
@@ -70,13 +71,15 @@ class TGLBase
 #endif
     double heartbeat_period;
     double tick_rate;
+    double client_input_update_rate;
     std::chrono::steady_clock::time_point time_of_last_send;
+    std::chrono::steady_clock::time_point time_of_last_input_send;
 
 
 	std::vector <TGLMesh*> meshes;
 	std::vector <TGLActor*> actors;
 	std::vector <TGLHudElement*> HUD_elements;
-	TGLCamera * active_camera;
+	TGLPlayer * active_camera;
 	float player_fov;
 	float player_start_pos_x;
 	float player_start_pos_y;
@@ -156,13 +159,14 @@ public:
 	GLFWwindow * get_window();
 	void add_camera(TGLCamera * in_camera);
 	void add_hud_element(TGLHudElement * in_element);
-	void apply_game_state(std::vector <char> * in_state);
-	void process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair);
+	void apply_game_state(std::vector <unsigned char> * in_state);
+	void process_msg(std::pair<sockaddr_in, std::vector<unsigned char>>* in_pair);
 #else
     void generate_game_state(bool full);
     void send_game_state_to_all();
     void update_clients();
-    void process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair);
+    void send_input_update();
+    void process_msg(std::pair<sockaddr_in, std::vector<unsigned char>>* in_pair);
 #endif
 
 	

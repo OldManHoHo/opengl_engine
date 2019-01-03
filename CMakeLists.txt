@@ -16,6 +16,7 @@ set (SRC ${top}/source/main.cpp
 	${top}/useful_structures.cpp
 	${top}/TGLChunkSpawn.cpp
 	${tmc}/TMCPlayer.cpp
+	${tmc}/TMCChunkDatabase.cpp
 	${top}/TGLPlayer.cpp
 	${top}/TGLPhysicsEngine.cpp
 	${top}/BlockGenerator.cpp

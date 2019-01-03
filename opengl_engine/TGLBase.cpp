@@ -99,13 +99,38 @@ void TGLBase::add_hud_element(TGLHudElement * in_element)
 void TGLBase::apply_game_state(std::vector <char> * in_state)
 {
 	int offset = 1;
+	TGLActor * cur_actor = nullptr;
 	short actor_id = *(short*)&(*in_state)[offset];
+	bool found = false;
+	for (auto actor : actors)
+	{
+		if (actor->id == actor_id)
+		{
+			cur_actor = actor;
+			found = true;
+		}
+	}
+	if (found == false)
+	{
+#ifdef USER_PLAYER_CLASS
+		USER_PLAYER_CLASS * new_player = new USER_PLAYER_CLASS;
+		new_player->set_pos(glm::vec3(player_start_pos_x, new_player->get_pos().y, player_start_pos_y));
+		new_player->set_chunk_spawn((TGLChunkSpawn*)chunks_spawner);
+		new_player->id = actor_id;
+#else
+		TGLPlayer * new_player = new TGLPlayer;
+		new_player->set_pos(glm::vec3(player_start_pos_x, new_player->get_pos().y, player_start_pos_y));
+		new_player->set_chunk_spawn((TGLChunkSpawn*)chunks_spawner);
+		new_player->id = actor_id;
+#endif
+		add_actor((TGLActor*)new_player);
+	}
 	offset += sizeof(short);
 	if( active_camera->id != actor_id )
 	{
 		for (auto actor :actors)
 		{
-			if (actor->id = actor_id)
+			if (actor->id == actor_id)
 			{
 				active_camera = (TGLCamera*)actor;
 			}
@@ -115,22 +140,33 @@ void TGLBase::apply_game_state(std::vector <char> * in_state)
 	offset += sizeof(short);
 	for (int i = 0; i < num_actors; ++i)
 	{
-		TGLActor * cur_actor = nullptr;
+		
 		short actor_id = *(short*)&(*in_state)[offset];
 		offset += sizeof(short);
 		for (auto actor : actors)
 		{
-			if (actor->id = actor_id)
+			if (actor->id == actor_id)
 			{
 				cur_actor = actor;
 			}
 		}
 		short actor_type = *(short*)&(*in_state)[offset];
 		offset += sizeof(short);
-		glm::mat4 actor_trans;
-		std::copy(&(*in_state)[offset], &(*in_state)[offset] + sizeof(GLfloat) * 16, glm::value_ptr(actor_trans));
-		cur_actor->transform = actor_trans;
-		offset += sizeof(GLfloat)*16;
+		glm::vec3 actor_pos;
+		glm::vec3 actor_scale;
+		glm::mat4 actor_rot;
+		//std::copy(in_state->begin() + offset, in_state->begin() + offset + sizeof(GLfloat) * 16, glm::value_ptr(actor_trans));
+		memcpy(glm::value_ptr(actor_pos), &(*in_state)[offset], sizeof(GLfloat) * 3);
+		offset += sizeof(GLfloat) * 3;
+		memcpy(glm::value_ptr(actor_rot), &(*in_state)[offset], sizeof(GLfloat) * 16);
+		offset += sizeof(GLfloat) * 16;
+		memcpy(glm::value_ptr(actor_scale), &(*in_state)[offset], sizeof(GLfloat) * 3);
+		offset += sizeof(GLfloat) * 3;
+		cur_actor->set_pos(actor_pos);
+		cur_actor->set_rot(actor_rot);
+		cur_actor->set_scale(actor_scale);
+		cur_actor->transform_calculated = true;
+		
 		
 		short num_int_props = *(short*)&(*in_state)[offset];
 		offset += sizeof(short);
@@ -159,14 +195,15 @@ void TGLBase::apply_game_state(std::vector <char> * in_state)
 			short int_prop_id = *(short*)&(*in_state)[offset];
 			offset += sizeof(short);
 			glm::vec3 vec3_prop_val;
-			std::copy(&(*in_state)[offset], &(*in_state)[offset] + 3, glm::value_ptr(vec3_prop_val));
+			//std::copy(&(*in_state)[offset], &(*in_state)[offset] + 3, glm::value_ptr(vec3_prop_val));
+			memcpy(glm::value_ptr(vec3_prop_val), &(*in_state)[offset], sizeof(GLfloat) * 3);
 			offset += sizeof(GLfloat)*3;
 		}
 		for (auto actor : actors)
 		{
 			if (actor_id == actor->id)
 			{
-				actor->transform = actor_trans;
+				//actor->transform = actor_trans;
 			}
 		}
 	}

@@ -6,6 +6,7 @@ TGLActor::TGLActor():
 	id(_id_counter),
 	is_chunk(false)
 {
+
 	transform = glm::mat4(1.0);
 	scale = glm::vec3(1.0, 1.0, 1.0);
 	pos = glm::vec3(0, 0, 0);
@@ -38,7 +39,7 @@ void TGLActor::set_transform(glm::mat4 in_transform)
 
 glm::mat4 TGLActor::get_transform()
 {
-	if (transform_calculated != true || static_physics == false)
+	if ((transform_calculated != true || static_physics == false))
 	{
 		glm::mat4 out_transform(1.0);
 		glm::mat4 trans = glm::translate(out_transform, pos);

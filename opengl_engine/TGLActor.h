@@ -51,6 +51,7 @@ protected:
 	TGLBounds * bounds;
 
 	bool transform_calculated;
+	bool update_transform;
 	bool on_ground;
 	friend class TGLPhysicsEngine;
     friend class TGLBase;

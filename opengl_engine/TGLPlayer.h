@@ -27,6 +27,7 @@ public:
 
 	TGLInventory inventory;
 	TGLInventoryItem * equipped_item;
+	TGLHudElement * inventory_hud;
 
 	float y_angle;
 	float x_angle;

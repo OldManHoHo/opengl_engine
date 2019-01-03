@@ -19,7 +19,7 @@ TMCPlayer::TMCPlayer():
 void TMCPlayer::init_inventory(int num_slots)
 {
 #ifdef _TGL_CLIENT
-    TGLHudElement inventory(inventory_slot_width*num_slots, inventory_slot_height, glm::vec2(inventory_screen_pos_x, inventory_screen_pos_y), glm::vec3(0.0, 0.0, 0.0));
+    inventory_hud = new TGLHudElement(inventory_slot_width*num_slots, inventory_slot_height, glm::vec2(inventory_screen_pos_x, inventory_screen_pos_y), glm::vec3(0.0, 0.0, 0.0));
 #endif
 	int offset = inventory_slot_border;
 	int shift = inventory_slot_width;
@@ -33,8 +33,8 @@ void TMCPlayer::init_inventory(int num_slots)
 	                                inventory_slot_border), glm::vec3(0.5, 0.5, 0.5), 
 	                                "content/textures/pickaxe.png");
 
-	    inventory.sub_elements.push_back(inventory_itemb);
-	    inventory.sub_elements.push_back(inventory_item);
+		inventory_hud->sub_elements.push_back(inventory_itemb);
+		inventory_hud->sub_elements.push_back(inventory_item);
 #endif
 	}
 }
@@ -142,22 +142,23 @@ void TMCPlayer::tick(double time_delta)
 	{
 	    if (i == equipped_index)
 	    {
-	        hud[0]->sub_elements[2*i]->color = equipped_border_color;
+			inventory_hud->sub_elements[2*i]->color = equipped_border_color;
+	        //hud[0]->sub_elements[2*i]->color = equipped_border_color;
 	    }
 	    else
 	    {
-	        hud[0]->sub_elements[2*i]->color = unequipped_border_color;
+			inventory_hud->sub_elements[2 * i]->color = unequipped_border_color;
 	    }
 	    
 	    TGLInventoryItem * next_item = inventory.get_item(i, 0);
 	    int index = i*2 + 1;
     	if (next_item != nullptr)
     	{
-    		hud[0]->sub_elements[index]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
+			inventory_hud->sub_elements[index]->set_offsets(useful_structures::item_id_to_texture_coords[next_item->type], useful_structures::item_id_to_texture_coords[next_item->type] + glm::vec2(16, 16));
     	}
     	else
     	{
-    		hud[0]->sub_elements[index]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
+			inventory_hud->sub_elements[index]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
     	}
 	}
 #endif

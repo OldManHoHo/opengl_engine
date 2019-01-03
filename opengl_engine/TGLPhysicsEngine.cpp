@@ -93,6 +93,7 @@ void TGLPhysicsEngine::tick(double time_delta, std::vector <TGLActor*> const & a
 std::vector <glm::vec3> TGLPhysicsEngine::get_world_blocks(TGLActor * in_actor, TGLChunkSpawn * chunks_spawner)
 {
 	glm::vec3 position = in_actor->get_pos();
+	
 
 	TGLBlockBounds * actor_bounds = (TGLBlockBounds*)(in_actor->get_bounds());
 	std::vector <glm::vec3> out_points;
@@ -196,9 +197,9 @@ void TGLPhysicsEngine::move(double time_delta, TGLActor * in_actor, std::vector 
 
 	for (auto in_block : in_blocks)
 	{
-		double y_pen = -abs(in_actor->pos.y - in_block.y) + (actor_bounds->height / 2.0 + block_height / 2.0);
-		double x_pen = -abs(in_actor->pos.x - in_block.x) + (actor_bounds->width / 2.0 + block_width / 2.0);
-		double z_pen = -abs(in_actor->pos.z - in_block.z) + (actor_bounds->depth / 2.0 + block_depth / 2.0);
+		double y_pen = -std::abs(in_actor->pos.y - in_block.y) + (actor_bounds->height / 2.0 + block_height / 2.0);
+		double x_pen = -std::abs(in_actor->pos.x - in_block.x) + (actor_bounds->width / 2.0 + block_width / 2.0);
+		double z_pen = -std::abs(in_actor->pos.z - in_block.z) + (actor_bounds->depth / 2.0 + block_depth / 2.0);
 		if (y_pen > 0 && x_pen > 0 && z_pen > 0)
 		{
 			in_actor->pos.x -= x_pen*sign(in_actor->vel.x)*1.01;
@@ -210,9 +211,9 @@ void TGLPhysicsEngine::move(double time_delta, TGLActor * in_actor, std::vector 
 
 	for (auto in_block : in_blocks)
 	{
-		double y_pen = -abs(in_actor->pos.y - in_block.y) + (actor_bounds->height / 2.0 + block_height / 2.0);
-		double x_pen = -abs(in_actor->pos.x - in_block.x) + (actor_bounds->width / 2.0 + block_width / 2.0);
-		double z_pen = -abs(in_actor->pos.z - in_block.z) + (actor_bounds->depth / 2.0 + block_depth / 2.0);
+		double y_pen = -std::abs(in_actor->pos.y - in_block.y) + (actor_bounds->height / 2.0 + block_height / 2.0);
+		double x_pen = -std::abs(in_actor->pos.x - in_block.x) + (actor_bounds->width / 2.0 + block_width / 2.0);
+		double z_pen = -std::abs(in_actor->pos.z - in_block.z) + (actor_bounds->depth / 2.0 + block_depth / 2.0);
 		if (y_pen > 0 && x_pen > 0 && z_pen > 0)
 		{
 			in_actor->pos.z -= z_pen*sign(in_actor->vel.z)*1.01;
@@ -224,9 +225,9 @@ void TGLPhysicsEngine::move(double time_delta, TGLActor * in_actor, std::vector 
 
 	for (auto in_block : in_blocks)
 	{
-		double y_pen = -abs(in_actor->pos.y - in_block.y) + (actor_bounds->height / 2.0 + block_height / 2.0);
-		double x_pen = -abs(in_actor->pos.x - in_block.x) + (actor_bounds->width / 2.0 + block_width / 2.0);
-		double z_pen = -abs(in_actor->pos.z - in_block.z) + (actor_bounds->depth / 2.0 + block_depth / 2.0);
+		double y_pen = -std::abs(in_actor->pos.y - in_block.y) + (actor_bounds->height / 2.0 + block_height / 2.0);
+		double x_pen = -std::abs(in_actor->pos.x - in_block.x) + (actor_bounds->width / 2.0 + block_width / 2.0);
+		double z_pen = -std::abs(in_actor->pos.z - in_block.z) + (actor_bounds->depth / 2.0 + block_depth / 2.0);
 		if (y_pen > 0 && x_pen > 0 && z_pen > 0)
 		{
 			in_actor->pos.y -= y_pen*sign(in_actor->vel.y)*1.01;
@@ -244,17 +245,17 @@ void TGLPhysicsEngine::collide_aligned_block_and_block2(TGLActor * in_actor, glm
 	double block_height = 1.0;
 	double block_width = 1.0;
 	double block_depth = 1.0;
-	double y_pen = -abs(in_actor->pos.y - in_block.y) + (actor_bounds->height / 2.0 + block_height / 2.0);
-	double x_pen = -abs(in_actor->pos.x - in_block.x) + (actor_bounds->width / 2.0 + block_width / 2.0);
-	double z_pen = -abs(in_actor->pos.z - in_block.z) + (actor_bounds->depth / 2.0 + block_depth / 2.0);
+	double y_pen = -std::abs(in_actor->pos.y - in_block.y) + (actor_bounds->height / 2.0 + block_height / 2.0);
+	double x_pen = -std::abs(in_actor->pos.x - in_block.x) + (actor_bounds->width / 2.0 + block_width / 2.0);
+	double z_pen = -std::abs(in_actor->pos.z - in_block.z) + (actor_bounds->depth / 2.0 + block_depth / 2.0);
 	double pen;
 
 	if (y_pen > 0 && x_pen > 0 && z_pen > 0)
 	{
 		// Collision detected
-		glm::vec3 collision_pos_1 = in_actor->vel*float(abs(y_pen / in_actor->vel.y));
-		glm::vec3 collision_pos_2 = in_actor->vel*float(abs(x_pen / in_actor->vel.x));
-		glm::vec3 collision_pos_3 = in_actor->vel*float(abs(z_pen / in_actor->vel.z));
+		glm::vec3 collision_pos_1 = in_actor->vel*float(std::abs(y_pen / in_actor->vel.y));
+		glm::vec3 collision_pos_2 = in_actor->vel*float(std::abs(x_pen / in_actor->vel.x));
+		glm::vec3 collision_pos_3 = in_actor->vel*float(std::abs(z_pen / in_actor->vel.z));
 		glm::vec3 collision_pos;
 		double l1 = glm::length(collision_pos_1);
 		double l2 = glm::length(collision_pos_2);
@@ -322,7 +323,7 @@ void TGLPhysicsEngine::collide_aligned_block_and_block(TGLActor * in_actor, glm:
 	double block_width = 1.0;
 	double block_depth = 1.0;
 	
-	while (abs(in_actor->pos.y - in_block.y) < actor_bounds->height / 2.0 + block_height / 2.0 && abs(in_actor->pos.x - in_block.x) < actor_bounds->width / 2.0 + block_width / 2.0 && abs(in_actor->pos.z - in_block.z) < actor_bounds->depth / 2.0 + block_depth / 2.0)
+	while (std::abs(in_actor->pos.y - in_block.y) < actor_bounds->height / 2.0 + block_height / 2.0 && std::abs(in_actor->pos.x - in_block.x) < actor_bounds->width / 2.0 + block_width / 2.0 && std::abs(in_actor->pos.z - in_block.z) < actor_bounds->depth / 2.0 + block_depth / 2.0)
 	{
 
 		// Collision found
@@ -354,7 +355,7 @@ void TGLPhysicsEngine::collide_aligned_block_and_block(TGLActor * in_actor, glm:
 			if (ty2 > 0)
 			{
 				double prev_y = in_actor->pos.y;
-				if (abs(ty2*(-in_actor->vel.y)) > 0.6)
+				if (std::abs(ty2*(-in_actor->vel.y)) > 0.6)
 				{
 					in_actor->pos.y = in_actor->prev_pos.y;
 					in_actor->vel.y = 0;
@@ -364,7 +365,7 @@ void TGLPhysicsEngine::collide_aligned_block_and_block(TGLActor * in_actor, glm:
 					in_actor->pos.y += 1.05*ty2*(-in_actor->vel.y);
 					in_actor->vel.y = 0;
 					in_actor->set_on_ground(true);
-					if (abs(prev_y - in_actor->pos.y) > 0.9)
+					if (std::abs(prev_y - in_actor->pos.y) > 0.9)
 					{
 						std::cout << "TEST" << "\n";
 					}
@@ -376,12 +377,12 @@ void TGLPhysicsEngine::collide_aligned_block_and_block(TGLActor * in_actor, glm:
 				//tx1 = (actor_bounds->width / 2.0 + block_width / 2.0 + in_block.x - in_actor->pos.x) / (in_actor->vel.x);
 				//tx2 = (-actor_bounds->width / 2.0 - block_width / 2.0 + in_block.x - in_actor->pos.x) / (in_actor->vel.x);
 				tx1 = (in_actor->pos.x - in_block.x - (actor_bounds->width / 2.0 + block_width / 2.0)) / -in_actor->vel.x;
-				tx2 = ((actor_bounds->width / 2.0 + block_width / 2.0) - abs(in_actor->pos.x - in_block.x)) / abs(in_actor->vel.x);
+				tx2 = ((actor_bounds->width / 2.0 + block_width / 2.0) - std::abs(in_actor->pos.x - in_block.x)) / std::abs(in_actor->vel.x);
 			}
 			else
 			{
 				tx1 = 0;
-				tx2 = ((actor_bounds->width / 2.0 + block_width / 2.0) - abs(in_actor->pos.x - in_block.x));
+				tx2 = ((actor_bounds->width / 2.0 + block_width / 2.0) - std::abs(in_actor->pos.x - in_block.x));
 				if (tx2 > 0)
 				{
 					if (in_actor->pos.x - in_actor->prev_pos.x > 0)
@@ -392,12 +393,12 @@ void TGLPhysicsEngine::collide_aligned_block_and_block(TGLActor * in_actor, glm:
 			}
 			if (tx2 > 0)
 			{
-				if (abs(in_actor->pos.x + tx2*(-in_actor->vel.x) - in_actor->pos.x) > 0.6)
+				if (std::abs(in_actor->pos.x + tx2*(-in_actor->vel.x) - in_actor->pos.x) > 0.6)
 				{
 					std::cout << "dx: " << in_actor->pos.x + tx2*(-in_actor->vel.x) - in_actor->pos.x << "\n";
 				}
 				double prev_x = in_actor->pos.x;
-				if (abs(tx2*(-in_actor->vel.x)) > 0.6)
+				if (std::abs(tx2*(-in_actor->vel.x)) > 0.6)
 				{
 					in_actor->pos.x = in_actor->prev_pos.x;
 					in_actor->vel.x = 0;
@@ -414,12 +415,12 @@ void TGLPhysicsEngine::collide_aligned_block_and_block(TGLActor * in_actor, glm:
 				//tz1 = (actor_bounds->depth / 2.0 + block_depth / 2.0 + in_block.z - in_actor->pos.z) / (in_actor->vel.z);
 				//tz2 = (-actor_bounds->depth / 2.0 - block_depth / 2.0 + in_block.z - in_actor->pos.z) / (in_actor->vel.z);
 				tz1 = (in_actor->pos.z - in_block.z - (actor_bounds->depth / 2.0 + block_depth / 2.0)) / -in_actor->vel.z;
-				tz2 = ((actor_bounds->depth / 2.0 + block_depth / 2.0) - abs(in_actor->pos.z - in_block.z)) / abs(in_actor->vel.z);
+				tz2 = ((actor_bounds->depth / 2.0 + block_depth / 2.0) - std::abs(in_actor->pos.z - in_block.z)) / std::abs(in_actor->vel.z);
 			}
 			else
 			{
 				tz1 = 0;
-				tz2 = ((actor_bounds->depth / 2.0 + block_depth / 2.0) - abs(in_actor->pos.z - in_block.z));
+				tz2 = ((actor_bounds->depth / 2.0 + block_depth / 2.0) - std::abs(in_actor->pos.z - in_block.z));
 				if (tz2 > 0)
 				{
 					if (in_actor->pos.z - in_actor->prev_pos.z > 0)
@@ -430,7 +431,7 @@ void TGLPhysicsEngine::collide_aligned_block_and_block(TGLActor * in_actor, glm:
 			}
 			if (tz2 > 0)
 			{
-				if (abs(tz2*(-in_actor->vel.z)) > 0.6)
+				if (std::abs(tz2*(-in_actor->vel.z)) > 0.6)
 				{
 					in_actor->pos.z = in_actor->prev_pos.z;
 					in_actor->vel.z = 0;
@@ -571,7 +572,7 @@ void TGLPhysicsEngine::collide_cylinder_and_block(TGLActor * in_actor, glm::vec3
 		}
 		else
 		{
-			if (abs(corrected.y - actor_bounds->height / 2.0 - (in_block.y + 0.5)) < 0.01)
+			if (std::abs(corrected.y - actor_bounds->height / 2.0 - (in_block.y + 0.5)) < 0.01)
 			{
 				corrected = in_actor->pos;
 				corrected.y = in_block.y + 0.5 + 0.01 + actor_bounds->height / 2.0;

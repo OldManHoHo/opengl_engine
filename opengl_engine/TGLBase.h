@@ -33,7 +33,7 @@ public:
 };
 #endif
 
-enum TGLActorType
+enum TGLObjectType
 {
 	world_object,
 	player_object

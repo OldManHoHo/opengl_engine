@@ -219,8 +219,20 @@ void TGLBase::generate_game_state(bool full)
         	*(short*)&game_state_buf[offset] = (short)actor->type;
         	offset += sizeof(short);
         	auto trans_p = glm::value_ptr(actor->get_transform());
-        	std::copy(trans_p, trans_p + 16, &game_state_buf[offset]);
-        	offset += sizeof(GLfloat)*16;
+        	auto pos_p = glm::value_ptr(actor->pos);
+        	auto rot_p = glm::value_ptr(actor->rot);
+        	auto scale_p = glm::value_ptr(actor->scale);
+		//actor->transform[0][0] = 50;
+        	//std::copy(trans_p, trans_p + sizeof(GLfloat)*16, &game_state_buf[offset]);
+		memcpy(&game_state_buf[offset], pos_p, 3*sizeof(GLfloat));
+		offset += 3*sizeof(GLfloat);
+		memcpy(&game_state_buf[offset], rot_p, 16*sizeof(GLfloat));
+		offset += 16*sizeof(GLfloat);
+		memcpy(&game_state_buf[offset], scale_p, 3*sizeof(GLfloat));
+		offset += 3*sizeof(GLfloat);
+		//*(float*)&game_state_buf[offset] = 10;
+		//*(float*)&game_state_buf[offset+4] = 20;
+        	//offset += sizeof(GLfloat)*16;
         	// # int props
         	*(short*)&game_state_buf[offset] = 0;
         	offset += sizeof(short);
@@ -255,7 +267,7 @@ void TGLBase::update_clients()
 		for (auto client : clients)
 		{
 			//printf("GLIENCTS %u\n", ntohs(client.first.addr.sin_port));	
-			*(short*)&game_state_buf[1] = 0;
+			*(short*)&game_state_buf[1] = client.second.actor_id;
 
 			udp_interface.s_send(game_state_buf, client.first.addr);
 			
@@ -579,7 +591,7 @@ void TGLBase::update()
 	}
 	else
 	{
-		time_delta = constant_time_delta;
+		time_delta = 1/tick_rate;//constant_time_delta;
 	}
 
 	/////////////////////////////////

@@ -2,6 +2,7 @@
 #include "math.h"
 #include <chrono>
 #include <algorithm>
+#include <iostream>
 
 
 
@@ -35,7 +36,7 @@ e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
 	if (test_gen)
 	{
-		e_block_type type = static_cast<e_block_type>((abs(int(floor(in_x / 16.0) + floor(in_z / 16.0)))) % 6);
+		e_block_type type = static_cast<e_block_type>((std::abs(int(floor(in_x / 16.0) + floor(in_z / 16.0)))) % 6);
 		if (in_z == 180)
 		{
 			return type;
@@ -63,13 +64,16 @@ e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 	float * trees_noise = trees->get_points(in_x, in_y, in_z, 1);
 	float * caves_noise = caves->get_points(in_x, in_y, in_z, 1);
 	float * caves_noise2 = caves2->get_points(in_x, in_y, in_z, 1);
+	
+	//std::cout << noises[0] << ", " << noises2[0] << ", " << noises3[0] << "\n";
+	//std::cout << caves_noise[0] << "\n";
 
 	e_block_type block = bt_air;
 
-	float mountain_draw = mount_noise[0] * abs(mount_noise2[0]);
-	int height_draw = abs(noises5[0])*(
+	float mountain_draw = mount_noise[0] * std::abs(mount_noise2[0]);
+	int height_draw = std::abs(noises5[0])*(
 		(noises[0] * 3.0 / 4 + noises2[0] / 4) * 10 +
-		abs(noises3[0]) * 50 +
+		std::abs(noises3[0]) * 50 +
 		noises4[0] * 60 +
 		mountain_draw * 60) + 175;
 	//fprintf(outfile, "%i, %i, %i, %f\n", j, k, i, caves_noise[j*division * 256 + k * 256 + i])
@@ -89,8 +93,8 @@ e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 	{
 
 	}
-	else if ((in_z >(height_draw) ||
-		(abs(caves_noise[0]) < 0.08))) //2+abs(caves_noise2[counter])/2)//caves_noise[counter]/2+caves_noise2[counter]/2 > 0.4)//(i > (noises[j*division + k] * 3.0 / 4 + noises2[j*division + k] / 4) * 10 + 175)//(i > (noises[j*division + k]*3.0/4 + noises2[j*division + k]/4) * 10 + 175) || 
+	else if ((in_z > height_draw ||
+		(std::abs(caves_noise[0]) < 0.08))) //2+std::abs(caves_noise2[counter])/2)//caves_noise[counter]/2+caves_noise2[counter]/2 > 0.4)//(i > (noises[j*division + k] * 3.0 / 4 + noises2[j*division + k] / 4) * 10 + 175)//(i > (noises[j*division + k]*3.0/4 + noises2[j*division + k]/4) * 10 + 175) || 
 	{
 		//blocks[((j*division*division) + k*division) + i] = 0;
 		//blocks[((j * 18 * 256) + k * 256) + i] = 0;
@@ -205,10 +209,10 @@ e_block_type * BlockGenerator::get_points(int in_x, int in_y, int in_z, int divi
 				e_block_type mod = check_for_mod(in_x + j, in_y + k, in_z + i);
 				if (mod == bt_invalid)
 				{
-					float mountain_draw = mount_noise[j*division + k] * abs(mount_noise2[j*division + k]);
-					int height_draw = abs(noises5[j*division + k])*(
+					float mountain_draw = mount_noise[j*division + k] * std::abs(mount_noise2[j*division + k]);
+					int height_draw = std::abs(noises5[j*division + k])*(
 						(noises[j*division + k] * 3.0 / 4 + noises2[j*division + k] / 4) * 10 +
-						abs(noises3[j*division + k]) * 50 +
+						std::abs(noises3[j*division + k]) * 50 +
 						noises4[j*division + k] * 60 +
 						mountain_draw * 60) + 175;
 					//fprintf(outfile, "%i, %i, %i, %f\n", j, k, i, caves_noise[j*division * 256 + k * 256 + i])
@@ -217,7 +221,7 @@ e_block_type * BlockGenerator::get_points(int in_x, int in_y, int in_z, int divi
 
 					}
 					else if ((i > (height_draw) ||
-						(abs(caves_noise[counter]) < 0.08))) //2+abs(caves_noise2[counter])/2)//caves_noise[counter]/2+caves_noise2[counter]/2 > 0.4)//(i > (noises[j*division + k] * 3.0 / 4 + noises2[j*division + k] / 4) * 10 + 175)//(i > (noises[j*division + k]*3.0/4 + noises2[j*division + k]/4) * 10 + 175) || 
+						(std::abs(caves_noise[counter]) < 0.08))) //2+std::abs(caves_noise2[counter])/2)//caves_noise[counter]/2+caves_noise2[counter]/2 > 0.4)//(i > (noises[j*division + k] * 3.0 / 4 + noises2[j*division + k] / 4) * 10 + 175)//(i > (noises[j*division + k]*3.0/4 + noises2[j*division + k]/4) * 10 + 175) || 
 					{
 						//blocks[((j*division*division) + k*division) + i] = 0;
 						//blocks[((j * 18 * 256) + k * 256) + i] = 0;
@@ -250,7 +254,7 @@ e_block_type * BlockGenerator::get_points(int in_x, int in_y, int in_z, int divi
 								blocks[counter] = bt_dirt_with_grass;
 							}
 
-							if (abs(trees_noise[counter]) + abs(noises[j*division + k])*0.1 < 0.04 && k > 0 && j > 0 && k < 18 && j < 18)
+							if (std::abs(trees_noise[counter]) + std::abs(noises[j*division + k])*0.1 < 0.04 && k > 0 && j > 0 && k < 18 && j < 18)
 							{
 								int chunk_x = floor((in_x + 1) / 16.0);
 								int chunk_y = floor((in_y + 1) / 16.0);
@@ -425,7 +429,7 @@ void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in
 		{
 			if (in_y + 1 <= size_x - 1)
 			{
-				if (abs(in_noise[in_x * size_x * 256 + (in_y + 1) * 256 + in_z + count]) > branch_prob)
+				if (std::abs(in_noise[in_x * size_x * 256 + (in_y + 1) * 256 + in_z + count]) > branch_prob)
 				{
 					in_blocks[in_x * size_x * 256 + (in_y + 1) * 256 + in_z + count] = bt_leaves;
 					set_point(bt_leaves, chunk_x*16 + in_x - 1, chunk_y * 16 + in_y + 1 - 1, in_z + count);
@@ -433,7 +437,7 @@ void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in
 			}
 			if (in_y - 1 >= 0)
 			{
-				if (abs(in_noise[in_x * size_x * 256 + (in_y - 1) * 256 + in_z + count]) > branch_prob)
+				if (std::abs(in_noise[in_x * size_x * 256 + (in_y - 1) * 256 + in_z + count]) > branch_prob)
 				{
 					in_blocks[in_x * size_x * 256 + (in_y - 1) * 256 + in_z + count] = bt_leaves;
 					set_point(bt_leaves, chunk_x * 16 + in_x - 1, chunk_y * 16 + in_y - 1 - 1, in_z + count);
@@ -441,7 +445,7 @@ void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in
 			}
 			if (in_x + 1 <= size_x - 1)
 			{
-				if (abs(in_noise[(in_x + 1) * size_x * 256 + in_y * 256 + in_z + count]) > branch_prob)
+				if (std::abs(in_noise[(in_x + 1) * size_x * 256 + in_y * 256 + in_z + count]) > branch_prob)
 				{
 					in_blocks[(in_x + 1) * size_x * 256 + in_y * 256 + in_z + count] = bt_leaves;
 					set_point(bt_leaves, chunk_x * 16 + in_x + 1 - 1, chunk_y * 16 + in_y - 1, in_z + count);
@@ -449,7 +453,7 @@ void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in
 			}
 			if (in_x - 1 >= 0)
 			{
-				if (abs(in_noise[(in_x - 1) * size_x * 256 + in_y * 256 + in_z + count]) > branch_prob)
+				if (std::abs(in_noise[(in_x - 1) * size_x * 256 + in_y * 256 + in_z + count]) > branch_prob)
 				{
 					in_blocks[(in_x - 1) * size_x * 256 + in_y * 256 + in_z + count] = bt_leaves;
 					set_point(bt_leaves, chunk_x * 16 + in_x - 1 - 1, chunk_y * 16 + in_y - 1, in_z + count);

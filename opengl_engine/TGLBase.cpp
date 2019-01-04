@@ -453,7 +453,7 @@ bool TGLBase::set_conf_value(std::string conf_var_name, std::string conf_var_val
 		float conf_var_value = std::stof(conf_var_value_str);
 		*conf_float_values[conf_var_name] = conf_var_value;
 	}
-	if (conf_double_values.find(conf_var_name) != conf_double_values.end())
+	else if (conf_double_values.find(conf_var_name) != conf_double_values.end())
 	{
 		if (only_print)
 		{

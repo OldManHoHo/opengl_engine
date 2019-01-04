@@ -179,7 +179,7 @@ bool TGLPlayer::change_inventory_amount(TGLItemId item_type, int in_amount)
 	return inventory.change_quantity(item_type, in_amount);
 }
 
-void TGLPlayer::generate_input_msg(std::vector <unsigned char> & input_msg)
+void TGLPlayer::generate_input_msg(std::vector <char> & input_msg)
 {
 	//std::vector <unsigned char> input_msg(1024);
 	if (input_msg.size() < 1024)
@@ -210,7 +210,7 @@ void TGLPlayer::generate_input_msg(std::vector <unsigned char> & input_msg)
 	}
 }
 
-void TGLPlayer::apply_input_msg(std::vector <unsigned char> & input_msg)
+void TGLPlayer::apply_input_msg(std::vector <char> & input_msg)
 {
 	int offset = 0;
 	TGLNetMsgType msg_type = (TGLNetMsgType)input_msg[offset];

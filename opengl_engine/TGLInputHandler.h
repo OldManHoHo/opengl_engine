@@ -12,6 +12,7 @@ public:
     double mouse_x, mouse_y;
     TGLInputHandler();
     void tick(double time_delta);
+	void generate_input();
 };
 
 #endif

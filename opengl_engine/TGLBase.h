@@ -62,8 +62,8 @@ class TGLBase
 	std::mutex console_mutex;
 	std::deque <std::string> console_queue;
 	
-	std::vector <unsigned char> game_state_buf;
-	std::vector <unsigned char> player_input_buf;
+	std::vector <char> game_state_buf;
+	std::vector <char> player_input_buf;
 #ifdef _TGL_CLIENT
 	GLFWwindow* window;
 #else
@@ -143,7 +143,7 @@ class TGLBase
 	glm::vec3 sun_intensity;
 	glm::vec3 sun_dir;
 	
-	std::map <chunk_coord, std::map<block_coord,unsigned char>> light_calcs;
+	std::map <chunk_coord, std::map<block_coord, char>> light_calcs;
 
 public:
 
@@ -159,14 +159,14 @@ public:
 	GLFWwindow * get_window();
 	void add_camera(TGLCamera * in_camera);
 	void add_hud_element(TGLHudElement * in_element);
-	void apply_game_state(std::vector <unsigned char> * in_state);
-	void process_msg(std::pair<sockaddr_in, std::vector<unsigned char>>* in_pair);
+	void apply_game_state(std::vector <char> * in_state);
+	void process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair);
+	void send_input_update();
 #else
     void generate_game_state(bool full);
     void send_game_state_to_all();
     void update_clients();
-    void send_input_update();
-    void process_msg(std::pair<sockaddr_in, std::vector<unsigned char>>* in_pair);
+    void process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair);
 #endif
 
 	

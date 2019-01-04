@@ -95,3 +95,9 @@ void TGLInputHandler::tick(double time_delta)
 	}
 #endif
 }
+
+void TGLInputHandler::generate_input()
+{
+	std::vector <unsigned char> message_buf(1024);
+
+}

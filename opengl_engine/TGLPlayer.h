@@ -45,8 +45,8 @@ public:
 	void add_hud(TGLHudElement * in_hud);
 	TGLInventoryItem& get_equipped();
 	bool change_inventory_amount(TGLItemId item_type, int in_amount);
-	void generate_input_msg(std::vector <unsigned char> & input_msg);
-	void apply_input_msg(std::vector <unsigned char> & input_msg);
+	void generate_input_msg(std::vector <char> & input_msg);
+	void apply_input_msg(std::vector <char> & input_msg);
 };
 
 #endif

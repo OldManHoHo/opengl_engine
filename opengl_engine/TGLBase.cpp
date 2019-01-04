@@ -88,7 +88,7 @@ GLFWwindow * TGLBase::get_window()
 
 void TGLBase::add_camera(TGLCamera * in_camera)
 {
-	active_camera = in_camera;
+	active_camera = (TGLPlayer*)in_camera;
 }
 
 void TGLBase::add_hud_element(TGLHudElement * in_element)
@@ -96,7 +96,7 @@ void TGLBase::add_hud_element(TGLHudElement * in_element)
 	HUD_elements.push_back(in_element);
 }
 
-void TGLBase::apply_game_state(std::vector <unsigned char> * in_state)
+void TGLBase::apply_game_state(std::vector <char> * in_state)
 {
 	int offset = 1;
 	TGLActor * cur_actor = nullptr;
@@ -132,7 +132,7 @@ void TGLBase::apply_game_state(std::vector <unsigned char> * in_state)
 		{
 			if (actor->id == actor_id)
 			{
-				active_camera = (TGLCamera*)actor;
+				active_camera = (TGLPlayer*)actor;
 			}
 		}
 	}
@@ -220,11 +220,24 @@ void TGLBase::apply_game_state(std::vector <unsigned char> * in_state)
 	// }
 }
 
-void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<unsigned char>>* in_pair)
+void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 {
 //	std::string message_string(in_pair->second.begin(), in_pair->second.end());
 //	last_received_game_state.ParseFromString(message_string);
 	apply_game_state(&in_pair->second);
+}
+
+
+void TGLBase::send_input_update()
+{
+	auto now = std::chrono::steady_clock::now();
+	unsigned int time_since = (std::chrono::duration_cast<std::chrono::microseconds> (now - time_of_last_input_send)).count();
+	if (time_since*1.0 / 1000000 > 1.0 / client_input_update_rate)
+	{
+		active_camera->generate_input_msg(player_input_buf);
+		udp_interface.s_send(player_input_buf, server_ip_address, server_udp_receive_port);
+		time_of_last_input_send = std::chrono::steady_clock::now();
+	}
 }
 
 #else
@@ -312,19 +325,8 @@ void TGLBase::update_clients()
 	}
 }
 
-void TGLBase::send_input_update()
-{
-	auto now = std::chrono::steady_clock::now();
-	int time_since = (std::chrono::duration_cast< std::chrono::microseconds> (now - time_of_last_input_send)).count();
-	if (time_since*1.0/1000000 > 1.0/client_input_update_rate)
-	{
-		active_camera->generate_input_msg(player_input_buf);
-		udp_interface.s_send(player_input_buf, server_ip_address, server_udp_receive_port);
-		time_of_last_input_send = std::chrono::steady_clock::now();
-	}
-}
 
-void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<unsigned char>>* in_pair)
+void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 {
 	printf("PROCESS\n");
 	if ((TGLNetMsgType)in_pair->second[0] == TGLNetMsgType::Heartbeat)
@@ -419,8 +421,8 @@ int TGLBase::init()
 	udp_interface.s_bind(client_ip_address, client_udp_receive_port, client_udp_send_port);
 	udp_interface.start_receive_thread();
 
-	std::pair<sockaddr_in, std::vector <unsigned char>> * net_msg;
-	std::vector<unsigned char>handshake(1, 0);
+	std::pair<sockaddr_in, std::vector <char>> * net_msg;
+	std::vector<char>handshake(1, TGLNetMsgType::Heartbeat);
 	udp_interface.pop_msg(net_msg);
 	while (net_msg == nullptr)
 	{
@@ -450,6 +452,16 @@ bool TGLBase::set_conf_value(std::string conf_var_name, std::string conf_var_val
 		}
 		float conf_var_value = std::stof(conf_var_value_str);
 		*conf_float_values[conf_var_name] = conf_var_value;
+	}
+	if (conf_double_values.find(conf_var_name) != conf_double_values.end())
+	{
+		if (only_print)
+		{
+			std::cout << conf_var_name << ": " << conf_double_values[conf_var_name] << "\n";
+			return false;
+		}
+		double conf_var_value = std::stod(conf_var_value_str);
+		*conf_double_values[conf_var_name] = conf_var_value;
 	}
 	else if (conf_bool_values.find(conf_var_name) != conf_bool_values.end())
 	{
@@ -691,7 +703,7 @@ void TGLBase::update()
 #ifdef _TGL_CLIENT
 		// process network messages
 		send_input_update();
-		std::pair<sockaddr_in, std::vector <unsigned char>> * net_msg;
+		std::pair<sockaddr_in, std::vector <char>> * net_msg;
 		udp_interface.pop_msg(net_msg);
 		while (net_msg != nullptr)
 		{
@@ -702,7 +714,7 @@ void TGLBase::update()
 #else
 		// process network messages
 		update_clients();
-		std::pair<sockaddr_in,std::vector <unsigned char>> * net_msg;
+		std::pair<sockaddr_in,std::vector <char>> * net_msg;
 		udp_interface.pop_msg(net_msg);
 		while (net_msg != nullptr)
 		{

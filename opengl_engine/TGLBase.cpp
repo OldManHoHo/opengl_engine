@@ -370,7 +370,9 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 	}
 	else if(in_pair->second[0] == 'x')
 	{
-		
+		std::lock_guard<std::mutex> Lock(console_queue_mutex);
+		std::string str(in_pair->second.begin()+1,in_pair->second.end());
+		console_queue.push_front(str);
 	}
 }
 #endif
@@ -448,7 +450,7 @@ bool TGLBase::set_conf_value(std::string conf_var_name, std::string conf_var_val
 	{
 		if (only_print)
 		{
-			std::cout << conf_var_name << ": " << conf_float_values[conf_var_name] << "\n";
+			std::cout << conf_var_name << ": " << *conf_float_values[conf_var_name] << "\n";
 			return false;
 		}
 		float conf_var_value = std::stof(conf_var_value_str);
@@ -458,7 +460,7 @@ bool TGLBase::set_conf_value(std::string conf_var_name, std::string conf_var_val
 	{
 		if (only_print)
 		{
-			std::cout << conf_var_name << ": " << conf_double_values[conf_var_name] << "\n";
+			std::cout << conf_var_name << ": " << *conf_double_values[conf_var_name] << "\n";
 			return false;
 		}
 		double conf_var_value = std::stod(conf_var_value_str);
@@ -468,7 +470,7 @@ bool TGLBase::set_conf_value(std::string conf_var_name, std::string conf_var_val
 	{
 		if (only_print)
 		{
-			std::cout << conf_var_name << ": " << conf_bool_values[conf_var_name] << "\n";
+			std::cout << conf_var_name << ": " << *conf_bool_values[conf_var_name] << "\n";
 			return false;
 		}
 		bool conf_var_value = std::stoi(conf_var_value_str);
@@ -478,7 +480,7 @@ bool TGLBase::set_conf_value(std::string conf_var_name, std::string conf_var_val
 	{
 		if (only_print)
 		{
-			std::cout << conf_var_name << ": " << conf_string_values[conf_var_name] << "\n";
+			std::cout << conf_var_name << ": " << *conf_string_values[conf_var_name] << "\n";
 			return false;
 		}
 		std::string conf_var_value = conf_var_value_str;
@@ -488,7 +490,7 @@ bool TGLBase::set_conf_value(std::string conf_var_name, std::string conf_var_val
 	{
 		if (only_print)
 		{
-			std::cout << conf_var_name << ": " << conf_int_values[conf_var_name] << "\n";
+			std::cout << conf_var_name << ": " << *conf_int_values[conf_var_name] << "\n";
 			return false;
 		}
 		int conf_var_value = std::stoi(conf_var_value_str);
@@ -614,16 +616,41 @@ void TGLBase::debug_console_loop()
 	std::cout << "Started debug console" << "\n";
 	while(1)
 	{
+#if defined(__linux__) || defined(__APPLE__)
+		usleep(1000000.0/tick_rate);
+#endif
 		std::lock_guard<std::mutex> Lock(console_mutex);
-		std::string console_command = console_queue.back();
-		console_queue.pop_back();
-		
-		std::string command = console_command.substr(0, console_command.find(" "));
-		std::string arg = console_command.substr(console_command.find(" ") + 1, console_command.size());
-		
-		if (command == "print")
+		std::lock_guard<std::mutex> Lock2(console_queue_mutex);
+		while(console_queue.size())
 		{
-			set_conf_value(arg,"",true);
+			
+			std::string console_command = console_queue.back();
+			console_queue.pop_back();
+			
+			std::string command = console_command.substr(0, console_command.find(" "));
+			std::string arg = console_command.substr(console_command.find(" ") + 1, console_command.size());
+			//std::cout << "Command: " << command << "\nArg: " << arg << "\n";
+			if (command == "print")
+			{
+				set_conf_value(arg,"",true);
+			}
+			else if(command == "print_actor_pos")
+			{
+				int actor_num = std::stoi(arg,nullptr);
+				bool found = false;
+				for (auto actor: actors)
+				{
+					if (actor->id == actor_num)
+					{
+						std::cout << "Actor " << arg << " pos:\n\t" << actor->pos.x << ", " << actor->pos.y << ", " << actor->pos.z << "\n";
+						found = true;
+					}
+				}
+				if (found == false)
+				{
+					std::cout << "Actor not found\n";
+				}
+			}
 		}
 	}
 	
@@ -1042,7 +1069,9 @@ void TGLBase::update()
 	int time_taken = std::chrono::duration_cast<std::chrono::microseconds> (end - begin).count();
 	if (1000000/tick_rate > time_taken && max_framerate_enabled)
 	{
+		console_mutex.unlock();
 		usleep(1000000/tick_rate - time_taken);
+		console_mutex.lock();
 	}
 	#else
 	end = std::chrono::steady_clock::now();

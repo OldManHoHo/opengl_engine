@@ -60,6 +60,7 @@ class TGLBase
 	
 	bool debug_console_enabled;
 	std::mutex console_mutex;
+	std::mutex console_queue_mutex;
 	std::deque <std::string> console_queue;
 	
 	std::vector <char> game_state_buf;

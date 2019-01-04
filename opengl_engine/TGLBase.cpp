@@ -120,7 +120,7 @@ void TGLBase::apply_game_state(std::vector <char> * in_state)
 #else
 		TGLPlayer * new_player = new TGLPlayer;
 		new_player->set_pos(glm::vec3(player_start_pos_x, new_player->get_pos().y, player_start_pos_y));
-		new_player->set_chunk_spawn((TGLChunkSpawn*)chunks_spawner);
+		//new_player->set_chunk_spawn((TGLChunkSpawn*)chunks_spawner);
 		new_player->id = actor_id;
 #endif
 		add_actor((TGLActor*)new_player);
@@ -244,7 +244,7 @@ void TGLBase::send_input_update()
 
 void TGLBase::send_game_state_to_all()
 {
-	std::vector <unsigned char> test;
+	std::vector <char> test;
     udp_interface.send_to_all(test);
 }
 
@@ -336,7 +336,7 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 		
 		if (clients.find(in_pair->first) != clients.end())
 		{
-			clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();
+			//clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();
 		}
 		else
 		{
@@ -347,12 +347,13 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 #else
 			TGLPlayer * new_player = new TGLPlayer;
 			new_player->set_pos(glm::vec3(player_start_pos_x,new_player->get_pos().y,player_start_pos_y));
-			new_player->set_chunk_spawn((TGLChunkSpawn*)chunks_spawner);
+			//new_player->set_chunk_spawn((TGLChunkSpawn*)chunks_spawner);
 #endif
 			add_actor((TGLActor*)new_player);
+			clients[in_pair->first] = TGLClientStatus();
 			clients[in_pair->first].actor_id = new_player->id;	
 		}
-		//clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();	
+		clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();	
 		//udp_interface.s_send(in_pair->second,in_pair->first);
 	}
 	else if ((TGLNetMsgType)in_pair->second[0] == TGLNetMsgType::PlayerInput)
@@ -674,6 +675,7 @@ void TGLBase::update()
 	
 	// If CPU lighting time interval met, try to take light update lock
 	// and update cpu lighting
+	// FIXME: Move to ChunkSpawn class
 	if (cpu_lighting_enabled && cpu_lighting_counter > cpu_lighting_interval)
 	{
 		//printf("%f\n",(time_count/time_sum));
@@ -741,6 +743,7 @@ void TGLBase::update()
 			for (int i = 0; i < actors.size(); ++i)
 			//for (int i = actors.size()-1; i >=0; --i)
 			{
+				//FIXME: needs to be moved out of TGLBase and into TMC class
 				if (actors[i]->is_chunk)
 				{
 					TGLChunk * act_chunk = (TGLChunk*)actors[i];
@@ -748,7 +751,7 @@ void TGLBase::update()
 					((TGLChunkSpawn*)chunks_spawner)->get_chunk_of_point(act_chunk->get_pos() + glm::vec3(1, 0, 1), chunk_x, chunk_y);
 					if (!((TGLChunkSpawn*)chunks_spawner)->chunk_in_fov(chunk_x, chunk_y, active_camera->get_pos(), ((TGLPlayer*)active_camera)->forward_vec))
 					{
-						//continue;
+						continue;
 					}
 				}
 				std::vector <TGLComponent*> components = actors[i]->get_components();

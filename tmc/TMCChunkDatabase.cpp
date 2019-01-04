@@ -1,6 +1,11 @@
 #include "TMCChunkDatabase.h"
 
 
+TMCChunkDatabase::TMCChunkDatabase()
+{
+    db_path = "./server_data";
+}
+
 void TMCChunkDatabase::load_chunk(int chunk_x, int chunk_y, std::map <chunk_coord, std::map<block_coord,block_def>>& world_mods)
 {
     chunk_coord chunk_to_load(chunk_x, chunk_y);

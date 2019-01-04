@@ -9,7 +9,6 @@
 #include "TGLMesh.h"
 #include "TGLInventory.h"
 #include "TGLHudElement.h"
-#include "TGLChunkSpawn.h"
 #include "TGLInputHandler.h"
 
 class TGLPlayer : public TGLCamera

@@ -68,6 +68,7 @@ int TGLUDPInterface::s_recv(std::vector <char>& out_msg, sockaddr_in * from_addr
 #endif
 	out_len = sizeof(sockaddr_in);
     int ret_length = recvfrom(recv_sock, &out_msg[0], int(out_msg.size()), 0, (sockaddr*)from_addr, &out_len);
+    from_addr->sin_port = ntohs(from_addr->sin_port);
     out_msg.resize(ret_length);
     return ret_length;
 }

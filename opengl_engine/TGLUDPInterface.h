@@ -32,6 +32,10 @@ struct udp_address
 	{
 		return addr.sin_port*pow(2,32) + addr.sin_addr.s_addr < other.addr.sin_port*pow(2,32) + other.addr.sin_addr.s_addr;
 	}
+	bool operator== (const udp_address& other) const
+	{
+		return addr.sin_port == other.addr.sin_port && addr.sin_addr.s_addr == other.addr.sin_addr.s_addr;
+	}
 };
 
 class TGLUDPInterface 

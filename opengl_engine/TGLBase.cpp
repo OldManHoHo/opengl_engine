@@ -329,14 +329,18 @@ void TGLBase::update_clients()
 void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 {
 	printf("PROCESS\n");
+	std::cout << "Client size: " << clients.size() << "\n";
+	in_pair->first.sin_port = client_udp_receive_port;
+	udp_address client_addr(in_pair->first);
+	std::cout << "udp_address: " << client_addr.addr.sin_port << ", s_addr: " << client_addr.addr.sin_addr.s_addr << "\n";
+	std::cout << "udp_address: " << in_pair->first.sin_port << ", s_addr: " << in_pair->first.sin_addr.s_addr << "\n";
 	if ((TGLNetMsgType)in_pair->second[0] == TGLNetMsgType::Heartbeat)
 	{
 		std::cout << "Handshake Received" << "\n";	
-		in_pair->first.sin_port = ntohs(client_udp_receive_port);
 		
-		if (clients.find(in_pair->first) != clients.end())
+		if (clients.find(client_addr) != clients.end())
 		{
-			//clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();
+			//clients[client_addr].time_of_last_heartbeat = std::chrono::steady_clock::now();
 		}
 		else
 		{
@@ -350,22 +354,35 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 			//new_player->set_chunk_spawn((TGLChunkSpawn*)chunks_spawner);
 #endif
 			add_actor((TGLActor*)new_player);
-			clients[in_pair->first] = TGLClientStatus();
-			clients[in_pair->first].actor_id = new_player->id;	
+			clients[client_addr] = TGLClientStatus();
+			clients[client_addr].actor_id = new_player->id;	
+			std::cout << "Added client with actor id: " << new_player->id << "\n";
+			std::cout << "udp_address: " << in_pair->first.sin_port << ", s_addr: " << in_pair->first.sin_addr.s_addr << "\n";
 		}
-		clients[in_pair->first].time_of_last_heartbeat = std::chrono::steady_clock::now();	
+		clients[client_addr].time_of_last_heartbeat = std::chrono::steady_clock::now();	
 		//udp_interface.s_send(in_pair->second,in_pair->first);
 	}
 	else if ((TGLNetMsgType)in_pair->second[0] == TGLNetMsgType::PlayerInput)
 	{
-		unsigned int input_actor_id = clients[in_pair->first].actor_id;
-		
-		for (auto actor : actors)
+		if (clients.find(client_addr) != clients.end())
 		{
-			if (actor->id == input_actor_id)
+			std::cout << "Client size: " << clients.size() << "\n";
+			unsigned int input_actor_id = clients[client_addr].actor_id;
+			std::cout << "received player input msg from: " << input_actor_id << "\nnumber of clients: " << clients.size() << "\n";
+			std::cout << "udp_address: " << in_pair->first.sin_port << ", s_addr: " << in_pair->first.sin_addr.s_addr << "\n";
+			
+			for (auto actor : actors)
 			{
-				((TGLPlayer*)actor)->apply_input_msg(in_pair->second);
+				if (actor->id == input_actor_id)
+				{
+					((TGLPlayer*)actor)->apply_input_msg(in_pair->second);
+				}
 			}
+		}
+		else
+		{
+			std::cout << "Input message recieved from unknown client\n";
+			std::cout << "udp_address: " << in_pair->first.sin_port << ", s_addr: " << in_pair->first.sin_addr.s_addr << "\n";
 		}
 	}
 	else if(in_pair->second[0] == 'x')

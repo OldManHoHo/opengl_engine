@@ -97,7 +97,7 @@ int main()
 	main_cam.set_chunk_spawn(&chunk_spawn);
 	
 	
-	gl_base.add_actor(&main_cam);
+	//gl_base.add_actor(&main_cam);
 	// gl_base.add_actor(&p1);
 	// gl_base.add_actor(&p2);
 	// gl_base.add_actor(&p3);

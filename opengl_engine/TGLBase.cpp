@@ -1069,7 +1069,7 @@ void TGLBase::update()
 
 ///////////////////////////////////////////
 // PHYSICS UPDATE
-#ifndef _TGL_CLIENT
+#ifdef _TGL_SERVER
 		physics_engine.tick(time_delta, actors, (TGLChunkSpawn*)chunks_spawner, gravity_enabled);
 #endif
 

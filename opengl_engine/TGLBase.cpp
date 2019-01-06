@@ -328,12 +328,9 @@ void TGLBase::update_clients()
 
 void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 {
-	printf("PROCESS\n");
-	std::cout << "Client size: " << clients.size() << "\n";
+	//printf("PROCESS\n");
 	in_pair->first.sin_port = client_udp_receive_port;
 	udp_address client_addr(in_pair->first);
-	std::cout << "udp_address: " << client_addr.addr.sin_port << ", s_addr: " << client_addr.addr.sin_addr.s_addr << "\n";
-	std::cout << "udp_address: " << in_pair->first.sin_port << ", s_addr: " << in_pair->first.sin_addr.s_addr << "\n";
 	if ((TGLNetMsgType)in_pair->second[0] == TGLNetMsgType::Heartbeat)
 	{
 		std::cout << "Handshake Received" << "\n";	
@@ -366,16 +363,16 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 	{
 		if (clients.find(client_addr) != clients.end())
 		{
-			std::cout << "Client size: " << clients.size() << "\n";
 			unsigned int input_actor_id = clients[client_addr].actor_id;
-			std::cout << "received player input msg from: " << input_actor_id << "\nnumber of clients: " << clients.size() << "\n";
-			std::cout << "udp_address: " << in_pair->first.sin_port << ", s_addr: " << in_pair->first.sin_addr.s_addr << "\n";
+			//std::cout << "received player input msg from: " << input_actor_id << "\nnumber of clients: " << clients.size() << "\n";
+			//std::cout << "udp_address: " << in_pair->first.sin_port << ", s_addr: " << in_pair->first.sin_addr.s_addr << "\n";
 			
 			for (auto actor : actors)
 			{
 				if (actor->id == input_actor_id)
 				{
 					((TGLPlayer*)actor)->apply_input_msg(in_pair->second);
+					//std::cout << "Applied input msg " << in_pair->second.size()  << "\n";
 				}
 			}
 		}

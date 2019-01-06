@@ -70,6 +70,7 @@ int TGLUDPInterface::s_recv(std::vector <char>& out_msg, sockaddr_in * from_addr
 #endif
 	out_len = sizeof(sockaddr_in);
     int ret_length = recvfrom(recv_sock, &out_msg[0], int(out_msg.size()), 0, (sockaddr*)from_addr, &out_len);
+    //std::cout << "Received msg size: " << ret_length << "\n";
     from_addr->sin_port = ntohs(from_addr->sin_port);
     out_msg.resize(ret_length);
     return ret_length;
@@ -88,6 +89,7 @@ void TGLUDPInterface::receive_loop()
     while(1)
     {
         buffer_queue.check_out_memory(recv_buffer);
+	recv_buffer->second.resize(1024);
         s_recv((*recv_buffer).second, &(recv_buffer->first));
         buffer_queue.push_front(recv_buffer);
     }

@@ -74,7 +74,9 @@ void TGLPlayer::tick(double time_delta)
 	{
 		y_angle += 2 * 3.14159;
 	}
+#ifdef _TGL_CLIENT
 	set_rot(glm::mat4(1.0));
+#endif
 	//set_rot(glm::quat());
 
 	
@@ -218,6 +220,7 @@ void TGLPlayer::apply_input_msg(std::vector <char> & input_msg)
 	
 	glm::mat4 new_rot;
 	memcpy(glm::value_ptr(new_rot), &input_msg[offset], sizeof(GLfloat)*16);
+	rot = new_rot;
 	offset += sizeof(GLfloat)*16;
 	
 	unsigned short key_state_count = *(unsigned short*)&input_msg[offset];

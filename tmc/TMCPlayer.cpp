@@ -64,6 +64,7 @@ void TMCPlayer::tick(double time_delta)
     if (input_handler.key_states[1])
 	{
 		
+		std::cout << "MOUSE 1" << "\n";
 
 		if (time_since_last_left >= multi_press_threshold)
 		{
@@ -91,6 +92,7 @@ void TMCPlayer::tick(double time_delta)
 					hit_to_post.props = props;
 					hit_to_post.type = item_id_to_block_type(get_equipped().type);
 					chunk_spawn->post_hit(hit_to_post);
+					//std::cout << "POSTED HIT" << "\n";
 				}
 			}
 			time_since_last_left = 0;

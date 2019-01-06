@@ -43,6 +43,9 @@ extern TGLActor debug_actor;
 
 void TGLPlayer::tick(double time_delta)
 {
+#ifdef _TGL_SERVER
+	get_view();
+#endif
 	input_handler.tick(time_delta);
 	
 	double xpos, ypos;

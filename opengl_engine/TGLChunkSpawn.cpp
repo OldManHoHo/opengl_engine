@@ -397,10 +397,10 @@ void TGLChunkSpawn::tick(double time_delta)
 			int chunk_y;
 			get_chunk_of_point(hit.loc, chunk_x, chunk_y);
 			
-			//std::cout << "REMOVING " << block_type << " FROM " << hit.loc.x - chunk_x * 16 << ", " << hit.loc.y << ", " << hit.loc.z - chunk_y * 16 << "\n";
-			//std::cout << "from chunk " << chunk_x << ", " << chunk_y << "\n";
 			glm::vec3 to_remove((unsigned int)(hit.loc.x - chunk_x * 16), (unsigned int)(hit.loc.y), (unsigned int)(hit.loc.z - chunk_y * 16));
 			e_block_type type_to_remove = block_generator->get_point(hit.loc.x, hit.loc.z, hit.loc.y);
+			std::cout << "REMOVING " << type_to_remove << " FROM " << hit.loc.x << ", " << hit.loc.y << ", " << hit.loc.z << "\n";
+			std::cout << "from chunk " << chunk_x << ", " << chunk_y << "\n";
 			if (type_to_remove != bt_air)
 			{
 				bool was_deleted = true;
@@ -410,6 +410,7 @@ void TGLChunkSpawn::tick(double time_delta)
 				if (was_deleted)
 				{
 					block_generator->set_point(bt_air, hit.loc.x, hit.loc.z, hit.loc.y);
+					std::cout << "SET POINT" << "\n";
 
 #ifndef _EXCLUDE_TMC_DROPPED_ITEM 
 					TMCDroppedItem * added = new TMCDroppedItem(block_type_to_item_id(type_to_remove));

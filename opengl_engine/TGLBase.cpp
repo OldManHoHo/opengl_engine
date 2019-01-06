@@ -314,6 +314,23 @@ void TGLBase::generate_game_state(bool full)
             // //as->transform().add_val();
         }
     }
+    std::vector <block_def>& changes = ((TGLChunkSpawn*)chunks_spawner)->get_block_changes();
+	
+    *(int*)&game_state_buf[offset] = (int)changes.size();
+    offset += sizeof(int);
+    for(auto change : changes)
+    {
+	game_state_buf[offset] = (char)change.type;	
+	offset += sizeof(char);
+        *(float*)&game_state_buf[offset] = (float)change.loc.x;
+       	offset += sizeof(float);
+        *(float*)&game_state_buf[offset] = (float)change.loc.y;
+       	offset += sizeof(float);
+        *(float*)&game_state_buf[offset] = (float)change.loc.z;
+       	offset += sizeof(float);
+
+    }
+    ((TGLChunkSpawn*)chunks_spawner)->clear_block_changes();
     game_state_buf.resize(offset);
 }
 

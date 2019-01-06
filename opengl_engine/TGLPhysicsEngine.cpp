@@ -57,7 +57,7 @@ void TGLPhysicsEngine::tick(double time_delta, std::vector <TGLActor*> const & a
 
 				feet = glm::vec3(round(feet.x), round(feet.y), round(feet.z));
 
-				e_block_type in_type = chunks_spawner->get_point(round(feet.x), round(feet.z), round(feet.y));
+				e_block_type in_type = chunks_spawner->get_point(round(feet.x), round(feet.y), round(feet.z));
 
 				(*it)->set_on_ground(false);
 				(*it)->vel += float(time_delta)*(*it)->accel + float(time_delta*gravity)*glm::vec3(0, -1.0, 0);
@@ -153,7 +153,7 @@ std::vector <glm::vec3> TGLPhysicsEngine::get_world_blocks(TGLActor * in_actor, 
 		{
 			for (int k = 0; k < 3; ++k)
 			{
-				e_block_type block_type = chunks_spawner->get_point(x[i], z[k],y[j]);
+				e_block_type block_type = chunks_spawner->get_point(x[i], y[j],z[k]);
 				
 				if (block_type != bt_air && block_type != bt_water)
 				{

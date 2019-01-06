@@ -410,6 +410,9 @@ void TGLChunkSpawn::tick(double time_delta)
 				if (was_deleted)
 				{
 					block_generator->set_point(bt_air, hit.loc.x, hit.loc.z, hit.loc.y);
+#ifdef _TGL_SERVER
+					new_block_changes.push_back(block_def(hit.loc.x, hit.loc.y, hit.loc.z, bt_air));
+#endif
 					std::cout << "SET POINT" << "\n";
 
 #ifndef _EXCLUDE_TMC_DROPPED_ITEM 
@@ -489,6 +492,9 @@ void TGLChunkSpawn::tick(double time_delta)
 			chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(placement.type, to_create);
 #endif
 			block_generator->set_point(placement.type, placement.loc.x, placement.loc.z, placement.loc.y);
+#ifdef _TGL_SERVER
+			new_block_changes.push_back(block_def(placement.loc.x, placement.loc.y, placement.loc.z, placement.type));
+#endif
 		}
 		posted_placements.clear();
 		
@@ -892,7 +898,7 @@ e_block_type TGLChunkSpawn::get_point(int x, int y, int z)
 {
 	if (!test_chunk)
 	{
-		return block_generator->get_point(x, y, z);
+		return block_generator->get_point(x, z, y);
 	}
 	else
 	{
@@ -905,6 +911,11 @@ e_block_type TGLChunkSpawn::get_point(int x, int y, int z)
 			return bt_air;
 		}
 	}
+}
+
+void TGLChunkSpawn::set_point(int x, int y, int z, e_block_type b_type)
+{
+	block_generator->set_point(b_type, x, z, y);
 }
 
 e_block_type * TGLChunkSpawn::get_points(int x, int y, int division)
@@ -1179,4 +1190,14 @@ void TGLChunkSpawn::set_sun_dir(glm::vec3 in_dir)
 	sun_dir_mutex.lock();
 	sun_dir = in_dir;
 	sun_dir_mutex.unlock();
+}
+
+std::vector <block_def>& TGLChunkSpawn::get_block_changes()
+{
+	return new_block_changes;
+}
+
+void TGLChunkSpawn::clear_block_changes()
+{
+	new_block_changes.clear();
 }

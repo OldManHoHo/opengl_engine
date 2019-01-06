@@ -54,6 +54,7 @@ class TGLChunkSpawn : public TGLActor
 	TGLMaterial * block_material;
 
 	BlockGenerator * block_generator;
+	std::vector <block_def> new_block_changes;
 
 	int block_type_count;
 
@@ -87,6 +88,7 @@ public:
 	bool between_angles(float x, float y, float in_angle_1, float in_angle_2);
 	std::vector <chunk_coord> get_chunks(int x0, int y0, int radius, float view_angle_1, float view_angle_2);
 	e_block_type get_point(int x, int y, int z);
+	void set_point(int x, int y, int z, e_block_type b_type);
 	e_block_type * get_points(int x, int y, int division);
 	void get_chunk_of_point(glm::vec3 in_point, int& out_chunk_x, int& out_chunk_y);
 	void post_hit(block_hit in_hit);
@@ -102,6 +104,8 @@ public:
 	void recalculate_light();
 	void update_lights();
 	void set_sun_dir(glm::vec3 in_dir);
+	std::vector <block_def>& get_block_changes();
+	void clear_block_changes();
 };
 
 #endif

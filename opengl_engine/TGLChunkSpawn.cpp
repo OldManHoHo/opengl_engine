@@ -937,7 +937,6 @@ std::vector <TGLActor*> TGLChunkSpawn::collect_nearby_dropped_items(glm::vec3 po
 	{
 		if (dropped_items.listing.find(coord) != dropped_items.listing.end())
 		{
-			std::cout << "CSDFSDFS"<< "\n";
 			std::vector <TGLActor*>& chunk_items = dropped_items.listing[coord];
 			for (auto vec_it : chunk_items)
 			{

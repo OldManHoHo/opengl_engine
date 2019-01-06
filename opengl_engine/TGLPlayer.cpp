@@ -13,7 +13,8 @@ extern TGLBase gl_base;
 TGLPlayer::TGLPlayer() :
 	inventory(10, 10),
 	multi_press_threshold(0.25),
-	blank_item(none, 0)
+	blank_item(none, 0),
+	equipped_index(0)
 {
 #ifdef _TGL_CLIENT
 	glfwSetInputMode(gl_base.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -194,6 +195,9 @@ void TGLPlayer::generate_input_msg(std::vector <char> & input_msg)
 	input_msg[offset] = (unsigned char)(TGLNetMsgType::PlayerInput);
 	offset += sizeof(unsigned char);
 	
+	input_msg[offset] = equipped_index;
+	offset += sizeof(unsigned char);
+
     auto rot_p = glm::value_ptr(rot);
 	memcpy(&input_msg[offset], rot_p, 16*sizeof(GLfloat));
 	offset += sizeof(GLfloat)*16;
@@ -209,6 +213,10 @@ void TGLPlayer::generate_input_msg(std::vector <char> & input_msg)
 		input_msg[offset] = (unsigned char)key_state.second;
 		offset += sizeof(unsigned char);
 		*key_state_count += 1; 
+		if (key_state.second)
+		{
+			std::cout << "KEY PRESSED" << "\n";
+		}
 	}
 }
 
@@ -218,6 +226,9 @@ void TGLPlayer::apply_input_msg(std::vector <char> & input_msg)
 	TGLNetMsgType msg_type = (TGLNetMsgType)input_msg[offset];
 	offset += sizeof(unsigned char);
 	
+	equipped_index = input_msg[offset];
+	offset += sizeof(unsigned char);
+
 	glm::mat4 new_rot;
 	memcpy(glm::value_ptr(new_rot), &input_msg[offset], sizeof(GLfloat)*16);
 	rot = new_rot;

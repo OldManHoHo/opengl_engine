@@ -27,6 +27,7 @@ public:
 	TGLInventory inventory;
 	TGLInventoryItem * equipped_item;
 	TGLHudElement * inventory_hud;
+	char equipped_index;
 
 	float y_angle;
 	float x_angle;
@@ -43,6 +44,7 @@ public:
 	glm::vec3 get_hitting();
 	void add_hud(TGLHudElement * in_hud);
 	TGLInventoryItem& get_equipped();
+	bool set_equipped(int item_num);
 	bool change_inventory_amount(TGLItemId item_type, int in_amount);
 	void generate_input_msg(std::vector <char> & input_msg);
 	void apply_input_msg(std::vector <char> & input_msg);

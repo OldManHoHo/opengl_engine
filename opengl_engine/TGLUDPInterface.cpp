@@ -44,7 +44,7 @@ int TGLUDPInterface::s_send(std::vector <char>& in_msg, std::string ip, int port
     sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
-//    std::cout << "Sent packet to: " << addr.sin_port << ", " << port << "\n";
+    //std::cout << "Sent packet to: " << addr.sin_port << ", " << port << ", size: " << in_msg.size() << "\n";
     //inet_aton(ip.c_str(), &addr.sin_addr);
 	inet_pton(AF_INET, ip.c_str(), &addr.sin_addr);
     return sendto(send_sock, &in_msg[0], in_msg.size(), 0, (sockaddr*)&addr, sizeof(addr));

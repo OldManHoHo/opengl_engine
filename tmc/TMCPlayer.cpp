@@ -23,20 +23,24 @@ void TMCPlayer::init_inventory(int num_slots)
 #endif
 	int offset = inventory_slot_border;
 	int shift = inventory_slot_width;
+#ifdef _TGL_CLIENT
 	for (int i = 0; i < num_slots; ++i)
 	{
-#ifdef _TGL_CLIENT
+
 	    TGLHudElement * inventory_itemb = new TGLHudElement(inventory_slot_width, inventory_slot_height, glm::vec2(i*inventory_slot_width, 0), glm::vec3(0.5, 0.5, 0.5));
 	    TGLHudElement * inventory_item = new TGLHudElement(inventory_slot_width - 2*inventory_slot_border, 
 	                                inventory_slot_height - 2*inventory_slot_border, 
 	                                glm::vec2(i*inventory_slot_width + inventory_slot_border, 
 	                                inventory_slot_border), glm::vec3(0.5, 0.5, 0.5), 
-	                                "content/textures/pickaxe.png");
+	                                "content/textures/mc.png");
 
 		inventory_hud->sub_elements.push_back(inventory_itemb);
 		inventory_hud->sub_elements.push_back(inventory_item);
-#endif
+		
+
 	}
+	add_hud(inventory_hud);
+#endif
 }
 
 extern TGLActor debug_actor;
@@ -131,7 +135,7 @@ void TMCPlayer::tick(double time_delta)
 		time_since_last_right = 0;
 	}
 #ifdef _TGL_CLIENT
-	static int equipped_index = 0;
+	
 	for (int i = 0; i < inventory.default_quick_use_size; ++i)
 	{
 	    if (input_handler.key_states['1' + i])
@@ -163,6 +167,8 @@ void TMCPlayer::tick(double time_delta)
 			inventory_hud->sub_elements[index]->set_offsets(glm::vec2(16, 8 * 16), glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
     	}
 	}
+#else
+	equipped_item = inventory.get_item(equipped_index, 0);
 #endif
 }
 

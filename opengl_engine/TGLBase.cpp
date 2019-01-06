@@ -124,9 +124,20 @@ void TGLBase::apply_game_state(std::vector <char> * in_state)
 		new_player->id = actor_id;
 #endif
 		add_actor((TGLActor*)new_player);
+		add_hud_element(new_player->inventory_hud);
 	}
 	offset += sizeof(short);
-	if( active_camera->id != actor_id )
+	if (active_camera == nullptr)
+	{
+		for (auto actor : actors)
+		{
+			if (actor->id == actor_id)
+			{
+				active_camera = (TGLPlayer*)actor;
+			}
+		}
+	}
+	else if( active_camera->id != actor_id )
 	{
 		for (auto actor :actors)
 		{
@@ -224,6 +235,7 @@ void TGLBase::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 {
 //	std::string message_string(in_pair->second.begin(), in_pair->second.end());
 //	last_received_game_state.ParseFromString(message_string);
+
 	apply_game_state(&in_pair->second);
 }
 
@@ -745,7 +757,6 @@ void TGLBase::update()
 // NETWORK MESSAGE PROCESSING
 #ifdef _TGL_CLIENT
 		// process network messages
-		send_input_update();
 		std::pair<sockaddr_in, std::vector <char>> * net_msg;
 		udp_interface.pop_msg(net_msg);
 		while (net_msg != nullptr)
@@ -753,6 +764,14 @@ void TGLBase::update()
 			process_msg(net_msg);
 			udp_interface.return_msg(net_msg);
 			udp_interface.pop_msg(net_msg);
+		}
+		if (active_camera != nullptr)
+		{
+			send_input_update();
+		}
+		else
+		{
+			return;
 		}
 #else
 		// process network messages
@@ -1193,7 +1212,10 @@ void TGLBase::update_sun(double time_delta)
 	}
 	//out_vec = glm::vec3(cos(sun_degrees), sin(sun_degrees), 0)*std::max(float(0), float(1 - sin(sun_degrees))) + glm::vec3(-1, -1, 0)*std::max(float(0), float(-sin(sun_degrees)));
 	out_vec = glm::vec3(cos(sun_degrees), sin(sun_degrees), 0);
-	sun_pos = out_vec * 50.0f + active_camera->get_pos();
+	if (active_camera != nullptr)
+	{
+		sun_pos = out_vec * 50.0f + active_camera->get_pos();
+	}
 	sun_dir = out_vec;
 	mult += time_of_day_multiplier*0.000002*time_delta;
 	//sun_pos = glm::vec3(0, 50, 0) + active_camera->get_pos();

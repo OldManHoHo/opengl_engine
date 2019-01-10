@@ -1,5 +1,5 @@
-#ifndef _TGL_INPUTHANDLER
-#define _TGL_INPUTHANDLER
+#ifndef TGL_INPUTHANDLER_H_
+#define TGL_INPUTHANDLER_H_
 
 #include <map>
 

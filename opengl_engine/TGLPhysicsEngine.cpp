@@ -1,10 +1,13 @@
-#include "TGLPhysicsEngine.h"
-#include "TGLBounds.h"
+
+
 #include <stdio.h>
+#include <math.h>
 #include <iostream>
 #include <fstream>
-#include <math.h>
 #include <algorithm>
+
+#include "TGLBounds.h"
+#include "TGLPhysicsEngine.h"
 
 template <typename T> int sign(T val) {
 	return (T(0) < val) - (val < T(0));

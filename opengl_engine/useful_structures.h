@@ -1,18 +1,17 @@
 #pragma once
-#ifndef MODELS
-#define MODELS
+#ifndef TGL_USEFUL_STRUCTURES_H_
+#define TGL_USEFUL_STRUCTURES_H_
 
 #ifdef _TGL_CLIENT
 #include <windows.h>
 #endif
-
-#include <vector>
 #include <map>
+#include <vector>
 //#include <gl/GL.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #include "TGLInventory.h"
 
 namespace useful_structures

@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef __TGL_Server__TGLGameState__
-#define __TGL_Server__TGLGameState__
+#ifndef TGL_GAMESTATE_H_
+#define TGL_GAMESTATE_H_
 
 #include <stdio.h>
 #include <vector>

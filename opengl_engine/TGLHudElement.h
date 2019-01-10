@@ -1,15 +1,14 @@
 #pragma once
-#ifndef _TGL_HUDELEMENT
-#define _TGL_HUDELEMENT
+#ifndef TGL_HUDELEMENT_H_
+#define TGL_HUDELEMENT_H_
 
 #include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#include "TGLShader.h"
 #include "TGLMaterial.h"
+#include "TGLShader.h"
 
 
 class TGLHudElement

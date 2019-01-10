@@ -1,19 +1,18 @@
 #pragma once
-#ifndef _TGL_CHUNKSPAWN
-#define _TGL_CHUNKSPAWN
+#ifndef TGL_CHUNKSPAWN_H_
+#define TGL_CHUNKSPAWN_H_
 
 #include <map>
-
-#include "tgl_gl.h"
 
 #include <vector>
 #include <deque>
 #include <mutex>
 
+#include "tgl_gl.h"
 #include "TGLActor.h"
 #include "TGLChunk.h"
 #include "TGLMesh.h"
-#include "BlockGenerator.h"
+#include "tmc/BlockGenerator.h"
 //#include "TMCDroppedItem.h"
 
 

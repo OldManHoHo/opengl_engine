@@ -5,18 +5,21 @@
 
 #include "TGLBase.h"
 #include "TGLCamera.h"
-#include "TMCPlayer.h"
-#include "TGLChunkSpawn.h"
+#include "tmc/TMCPlayer.h"
+#include "tmc/TGLChunkSpawn.h"
 #include "useful_structures.h"
 
 #ifdef _UNIT_TEST
-#include "Simplex.h"
+#include "tmc/Simplex.h"
 #endif
 
-//extern std::vector <GLfloat> useful_structures::vertex_data_block_small;
 
-TGLBase gl_base;
+
+TGLBase gl_base; // TODO: Either make TGLBase object accessible to classes
+				 //
 TGLActor debug_actor;
+
+
 class rot_actor : public TGLActor
 {
 	void tick(double time_delta)

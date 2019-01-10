@@ -3,39 +3,38 @@ project (TGL_Server)
 
 
 set (top "./opengl_engine")
-set (tmc "./tmc")
+set (tmc "./opengl_engine/tmc")
 include_directories(${top}/)
 include_directories(${top}/include)
 include_directories(${top}/glm-0.9.9-a2)
-include_directories(${tmc})
+#include_directories(${tmc})
 include_directories(${top}/FastNoiseSIMD)
 
 set (SRC ${top}/source/main.cpp
 	${top}/TGLBase.cpp
 	${top}/TGLActor.cpp
 	${top}/useful_structures.cpp
-	${top}/TGLChunkSpawn.cpp
+	${tmc}/TGLChunkSpawn.cpp
 	${tmc}/TMCPlayer.cpp
 	${tmc}/TMCChunkDatabase.cpp
 	${top}/TGLPlayer.cpp
 	${top}/TGLPhysicsEngine.cpp
-	${top}/BlockGenerator.cpp
+	${tmc}/BlockGenerator.cpp
 	${top}/TGLInventory.cpp
 	${top}/TGLCamera.cpp
 	${top}/TGLInputHandler.cpp
 	${top}/TGLComponent.cpp
     ${top}/TGLUDPInterface.cpp
-	${top}/TMCDroppedItem.cpp
+	${tmc}/TMCDroppedItem.cpp
 	${top}/TGLLibraryQueue.cpp
 	${top}/TGLGameState.cpp
-	${top}/Simplex.cpp
-	${top}/WhiteNoise.cpp
+	${tmc}/Simplex.cpp
+	${tmc}/WhiteNoise.cpp
 	${top}/FastNoiseSIMD/FastNoiseSIMD.cpp
 	${top}/FastNoiseSIMD/FastNoiseSIMD_internal.cpp
 	${top}/FastNoiseSIMD/FastNoiseSIMD_sse2.cpp
 	${top}/FastNoiseSIMD/FastNoiseSIMD_sse41.cpp
-	${top}/Generator.cpp
-	${top}/game_state/game_state.pb.cc
+	${tmc}/Generator.cpp
 	)
 
 #	${top}/FastNoiseSIMD/FastNoiseSIMD_avx2.cpp
@@ -43,6 +42,7 @@ set (SRC ${top}/source/main.cpp
 #	${top}/FastNoiseSIMD/FastNoiseSIMD_neon.cpp
 add_compile_options(-std=c++11 -O3 )
 add_compile_options(-D_TGL_SERVER)
+add_compile_options(-DGLM_ENABLE_EXPERIMENTAL)
 #add_compile_options(-D_UNIT_TEST)
 #add_compile_options(-D_EXCLUDE_TMC_DROPPED_ITEM)
 

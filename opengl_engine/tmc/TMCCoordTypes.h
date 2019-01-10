@@ -1,5 +1,5 @@
-#ifndef _TMC_COORDTYPES
-#define _TMC_COORDTYPES
+#ifndef TMC_COORDTYPES_H_
+#define TMC_COORDTYPES_H_
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

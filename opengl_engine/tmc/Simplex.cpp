@@ -1,4 +1,4 @@
-#include "Simplex.h"
+#include "tmc/Simplex.h"
 
 #include <vector>
 

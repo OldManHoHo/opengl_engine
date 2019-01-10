@@ -3,7 +3,6 @@
 #include "TGLInventory.h"
 
 
-
 int block_place_range = int(iid_sand_block) + 1;
 
 e_block_type item_id_to_block_type(TGLItemId item_id)

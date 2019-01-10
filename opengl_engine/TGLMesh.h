@@ -1,19 +1,20 @@
 #pragma once
-#ifndef _TGL_MESH
-#define _TGL_MESH
+#ifndef TGL_MESH_H_
+#define TGL_MESH_H_
 
+
+
+
+#include <set>
+#include <vector>
 
 #include "tgl_gl.h"
-
-#include <vector>
-#include <set>
-
-#include "TGLShader.h"
 #include "TGLComponent.h"
-#include "TGLTexture.h"
-#include "TGLMeshVertices.h"
 #include "TGLMaterial.h"
-#include "BlockGenerator.h"
+#include "TGLMeshVertices.h"
+#include "TGLShader.h"
+#include "TGLTexture.h"
+#include "tmc/BlockGenerator.h"
 
 struct texture_objects
 {

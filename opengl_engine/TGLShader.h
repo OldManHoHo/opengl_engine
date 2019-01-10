@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _TGL_SHADER
-#define _TGL_SHADER
+#ifndef TGL_SHADER_H_
+#define TGL_SHADER_H_
 
 
 #include "tgl_gl.h"

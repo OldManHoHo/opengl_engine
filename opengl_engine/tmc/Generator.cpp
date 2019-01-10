@@ -1,5 +1,4 @@
-#include "Generator.h"
-
+#include "tmc/Generator.h"
 
 
 float Generator::get_point(int in_x, int in_y, int in_z)

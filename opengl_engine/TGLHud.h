@@ -1,4 +1,7 @@
 #pragma once
+#ifndef TGL_HUD_H_
+#define TGL_HUD_H_
+
 #include "ft2build.h"
 #include FT_FREETYPE_H
 #include "TGLBase.h"
@@ -29,3 +32,4 @@ public:
 	GLuint link_shader();
 };
 
+#endif

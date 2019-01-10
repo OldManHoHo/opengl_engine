@@ -1,8 +1,8 @@
-#ifndef _TMCPlayer
-#define _TMCPlayer
+#ifndef TMC_PLAYER_H_
+#define TMC_PLAYER_H_
 
-#include "TGLChunkSpawn.h"
 #include "TGLPlayer.h"
+#include "tmc/TGLChunkSpawn.h"
 
 class TMCPlayer : public TGLPlayer
 {

@@ -1,14 +1,13 @@
 #pragma once
-#ifndef _TGL_MESHVERTICES
-#define _TGL_MESHVERTICES
-
-#include "tgl_gl.h"
+#ifndef TGL_MESHVERTICES_H_
+#define TGL_MESHVERTICES_H_
 
 #include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "tgl_gl.h"
 
 class TGLMeshVertices
 {

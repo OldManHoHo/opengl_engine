@@ -1,9 +1,12 @@
 #pragma once
-#include "tgl_gl.h"
+#ifndef TGL_RAYBOUNCE_H_
+#define TGL_RAYBOUNCE_H_
+
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include "tgl_gl.h"
 #include "TGLShader.h"
 #include "TGLMaterial.h"
 
@@ -33,3 +36,4 @@ public:
 	GLuint get_framebuffer();
 };
 
+#endif

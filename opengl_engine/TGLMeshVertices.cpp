@@ -1,7 +1,6 @@
 #include "TGLMeshVertices.h"
 
 
-
 TGLMeshVertices::TGLMeshVertices(std::vector<GLfloat> const &vertices)
 {
 	GLuint VAO;

@@ -1,7 +1,11 @@
 #pragma once
+#ifndef TGL_WHITENOISE_H_
+#define TGL_WHITENOISE_H_
+
 #include "FastNoiseSIMD/FastNoiseSIMD.h"
-#include "Generator.h"
-class Cellular :
+#include "tmc/Generator.h"
+
+class WhiteNoise :
 	public Generator
 {
 	FastNoiseSIMD* myNoise;
@@ -9,12 +13,13 @@ class Cellular :
 	float scale;
 
 public:
-	Cellular(int in_seed, float in_scale = 0);
-	~Cellular();
-
+	WhiteNoise(int in_seed, float in_scale = 0);
+	~WhiteNoise();
+	
 	float get_point(int in_x, int in_y, int in_z);
 	float get_point_2d(int in_x, int in_y);
 	float * get_points(int in_x, int in_y, int in_z, int division);
 	float * get_points_2d(int in_x, int in_y, int division);
 };
 
+#endif

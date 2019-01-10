@@ -1,6 +1,6 @@
 #include "TGLCamera.h"
-#include <iostream>
 
+#include <iostream>
 
 
 TGLCamera::TGLCamera()

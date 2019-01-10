@@ -1,5 +1,4 @@
 #include "TGLChunk.h"
-
 #include "TGLMesh.h"
 
 TGLChunk::TGLChunk(TGLMeshVertices * mesh_vertices, TGLMaterial * block_material, int type_count, std::vector <std::vector <GLfloat>> instances)

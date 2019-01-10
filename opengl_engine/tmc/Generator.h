@@ -1,5 +1,7 @@
-#pragma once
+#ifndef TMC_GENERATOR_H_
+#define TMC_GENERATOR_H_
 
+#pragma once
 
 class Generator
 {
@@ -13,3 +15,4 @@ public:
 
 };
 
+#endif

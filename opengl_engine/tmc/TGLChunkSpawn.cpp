@@ -1,3 +1,5 @@
+#include "TGLChunkSpawn.h"
+
 #include <algorithm>
 #ifdef __APPLE__
 #include <unistd.h>
@@ -5,15 +7,12 @@
 #include <unistd.h>
 #endif
 
-#include "TGLChunkSpawn.h"
 #include "TGLBase.h"
+#ifndef _EXCLUDE_TMC_DROPPED_ITEM
+#include "tmc/TMCDroppedItem.h"
+#endif
 #include "useful_structures.h"
 
-#ifndef _EXCLUDE_TMC_DROPPED_ITEM
-#include "TMCDroppedItem.h"
-#endif
-
-#include <algorithm>
 
 #define PI 3.1415926
 

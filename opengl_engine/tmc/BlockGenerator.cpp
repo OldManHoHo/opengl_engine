@@ -1,7 +1,8 @@
-#include "BlockGenerator.h"
-#include "math.h"
-#include <chrono>
+#include "tmc/BlockGenerator.h"
+
+#include <math.h>
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 
 
@@ -31,9 +32,15 @@ BlockGenerator::~BlockGenerator()
 }
 
 
+// get_point
+//
+// get_point: return block type of a single block given by coordinates 
+// in_x, in_y, in_z. No get_points call is required before this. 
 e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 {
 	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+	
+	// Non-random generation used for testing
 	if (test_gen)
 	{
 		e_block_type type = static_cast<e_block_type>((std::abs(int(floor(in_x / 16.0) + floor(in_z / 16.0)))) % 6);
@@ -48,6 +55,7 @@ e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 	d1.loc = block_coord(1, 2, 3);
 	d1.type = bt_tree;
 
+	// If block is player modified, return that modification
 	e_block_type new_type = check_for_mod(in_x, in_y, in_z);
 	if (new_type != bt_invalid)
 	{
@@ -71,6 +79,9 @@ e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 	e_block_type block = bt_air;
 
 	float mountain_draw = mount_noise[0] * std::abs(mount_noise2[0]);
+	
+	// height_draw is used for the basic land surface height of any point
+	// given in two dimensions
 	int height_draw = std::abs(noises5[0])*(
 		(noises[0] * 3.0 / 4 + noises2[0] / 4) * 10 +
 		std::abs(noises3[0]) * 50 +
@@ -149,12 +160,23 @@ e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 	return block;
 }
 
-
+// NOT USED
 e_block_type BlockGenerator::get_point_2d(int in_x, int in_y)
 {
 	return bt_air;
 }
 
+
+// get_points
+//
+// get_points generates block types for an array of discrete coordinates
+// given by in_x to in_x + division, in_y to in_y + division, 0 to 256
+// in_z is currently not used for anything. The result is stored in the 
+// data member "blocks". If another call to get_points is made, blocks
+// will be erased and overwritten. Once a call to get_points has been made,
+// the index and is_visible functions can be used to get the block type of a
+// single coordinate or the visibility status of a single coordinate
+// respectively
 e_block_type * BlockGenerator::get_points(int in_x, int in_y, int in_z, int division)
 {
 	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
@@ -311,6 +333,10 @@ e_block_type * BlockGenerator::get_points_2d(int in_x, int in_y, int division)
 	return nullptr;
 }
 
+
+// set_point
+//
+// set_point sets a world_mod entry for the given coordinate
 void BlockGenerator::set_point(e_block_type in_block_type, int in_x, int in_y, int in_z)
 {
 	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
@@ -345,6 +371,10 @@ void BlockGenerator::set_point(e_block_type in_block_type, int in_x, int in_y, i
 	}
 }
 
+// check_for_mod
+//
+// check_for_mod checks user set blocks for the given coordinate. If the
+// coordinate exists in the user set blocks, it returns the block type.
 e_block_type BlockGenerator::check_for_mod(int in_x, int in_y, int in_z)
 {
 	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
@@ -368,6 +398,14 @@ e_block_type BlockGenerator::check_for_mod(int in_x, int in_y, int in_z)
 	return bt_invalid;
 }
 
+
+// index
+//
+// index returns a block type from the get_points generated array. The 
+// coordinates given to index must be relative to the get_points input
+// coordinate. For example, if get_points input coordinate was 
+// 2,5,1 and you wanted to get the block type of world coordinate 4,8,1
+// the input coordinate to index would be 4-2, 8-5, 1-1 = 2, 3, 0
 e_block_type BlockGenerator::index(int in_x, int in_y, int in_z)
 {
 	std::lock_guard<std::recursive_mutex> Lock(access_mutex);
@@ -375,6 +413,16 @@ e_block_type BlockGenerator::index(int in_x, int in_y, int in_z)
 	return retval;
 }
 
+
+// is_visible
+//
+// is_visible returns a visibility status from the get_points generated array. The 
+// coordinates given to index must be relative to the get_points input
+// coordinate. For example, if get_points input coordinate was 
+// 2,5,1 and you wanted to get the visibility of world coordinate 4,8,1
+// the input coordinate to is_visible would be 4-2, 8-5, 1-1 = 2, 3, 0
+//
+// The a block that is considered to have a status of visible
 bool BlockGenerator::is_visible(int in_x, int in_y, int in_z)
 {
 	std::lock_guard<std::recursive_mutex> Lock(access_mutex);

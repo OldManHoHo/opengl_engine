@@ -1,15 +1,15 @@
 #pragma once
-#ifndef _TGL_ACTOR
-#define _TGL_ACTOR
+#ifndef TGL_ACTOR_H_
+#define TGL_ACTOR_H_
+
+#include <deque>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <vector>
-#include <deque>
-
-#include "TGLComponent.h"
 #include "TGLBounds.h"
+#include "TGLComponent.h"
 
 class TGLActor
 {

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _TGL_BOUNDS
-#define _TGL_BOUNDS
+#ifndef TGL_BOUNDS_H_
+#define TGL_BOUNDS_H_
 
 class TGLBounds
 {

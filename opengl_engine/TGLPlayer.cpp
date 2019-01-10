@@ -1,10 +1,10 @@
-#include "tgl_gl.h"
-
 #include "TGLPlayer.h"
 
-#include "TGLBase.h"
-#include <glm/gtx/matrix_decompose.hpp>
 #include <stdio.h>
+
+#include <glm/gtx/matrix_decompose.hpp>
+#include "tgl_gl.h"
+#include "TGLBase.h"
 #include "useful_structures.h"
 
 //extern std::vector <GLfloat> vertex_data_block_small;

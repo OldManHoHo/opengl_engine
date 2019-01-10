@@ -1,6 +1,7 @@
-#include "TGLInputHandler.h"
 #include "TGLBase.h"
 #include "TGLGameState.h"
+#include "TGLInputHandler.h"
+
 
 extern TGLBase gl_base;
 

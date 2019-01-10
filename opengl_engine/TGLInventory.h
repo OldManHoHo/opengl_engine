@@ -1,11 +1,11 @@
-#ifndef _TGL_INVENTORY
-#define _TGL_INVENTORY
+#ifndef TGL_INVENTORY_H_
+#define TGL_INVENTORY_H_
 
 #include <vector>
 #include <stdio.h> 
 
-#include "BlockGenerator.h"
-#include "TGLChunkSpawn.h"
+#include "tmc/BlockGenerator.h"
+#include "tmc/TGLChunkSpawn.h"
 
 enum TGLItemId
 {

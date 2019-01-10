@@ -1,8 +1,7 @@
-
-
-#include "TGLComponent.h"
 #include <stdio.h>
+
 #include "TGLActor.h"
+#include "TGLComponent.h"
 
 
 TGLComponent::TGLComponent() : parent(nullptr), is_child(false)

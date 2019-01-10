@@ -1,21 +1,32 @@
+#ifndef TMC_BLOCKGENERATOR_H_
+#define TMC_BLOCKGENERATOR_H_
+
+// Class BlockGenerator
+//
+// The BlockGenerator class is intended to generate block types
+// based on input of coordinates. Given discrete input of coordinates
+// BlockGenerator should return either a number of block types
+// in a given space or a single block type for the given coordinate.
+//
+
 #pragma once
 #include <map>
-#include <vector>
 #include <mutex>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#include "Generator.h"
-#include "Simplex.h"
-#include "Cellular.h"
-#include "WhiteNoise.h"
-#include "TMCChunkDatabase.h"
-#include "TMCCoordTypes.h"
+#include "tmc/Cellular.h"
+#include "tmc/Generator.h"
+#include "tmc/Simplex.h"
+#include "tmc/TMCChunkDatabase.h"
+#include "tmc/TMCCoordTypes.h"
+#include "tmc/WhiteNoise.h"
 
 class BlockGenerator
 {
+	// Various noise generators for terrain generation
 	Simplex * height;
 	Simplex * height2;
 	Simplex * height3;
@@ -27,16 +38,23 @@ class BlockGenerator
 	Simplex * caves;
 	Simplex * caves2;
 	e_block_type * blocks;
+	
+	// Size of last get_points call
 	int size_x;
 	int size_y;
 	int counter;
+	
 	int seed;
 
 	bool test_gen;
 
+	// Player made modification storage
 	std::map <chunk_coord, std::map<block_coord,block_def>> world_mods;
+	
+	// Player made modification file storage access
 	TMCChunkDatabase chunk_db;
 
+	// Single mutex used for access of whole object
 	std::recursive_mutex access_mutex;
 
 public:
@@ -63,4 +81,6 @@ public:
 
 #ifdef _UNIT_TEST
 void BlockGenerator_TEST();
+#endif
+
 #endif

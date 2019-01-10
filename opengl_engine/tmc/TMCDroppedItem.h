@@ -1,9 +1,9 @@
 
 #include "TGLActor.h"
+#include "TGLMaterial.h"
+#include "TGLMesh.h"
 #include "TGLMeshVertices.h"
 #include "useful_structures.h"
-#include "TGLMesh.h"
-#include "TGLMaterial.h"
 
 class TMCDroppedItem :
 	public TGLActor

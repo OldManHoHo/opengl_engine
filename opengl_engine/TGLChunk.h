@@ -1,14 +1,11 @@
 #pragma once
-#ifndef _TGL_CHUNK
-#define _TGL_CHUNK
-
+#ifndef TGL_CHUNK_H_
+#define TGL_CHUNK_H_
 
 #include "tgl_gl.h"
-
 #include "TGLActor.h"
-#include "TGLMeshVertices.h"
 #include "TGLMaterial.h"
-#include "TGLActor.h"
+#include "TGLMeshVertices.h"
 
 
 class TGLChunk : public TGLActor

@@ -1,7 +1,7 @@
 #include "TGLHud.h"
 
-#include <iostream>
 #include <GL/gl.h>
+#include <iostream>
 
 
 TGLHud::TGLHud()

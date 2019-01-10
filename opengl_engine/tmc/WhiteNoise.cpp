@@ -1,5 +1,4 @@
-#include "WhiteNoise.h"
-
+#include "tmc/WhiteNoise.h"
 
 
 WhiteNoise::WhiteNoise(int in_seed, float in_scale)

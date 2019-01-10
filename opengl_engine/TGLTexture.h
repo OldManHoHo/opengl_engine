@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _TGL_TEXTURE
-#define _TGL_TEXTURE
+#ifndef TGL_TEXTURE_H_
+#define TGL_TEXTURE_H_
 
 #include "tgl_gl.h"
 

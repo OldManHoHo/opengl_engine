@@ -1,3 +1,5 @@
+#ifndef TGL_GL_H_
+#define TGL_GL_H_
 
 #ifdef _TGL_CLIENT
 #include <glad/glad.h>
@@ -15,4 +17,6 @@ typedef unsigned int GLuint;
 typedef float GLfloat;
 typedef float GLclampf;
 typedef void GLvoid;
+#endif
+
 #endif

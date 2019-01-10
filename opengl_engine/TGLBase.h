@@ -1,28 +1,26 @@
 #pragma once
-#ifndef _TGL_BASE
-#define _TGL_BASE
+#ifndef TGL_BASE_H_
+#define TGL_BASE_H_
 
-#define GLM_ENABLE_EXPERIMENTAL
+#include <chrono>
+#include <iostream>
+#include <unordered_map>
+#include <vector>
 
 #include "tgl_gl.h"
-
-#include <iostream>
-#include <vector>
-#include <chrono>
-#include <unordered_map>
-
-#include "TGLMesh.h"
-#include "TGLCamera.h"
-#include "TGLPlayer.h"
-#include "TGLPhysicsEngine.h"
-#include "TGLHudElement.h"
-#include "TGLUDPInterface.h"
-#include "TGLGameState.h"
 #include "TGL_USER_CLASSES.h"
-
+#include "TGLCamera.h"
+#include "TGLGameState.h"
+#include "TGLHudElement.h"
+#include "TGLMesh.h"
+#include "TGLPhysicsEngine.h"
+#include "TGLPlayer.h"
 #ifdef _TGL_CLIENT
 #include "TGLRayBounce.h"
 #endif
+#include "TGLUDPInterface.h"
+
+
 
 #ifndef _TGL_CLIENT
 class TGLClientStatus

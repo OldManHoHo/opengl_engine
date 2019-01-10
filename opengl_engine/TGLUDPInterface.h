@@ -1,23 +1,24 @@
+#ifndef TGL_UDPINTERFACE_H_
+#define TGL_UDPINTERFACE_H_
 
+#include <math.h>
 #include <sys/types.h>          /* See NOTES */
 #ifdef _TGL_CLIENT
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #else
-#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #endif
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <deque>
-#include <map>
 #include <algorithm>
-#include <set>
+#include <deque>
+#include <iostream>
 #include <map>
-#include <math.h>
+#include <set>
+#include <thread>
+#include <vector>
 
 #include "TGLLibraryQueue.h"
 
@@ -69,3 +70,5 @@ public:
 	void pop_msg(std::pair <sockaddr_in,std::vector<char>>*& out_pair);
 	void return_msg(std::pair <sockaddr_in,std::vector<char>>*& in_pair);
 };
+
+#endif

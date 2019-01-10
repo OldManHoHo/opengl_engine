@@ -1,7 +1,6 @@
 #pragma once
-
-#ifndef _TGL_CAMERA
-#define _TGL_CAMERA
+#ifndef TGL_CAMERA_H_
+#define TGL_CAMERA_H_
 
 #include "TGLActor.h"
 

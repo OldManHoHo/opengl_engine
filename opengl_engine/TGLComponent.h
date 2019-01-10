@@ -1,7 +1,6 @@
 #pragma once
-#ifndef _TGL_COMPONENT
-#define _TGL_COMPONENT
-
+#ifndef TGL_COMPONENT_H_
+#define TGL_COMPONENT_H_
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

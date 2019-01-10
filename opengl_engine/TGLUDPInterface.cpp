@@ -1,6 +1,5 @@
 #include "TGLUDPInterface.h"
 
-
 #ifdef _TGL_CLIENT
 #pragma comment(lib, "Ws2_32.lib")
 #define inet_pton InetPton

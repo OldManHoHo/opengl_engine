@@ -1,19 +1,21 @@
 #define _CRT_SECURE_NO_WARNINGS
+
 #include "TGLBase.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <string>
-#include <chrono>
+
 #include <stdio.h>
-#include <thread>
-#include <ctime>
-#include <algorithm>
 #include <stdlib.h>
-#include <fstream>
 #ifndef _TGL_CLIENT
 #include <unistd.h>
 #endif
+#include <algorithm>
+#include <ctime>
+#include <fstream>
+#include <string>
+#include <thread>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 
 TGLBase::TGLBase(): 

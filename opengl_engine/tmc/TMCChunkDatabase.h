@@ -1,7 +1,10 @@
-#include <iostream>
+#ifndef TMC_CHUNKDATABASE_H_
+#define TMC_CHUNKDATABASE_H_
+
 #include <fstream>
-#include <string>
+#include <iostream>
 #include <map>
+#include <string>
 
 #include "TMCCoordTypes.h"
 
@@ -14,3 +17,5 @@ public:
     void load_chunk(int chunk_x, int chunk_y, std::map <chunk_coord, std::map<block_coord,block_def>>& world_mods);
     void save_chunk(int chunk_x, int chunk_y, std::map <chunk_coord, std::map<block_coord,block_def>>& world_mods);
 };
+
+#endif

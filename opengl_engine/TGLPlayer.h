@@ -1,15 +1,16 @@
 #pragma once
-#ifndef _TGL_PLAYER
-#define _TGL_PLAYER
+#ifndef TGL_PLAYER_H_
+#define TGL_PLAYER_H_
 
 
 #include <vector>
 
 #include "TGLCamera.h"
-#include "TGLMesh.h"
-#include "TGLInventory.h"
 #include "TGLHudElement.h"
 #include "TGLInputHandler.h"
+#include "TGLInventory.h"
+#include "TGLMesh.h"
+
 
 class TGLPlayer : public TGLCamera
 {

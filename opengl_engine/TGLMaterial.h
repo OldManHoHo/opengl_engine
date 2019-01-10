@@ -1,11 +1,12 @@
 #pragma once
-#ifndef _TGL_MATERIAL
-#define _TGL_MATERIAL
+#ifndef TGL_MATERIAL_H_
+#define TGL_MATERIAL_H_
 
 #include <vector>
 
-#include "TGLTexture.h"
 #include "TGLShader.h"
+#include "TGLTexture.h"
+
 
 class TGLMaterial
 {

@@ -1,7 +1,7 @@
 #include "TGLMaterial.h"
 
-#include <string>
 #include <iostream>
+#include <string>
 
 
 TGLMaterial::TGLMaterial()

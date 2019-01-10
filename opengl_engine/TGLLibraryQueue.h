@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef __TGL_Server__TGLLibraryQueue__
-#define __TGL_Server__TGLLibraryQueue__
+#ifndef TGL_LIBRARYQUEUE_H_
+#define TGL_LIBRARYQUEUE_H_
 
 #include <stdio.h>
 #include <deque>

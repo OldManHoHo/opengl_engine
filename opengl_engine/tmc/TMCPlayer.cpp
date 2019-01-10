@@ -1,10 +1,9 @@
-#include "TMCPlayer.h"
 #include "TGLBase.h"
-#include "useful_structures.h"
-
 #ifndef _EXCLUDE_TMC_DROPPED_ITEM
-#include "TMCDroppedItem.h"
+#include "tmc/TMCDroppedItem.h"
 #endif
+#include "tmc/TMCPlayer.h"
+#include "useful_structures.h"
 
 extern TGLBase gl_base;
 

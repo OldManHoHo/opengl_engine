@@ -1,7 +1,7 @@
 #include "TGLShader.h"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <streambuf>
 
 TGLShader::TGLShader(char * shader_file, GLuint shader_type)

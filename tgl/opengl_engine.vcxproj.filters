@@ -1,0 +1,290 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="FastNoiseSIMD">
+      <UniqueIdentifier>{ebbbe624-6981-47e5-8758-949bc1b38221}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tcm">
+      <UniqueIdentifier>{985a257f-3598-468a-bee9-82b37f32871b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\tcm">
+      <UniqueIdentifier>{13cdb87f-3c68-43d7-9858-92b5d8095b2e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\glad\glad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\KHR\khrplatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/tgl::Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vertex_shader.glsl">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/actor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/tmc::ChunkSpawn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/chunk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/tgl::Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/tgl::MeshVertices.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Simplex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WhiteNoise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="block_generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cellular.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FastNoiseSIMD\FastNoiseSIMD_internal.h">
+      <Filter>FastNoiseSIMD</Filter>
+    </ClInclude>
+    <ClInclude Include="FastNoiseSIMD\FastNoiseSIMD.h">
+      <Filter>FastNoiseSIMD</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/physics_engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/bounds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/TGLHud.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/tgl::Inventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/hud_element.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="useful_structures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TMCDroppedItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/tgl_gl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/input_handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/tgl::LibraryQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/udp_interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_state\game_state.pb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgl/ray_bounce.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tmc\TMCPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::Actor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::Component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/TGLCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tmc::ChunkSpawn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tmc::Chunk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::MeshVertices.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Generator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Simplex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WhiteNoise.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cellular.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD.cpp">
+      <Filter>FastNoiseSIMD</Filter>
+    </ClCompile>
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_avx2.cpp">
+      <Filter>FastNoiseSIMD</Filter>
+    </ClCompile>
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_avx512.cpp">
+      <Filter>FastNoiseSIMD</Filter>
+    </ClCompile>
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_internal.cpp">
+      <Filter>FastNoiseSIMD</Filter>
+    </ClCompile>
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_neon.cpp">
+      <Filter>FastNoiseSIMD</Filter>
+    </ClCompile>
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_sse2.cpp">
+      <Filter>FastNoiseSIMD</Filter>
+    </ClCompile>
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_sse41.cpp">
+      <Filter>FastNoiseSIMD</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::PhysicsEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::Bounds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::Inventory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::HudElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="useful_structures.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TMCDroppedItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/InputHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::LibraryQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::UDPInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgl/tgl::RayBounce.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tmc\TMCChunkDatabase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tmc\TMCPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fragment_shader.glsl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="fragment_shader_default.glsl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="vertex_shader_default.glsl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="vertex_shader_glyph.glsl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="fragment_shader_glyph.glsl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="fragment_shader_HUD.glsl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="vertex_shader_HUD.glsl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="fragment_shader_HUD_tex.glsl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="vertex_shader_HUD_tex.glsl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="fragment_shader_light.glsl" />
+    <None Include="vertex_shader_light.glsl" />
+    <None Include="..\global.conf" />
+    <None Include="global.conf" />
+    <None Include="ray_bounce_fragment.glsl" />
+    <None Include="ray_bounce_vertex.glsl" />
+  </ItemGroup>
+</Project>

@@ -34,6 +34,18 @@ Actor::~Actor()
 	}
 }
 
+Actor::Actor(const Actor& rhs)
+{
+	for (auto component : rhs.components)
+	{
+		//components
+	}
+}
+
+Actor& Actor::operator=(const Actor& rhs)
+{
+		
+}
 
 void Actor::set_transform(glm::mat4 in_transform)
 {

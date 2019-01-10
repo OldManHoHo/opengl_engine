@@ -71,6 +71,9 @@ public:
 
 	Actor();
 	~Actor();
+	Actor(const Actor& rhs);
+	Actor& operator=(const Actor& rhs);
+	
 	void set_transform(glm::mat4 in_transform);
 	glm::mat4 get_transform();
 	glm::vec3 get_pos();

@@ -107,8 +107,8 @@ namespace useful_structures
 		tgl::Material * temp_mat = new tgl::Material();
 
 
-		tgl::Shader v_shader("vertex_shader.glsl", GL_VERTEX_SHADER);
-		tgl::Shader f_shader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+		tgl::Shader v_shader("content/shaders/vertex_shader.glsl", GL_VERTEX_SHADER);
+		tgl::Shader f_shader("content/shaders/fragment_shader.glsl", GL_FRAGMENT_SHADER);
 
 		GLenum err;
 		while ((err = glGetError()) != GL_NO_ERROR)

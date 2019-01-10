@@ -8,7 +8,7 @@ namespace tgl
 
 GLfloat * calculate_normals(GLfloat * vertices, int length)
 {
-	GLfloat * out_normals = new GLfloat[length];
+	
 	glm::vec3 center(0,0,0);
 
 	for (int i = 0; i < length; i+=3)
@@ -17,6 +17,7 @@ GLfloat * calculate_normals(GLfloat * vertices, int length)
 		
 	}
 	center = center * (1.0f / (length / 3));
+	GLfloat * out_normals = new GLfloat[length];
 	for (int i = 0; i < length; i=i+9)
 	{
 		glm::vec3 vert1 = glm::vec3(vertices[i], vertices[i + 1], vertices[i + 2]);

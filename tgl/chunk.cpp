@@ -28,8 +28,9 @@ Chunk::~Chunk()
 
 bool Chunk::remove_instance(int block_type, glm::vec3 loc)
 {
-	int index = -1;
+	
 	std::vector <GLfloat>& fresh_instances = ((tgl::Mesh*)components[block_type - 1])->get_instances();
+	int index = -1;
 	for (int i = 0; i < fresh_instances.size(); i += 3)
 	{
 		if (fresh_instances[i] == int(loc.x) && fresh_instances[i + 1] == int(loc.y) && fresh_instances[i + 2] == int(loc.z))

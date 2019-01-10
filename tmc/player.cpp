@@ -53,7 +53,6 @@ void Player::tick(double time_delta)
 
 	static double time_since_last_left = 10;
 	static double time_since_last_right = 10;
-
 	time_since_last_left += time_delta;
 	time_since_last_right += time_delta;
     

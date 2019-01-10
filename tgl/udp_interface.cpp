@@ -11,10 +11,9 @@ namespace tgl
 UDPInterface::UDPInterface()
 {
 #ifdef _TGL_CLIENT
+	// Initialize Winsock
 	WSADATA wsaData;
 	int iResult;
-
-	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0) {
 		printf("WSAStartup failed: %d\n", iResult);

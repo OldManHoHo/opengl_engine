@@ -45,9 +45,6 @@ void Material::add_texture(tgl::Texture * in_texture, GLfloat * in_coords, int c
 
 GLuint Material::link_shader()
 {
-	int  success;
-	char infoLog[512];
-
 	if (shader_program != 0)
 	{
 		glDeleteProgram(shader_program);
@@ -62,8 +59,10 @@ GLuint Material::link_shader()
 
 	glLinkProgram(shader_program);
 
+	int  success;
 	glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
 	if (!success) {
+		char infoLog[512];
 		glGetProgramInfoLog(shader_program, 512, NULL, infoLog);
 		std::cout << "SHADER LINK FAILED\n" << infoLog << std::endl;
 		linked = false;

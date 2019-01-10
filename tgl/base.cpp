@@ -457,8 +457,8 @@ int Base::init()
 
 	//glDepthRange(0.0f, 1.0f);
 	tgl::Material * default_material = new tgl::Material;
-	tgl::Shader v_shader("vertex_shader_default.glsl", GL_VERTEX_SHADER);
-	tgl::Shader f_shader("fragment_shader_default.glsl", GL_FRAGMENT_SHADER);
+	tgl::Shader v_shader("content/shaders/vertex_shader_default.glsl", GL_VERTEX_SHADER);
+	tgl::Shader f_shader("content/shaders/fragment_shader_default.glsl", GL_FRAGMENT_SHADER);
 
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR)
@@ -767,7 +767,7 @@ void Base::update()
 		{
 			update_sun(time_delta);
 		}
-		unsigned int shadow_map_size = ray_bounce.shadow_map_size;
+
 		// input
 		processInput(window);
 
@@ -815,12 +815,15 @@ void Base::update()
 #ifdef _TGL_CLIENT
 ///////////////////////////////////////////
 // SHADOW MAP DRAWING
+		unsigned int shadow_map_size = ray_bounce.shadow_map_size;
 		if (shadow_maps_enabled && shadow_map_counter > shadow_map_interval)
 		{
+			
 			glBindFramebuffer(GL_FRAMEBUFFER, ray_bounce.get_framebuffer());
 			glClearColor(1.0, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+			
+			
 			glViewport(0, 0, shadow_map_size, shadow_map_size); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 			glUseProgram(ray_bounce.mat->get_shader_program());
 
@@ -856,7 +859,6 @@ void Base::update()
 						{
 							shadow_pos1 = active_camera->get_pos();
 							sun_pos_buf1 = sun_pos;
-							glm::vec3 light_pos(shadow_pos1.x + 10, 200, shadow_pos1.z + 10);
 							glm::vec3 side_vec = glm::cross(shadow_pos1 - sun_pos_buf1, glm::vec3(1, 0, 0));
 							double light_dist = glm::length(shadow_pos1 - sun_pos_buf1);
 
@@ -979,7 +981,6 @@ void Base::update()
 
 					if (shadow_maps_enabled)
 					{
-						glm::vec3 light_pos(shadow_pos2.x + 10, 200, shadow_pos2.z + 10);
 						glm::vec3 side_vec = glm::cross(shadow_pos2 - sun_pos_buf2, glm::vec3(1, 0, 0));
 						double light_dist = glm::length(shadow_pos2 - sun_pos_buf2);
 
@@ -1034,12 +1035,12 @@ void Base::update()
 			GLuint shader_id = HUD_elements[i]->mat.get_shader_program();
 			glUseProgram(shader_id);
 
-			GLuint params_loc = glGetUniformLocation(shader_id, "params");
 			GLfloat * params = HUD_elements[i]->get_params();
 			params[0] /= window_width;
 			params[1] /= window_height;
 			params[2] /= window_width;
 			params[3] /= window_height;
+			GLuint params_loc = glGetUniformLocation(shader_id, "params");
 			glUniform4fv(params_loc, 1, params);
 
 			GLuint color_loc = glGetUniformLocation(shader_id, "color");
@@ -1048,8 +1049,8 @@ void Base::update()
 			if (HUD_elements[i]->texture_active)
 			{
 				GLuint offset_loc_1 = glGetUniformLocation(shader_id, "tex_offset_1");
-				GLuint offset_loc_2 = glGetUniformLocation(shader_id, "tex_offset_2");
 				glUniform2fv(offset_loc_1, 1, glm::value_ptr(HUD_elements[i]->top_left_tex_offset));
+				GLuint offset_loc_2 = glGetUniformLocation(shader_id, "tex_offset_2");
 				glUniform2fv(offset_loc_2, 1, glm::value_ptr(HUD_elements[i]->bottom_right_tex_offset));
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, HUD_elements[i]->tex->get_name());
@@ -1063,7 +1064,6 @@ void Base::update()
 				shader_id = sub_el->mat.get_shader_program();
 				glUseProgram(shader_id);
 
-				params_loc = glGetUniformLocation(shader_id, "params");
 				GLfloat * params_sub = sub_el->get_params();
 				params_sub[0] /= window_width;
 				params_sub[1] /= window_height;
@@ -1071,6 +1071,7 @@ void Base::update()
 				params_sub[3] /= window_height;
 				params_sub[2] += params[2];
 				params_sub[3] += params[3];
+				params_loc = glGetUniformLocation(shader_id, "params");
 				glUniform4fv(params_loc, 1, params_sub);
 
 				color_loc = glGetUniformLocation(shader_id, "color");
@@ -1079,8 +1080,8 @@ void Base::update()
 				if (sub_el->texture_active)
 				{
 					GLuint offset_loc_1 = glGetUniformLocation(shader_id, "tex_offset_1");
-					GLuint offset_loc_2 = glGetUniformLocation(shader_id, "tex_offset_2");
 					glUniform2fv(offset_loc_1, 1, glm::value_ptr(sub_el->top_left_tex_offset));
+					GLuint offset_loc_2 = glGetUniformLocation(shader_id, "tex_offset_2");
 					glUniform2fv(offset_loc_2, 1, glm::value_ptr(sub_el->bottom_right_tex_offset));
 					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_2D, sub_el->tex->get_name());
@@ -1200,7 +1201,7 @@ void Base::get_game_state()
 
 void Base::update_sun(double time_delta)
 {
-	static double mult = 0;
+	
 	std::time_t now_time = time(NULL);
 	struct tm * aTime = std::localtime(&now_time);
 	double ssy = aTime->tm_yday * 24 * 60 * 60 + aTime->tm_hour * 60 * 60 + aTime->tm_sec;
@@ -1216,9 +1217,10 @@ void Base::update_sun(double time_delta)
 
 	double sun_degrees = 3.1415926 * 2 * ssm / full_day - 3.1415926 / 2;
 
+	static double mult = 0;
 	sun_degrees = mult * 3.141592654 * 2 + start_time_of_day*2*3.1415926/24 - 3.1415926/2;
 
-	glm::vec3 out_vec;
+	
 	//dir = glm::vec3(1, 0, 0);
 	if (sun_degrees > 2 * 3.1415926)
 	{
@@ -1234,6 +1236,8 @@ void Base::update_sun(double time_delta)
 	{
 		sun_intensity = glm::vec3(0.3, 0.3, 0.3);
 	}
+	
+	glm::vec3 out_vec;
 	//out_vec = glm::vec3(cos(sun_degrees), sin(sun_degrees), 0)*std::max(float(0), float(1 - sin(sun_degrees))) + glm::vec3(-1, -1, 0)*std::max(float(0), float(-sin(sun_degrees)));
 	out_vec = glm::vec3(cos(sun_degrees), sin(sun_degrees), 0);
 	if (active_camera != nullptr)

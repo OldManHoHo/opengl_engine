@@ -31,8 +31,8 @@ glm::mat4 Camera::get_projection()
 glm::mat4 Camera::get_view()
 {
 	glm::vec3 forward(1.0f, 0.0f, 0.0f);
-	glm::vec3 up(0.0f, 1.0f, 0.0f);
 	forward = glm::mat3(get_rot())*forward;
+	glm::vec3 up(0.0f, 1.0f, 0.0f);
 	up = glm::mat3(get_rot())*up;
 	eye_loc = get_pos() + up*float(1.65 - 1.85 / 2);
 	view = glm::lookAt(eye_loc, eye_loc + forward, up);

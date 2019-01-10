@@ -52,10 +52,6 @@ e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 		return bt_air;
 	}
 
-	block_def d1;
-	d1.loc = block_coord(1, 2, 3);
-	d1.type = bt_tree;
-
 	// If block is player modified, return that modification
 	e_block_type new_type = check_for_mod(in_x, in_y, in_z);
 	if (new_type != bt_invalid)
@@ -447,9 +443,6 @@ bool BlockGenerator::is_visible(int in_x, int in_y, int in_z)
 		}
 	}
 	return 1;
-	bool retval = !(index(in_x, in_y, in_z + 1)*index(in_x, in_y, in_z - 1)*index(in_x, in_y + 1, in_z)*index(in_x, in_y - 1, in_z)
-		*index(in_x + 1, in_y, in_z)*index(in_x - 1, in_y, in_z));
-	return retval;
 }
 
 void BlockGenerator::get_tree(float * in_noise, e_block_type * in_blocks, int in_x, int in_y, int in_z, int chunk_x, int chunk_y)

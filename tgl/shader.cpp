@@ -19,12 +19,11 @@ Shader::~Shader()
 
 void Shader::load_shader(char * shader_file, GLuint shader_type)
 {
-	int  success;
-	char infoLog[512];
+	
+	
 
 	std::ifstream t(shader_file);
 	std::string str;
-
 	t.seekg(0, std::ios::end);
 	str.reserve(t.tellg());
 	t.seekg(0, std::ios::beg);
@@ -39,10 +38,11 @@ void Shader::load_shader(char * shader_file, GLuint shader_type)
 	glShaderSource(shader_object, 1, &source, NULL);
 	glCompileShader(shader_object);
 
-	
+	int  success;
 	glGetShaderiv(shader_object, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
+		char infoLog[512];
 		glGetShaderInfoLog(shader_object, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}

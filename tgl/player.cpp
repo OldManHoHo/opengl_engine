@@ -11,7 +11,7 @@ namespace tgl
 {
 
 //extern std::vector <GLfloat> vertex_data_block_small;
-extern tgl::Base gl_base;
+extern tgl::Base gl_base; // TODO: Get rid of this global
 
 Player::Player() :
 	inventory(10, 10),
@@ -51,7 +51,7 @@ void Player::tick(double time_delta)
 #endif
 	input_handler.tick(time_delta);
 	
-	double xpos, ypos;
+	
 	static float debug_rot = 0.0;
 	static float time_passed = 0.0;
 	time_passed += time_delta;
@@ -61,6 +61,7 @@ void Player::tick(double time_delta)
 	up_vector = glm::mat3(get_rot())*up_vector;
 	glm::vec3 x_vector(1.0, 0.0, 0.0);
 	//glfwGetCursorPos(gl_base.get_window(), &xpos, &ypos);
+	double xpos, ypos;
 	xpos = input_handler.mouse_x;
 	ypos = input_handler.mouse_y;
 	x_angle += ypos*3.14159 / 5000;

@@ -100,7 +100,6 @@ ChunkSpawn::ChunkSpawn():
 {
 	block_generator = new BlockGenerator(test_chunk);
 
-	
 #ifdef _TGL_CLIENT
 	std::vector <GLfloat> dirt_with_grass;
 	std::vector <GLfloat> dirt;
@@ -206,17 +205,16 @@ ChunkSpawn::ChunkSpawn():
 
 	block_mesh_vertices = new tgl::MeshVertices(useful_structures::vertex_data_block_small);
 	
-	//tgl::Shader v_shader("vertex_shader_light.glsl", GL_VERTEX_SHADER);
-	//tgl::Shader f_shader("fragment_shader_light.glsl", GL_FRAGMENT_SHADER);
-	tgl::Shader v_shader("vertex_shader_light.glsl", GL_VERTEX_SHADER);
-	tgl::Shader f_shader("fragment_shader_light.glsl", GL_FRAGMENT_SHADER);
-
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR)
 	{
 		printf("GL ERROR: %d\n", err);
 	}
 
+		//tgl::Shader v_shader("vertex_shader_light.glsl", GL_VERTEX_SHADER);
+	//tgl::Shader f_shader("fragment_shader_light.glsl", GL_FRAGMENT_SHADER);
+	tgl::Shader v_shader("content/shaders/vertex_shader_light.glsl", GL_VERTEX_SHADER);
+	tgl::Shader f_shader("content/shaders/fragment_shader_light.glsl", GL_FRAGMENT_SHADER);
 	block_material->add_shader(&v_shader);
 	block_material->add_shader(&f_shader);
 	block_material->link_shader();
@@ -237,6 +235,7 @@ ChunkSpawn::ChunkSpawn():
 #endif
 	
 	return;
+	// TODO: Why does this cause shakey graphics issues?
 	for (int i = -5; i < 5; ++i)
 	{
 		for (int j = -5; j < 5; ++j)
@@ -247,9 +246,7 @@ ChunkSpawn::ChunkSpawn():
 
 }
 
-
-extern tgl::Actor debug_actor;
-
+extern tgl::Actor debug_actor; // TODO: get rid of this
 
 template <typename T> int sign(T val) {
 	return (T(0) < val) - (val < T(0));
@@ -393,6 +390,7 @@ void ChunkSpawn::tick(double time_delta)
 #endif
 		
 		// Process hits
+		// TODO: Use function for this
 		for (auto hit : posted_hits)
 		{
 			int chunk_x;
@@ -629,7 +627,6 @@ void ChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 	{
 		instances.push_back(std::vector<GLfloat>(0));
 	}
-	int count = 0;
 
 	block_generator->get_points((chunk_x * 16 - 1), (chunk_y * 16 - 1), 0, 18);
 	

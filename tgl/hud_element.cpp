@@ -12,13 +12,13 @@ tgl::HudElement::tgl::HudElement(GLfloat in_width, GLfloat in_height, glm::vec2 
 	{
 		tex = new tgl::Texture(texture_file);
 		texture_active = true;
-		hud_shader_f = new tgl::Shader("fragment_shader_HUD_tex.glsl", GL_FRAGMENT_SHADER);
-		hud_shader_v = new tgl::Shader("vertex_shader_HUD_tex.glsl", GL_VERTEX_SHADER);
+		hud_shader_f = new tgl::Shader("content/shaders/fragment_shader_HUD_tex.glsl", GL_FRAGMENT_SHADER);
+		hud_shader_v = new tgl::Shader("content/shaders/vertex_shader_HUD_tex.glsl", GL_VERTEX_SHADER);
 	}
 	else
 	{
-		hud_shader_f = new tgl::Shader("fragment_shader_HUD.glsl", GL_FRAGMENT_SHADER);
-		hud_shader_v = new tgl::Shader("vertex_shader_HUD.glsl", GL_VERTEX_SHADER);
+		hud_shader_f = new tgl::Shader("content/shaders/fragment_shader_HUD.glsl", GL_FRAGMENT_SHADER);
+		hud_shader_v = new tgl::Shader("content/shaders/vertex_shader_HUD.glsl", GL_VERTEX_SHADER);
 	}
 
 	if (bottom_right_tex_offset.x != 0 && bottom_right_tex_offset.y != 0)

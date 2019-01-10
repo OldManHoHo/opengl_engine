@@ -87,8 +87,8 @@ void RayBounce::init()
 
 
 
-	v_shader = new tgl::Shader("ray_bounce_vertex.glsl", GL_VERTEX_SHADER);
-	f_shader = new tgl::Shader("ray_bounce_fragment.glsl", GL_FRAGMENT_SHADER);
+	v_shader = new tgl::Shader("content/shaders/ray_bounce_vertex.glsl", GL_VERTEX_SHADER);
+	f_shader = new tgl::Shader("content/shaders/ray_bounce_fragment.glsl", GL_FRAGMENT_SHADER);
 
 	mat = new tgl::Material();
 	mat->add_shader(v_shader);
@@ -100,7 +100,6 @@ void RayBounce::set_up()
 {
 
 	glm::vec3 lightInvDir = glm::vec3(0, 200, 0);
-
 	// Compute the MVP matrix from the light's point of view
 	glm::mat4 depthProjectionMatrix = glm::ortho<float>(-100, 100, -100, 100, 0, 1000);
 	glm::mat4 depthViewMatrix = glm::lookAt(lightInvDir, glm::vec3(0, 0, 0), glm::vec3(1, 0, 0));

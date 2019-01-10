@@ -54,7 +54,6 @@ void PhysicsEngine::tick(double time_delta, std::vector <tgl::Actor*> const & ac
 		{
 			if((*it)->mass > 0)
 			{
-				double speed_mult = 1.0;
 				//std::ofstream out_file;
 				//out_file.open("test.txt", std::ios::app);
 				
@@ -62,12 +61,12 @@ void PhysicsEngine::tick(double time_delta, std::vector <tgl::Actor*> const & ac
 				glm::vec3 feet = (*it)->get_pos() - glm::vec3(0, bounds->height, 0);
 
 				feet = glm::vec3(round(feet.x), round(feet.y), round(feet.z));
-
 				e_block_type in_type = chunks_spawner->get_point(round(feet.x), round(feet.y), round(feet.z));
 
 				(*it)->set_on_ground(false);
 				(*it)->vel += float(time_delta)*(*it)->accel + float(time_delta*gravity)*glm::vec3(0, -1.0, 0);
 
+				double speed_mult = 1.0;
 				if (in_type == bt_water)
 				{
 					speed_mult = 0.25;
@@ -104,6 +103,8 @@ std::vector <glm::vec3> PhysicsEngine::get_world_blocks(tgl::Actor * in_actor, t
 	tgl::BlockBounds * actor_bounds = (tgl::BlockBounds*)(in_actor->get_bounds());
 	std::vector <glm::vec3> out_points;
 
+
+	// TODO: Get rid of most of this shit
 	int x[3];
 	int y[5];
 	int z[3];
@@ -172,35 +173,15 @@ std::vector <glm::vec3> PhysicsEngine::get_world_blocks(tgl::Actor * in_actor, t
 		}
 	}
 	return out_points;
-	int counter = 256;
-	//unsigned char * block_type = chunks_spawner->get_points(16*int(int(position.x / 16)) - 1, 16 * int(int(position.z/16)) - 1, 18);
-	while (1)
-	{
-		int block_type = chunks_spawner->get_point( -int(position.x), -int(position.z), 0);
-		if (block_type)
-		{
-			//in_actor->pos.y = block_type + 2;
-			//in_actor->vel.y = 0;
-			break;
-		}
-	}
-
-	return out_points;
 }
 
 void PhysicsEngine::move(double time_delta, tgl::Actor * in_actor, std::vector <glm::vec3>  in_blocks, double in_speed_mult)
 {
+	in_actor->pos.x += in_actor->vel.x*time_delta*in_speed_mult;
 	tgl::BlockBounds * actor_bounds = (tgl::BlockBounds*)(in_actor->get_bounds());
 	double block_height = 1.0;
 	double block_width = 1.0;
 	double block_depth = 1.0;
-	double pen;
-
-
-
-
-	in_actor->pos.x += in_actor->vel.x*time_delta*in_speed_mult;
-
 	for (auto in_block : in_blocks)
 	{
 		double y_pen = -std::abs(in_actor->pos.y - in_block.y) + (actor_bounds->height / 2.0 + block_height / 2.0);
@@ -214,7 +195,6 @@ void PhysicsEngine::move(double time_delta, tgl::Actor * in_actor, std::vector <
 	}
 
 	in_actor->pos.z += in_actor->vel.z*time_delta*in_speed_mult;
-
 	for (auto in_block : in_blocks)
 	{
 		double y_pen = -std::abs(in_actor->pos.y - in_block.y) + (actor_bounds->height / 2.0 + block_height / 2.0);
@@ -228,7 +208,6 @@ void PhysicsEngine::move(double time_delta, tgl::Actor * in_actor, std::vector <
 	}
 
 	in_actor->pos.y += in_actor->vel.y*time_delta*in_speed_mult;
-
 	for (auto in_block : in_blocks)
 	{
 		double y_pen = -std::abs(in_actor->pos.y - in_block.y) + (actor_bounds->height / 2.0 + block_height / 2.0);
@@ -243,6 +222,8 @@ void PhysicsEngine::move(double time_delta, tgl::Actor * in_actor, std::vector <
 	}
 
 }
+
+// TODO: Determine if there's any reason to keep below functions
 
 void PhysicsEngine::collide_aligned_block_and_block2(tgl::Actor * in_actor, glm::vec3 in_block)
 {

@@ -5,8 +5,6 @@ namespace tgl
 
 MeshVertices::MeshVertices(std::vector<GLfloat> const &vertices)
 {
-	GLuint VAO;
-	
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR)
 	{
@@ -29,18 +27,19 @@ MeshVertices::~MeshVertices()
 
 void MeshVertices::calculate_normals(std::vector<GLfloat> const &vertices)
 {
-	int length = vertices.size();
-	std::vector <GLfloat> out_normals;
-	//out_normals.resize(length);
-	out_normals = vertices;
+	
+	
 	
 	glm::vec3 center(0, 0, 0);
-	
+	int length = vertices.size();
 	for (int i = 0; i < length; i += 3)
 	{
 		center += glm::vec3(vertices[i], vertices[i + 1], vertices[i + 2]);
 	}
 	center = center * (1.0f / (length / 3));
+	std::vector <GLfloat> out_normals;
+	//out_normals.resize(length);
+	out_normals = vertices;
 	for (int i = 0; i < length; i = i + 9)
 	{
 		glm::vec3 vert1 = glm::vec3(vertices[i], vertices[i + 1], vertices[i + 2]);

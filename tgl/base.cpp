@@ -103,8 +103,8 @@ void Base::add_hud_element(tgl::HudElement * in_element)
 void Base::apply_game_state(std::vector <char> * in_state)
 {
 	int offset = 1;
-	tgl::Actor * cur_actor = nullptr;
 	short actor_id = *(short*)&(*in_state)[offset];
+	tgl::Actor * cur_actor = nullptr;
 	bool found = false;
 	for (auto actor : actors)
 	{
@@ -167,14 +167,15 @@ void Base::apply_game_state(std::vector <char> * in_state)
 		}
 		short actor_type = *(short*)&(*in_state)[offset];
 		offset += sizeof(short);
-		glm::vec3 actor_pos;
-		glm::vec3 actor_scale;
-		glm::mat4 actor_rot;
+		
 		//std::copy(in_state->begin() + offset, in_state->begin() + offset + sizeof(GLfloat) * 16, glm::value_ptr(actor_trans));
+		glm::vec3 actor_pos;
 		memcpy(glm::value_ptr(actor_pos), &(*in_state)[offset], sizeof(GLfloat) * 3);
 		offset += sizeof(GLfloat) * 3;
+		glm::mat4 actor_rot;
 		memcpy(glm::value_ptr(actor_rot), &(*in_state)[offset], sizeof(GLfloat) * 16);
 		offset += sizeof(GLfloat) * 16;
+		glm::vec3 actor_scale;
 		memcpy(glm::value_ptr(actor_scale), &(*in_state)[offset], sizeof(GLfloat) * 3);
 		offset += sizeof(GLfloat) * 3;
 		cur_actor->set_pos(actor_pos);
@@ -258,7 +259,7 @@ void Base::send_input_update()
 
 #else
 
-void Base::send_game_state_to_all()
+void Base::send_game_state_to_all() // TODO: implement or remove
 {
 	std::vector <char> test;
     udp_interface.send_to_all(test);
@@ -285,15 +286,16 @@ void Base::generate_game_state(bool full)
         	*(short*)&game_state_buf[offset] = (short)actor->type;
         	offset += sizeof(short);
         	auto trans_p = glm::value_ptr(actor->get_transform());
-        	auto pos_p = glm::value_ptr(actor->pos);
-        	auto rot_p = glm::value_ptr(actor->rot);
-        	auto scale_p = glm::value_ptr(actor->scale);
+
 			//actor->transform[0][0] = 50;
 	        	//std::copy(trans_p, trans_p + sizeof(GLfloat)*16, &game_state_buf[offset]);
+	        auto pos_p = glm::value_ptr(actor->pos);
 			memcpy(&game_state_buf[offset], pos_p, 3*sizeof(GLfloat));
 			offset += 3*sizeof(GLfloat);
+			auto rot_p = glm::value_ptr(actor->rot);
 			memcpy(&game_state_buf[offset], rot_p, 16*sizeof(GLfloat));
 			offset += 16*sizeof(GLfloat);
+			auto scale_p = glm::value_ptr(actor->scale);
 			memcpy(&game_state_buf[offset], scale_p, 3*sizeof(GLfloat));
 			offset += 3*sizeof(GLfloat);
 			//*(float*)&game_state_buf[offset] = 10;
@@ -477,6 +479,7 @@ int Base::init()
 	while (net_msg == nullptr)
 	{
 		udp_interface.s_send(handshake, server_ip_address, server_udp_receive_port);
+		udp_interface.return_msg(net_msg);
 		udp_interface.pop_msg(net_msg);
 		Sleep(1000);
 	}

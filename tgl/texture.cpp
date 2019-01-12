@@ -10,7 +10,7 @@ namespace tgl
 
 GLuint Texture::texture_count = 0;
 
-Texture::Texture(char * filename)
+Texture::Texture(const char * filename)
 {
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR)

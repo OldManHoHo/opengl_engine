@@ -19,7 +19,7 @@ class Texture
     int height;
 
     GLuint texture_id;
-    explicit Texture(char * filename);
+    explicit Texture(const char * filename);
     ~Texture();
     GLuint get_name();
 };

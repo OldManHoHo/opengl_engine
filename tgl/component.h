@@ -31,7 +31,7 @@ class Component
     bool is_child;
 
     Component();
-    ~Component();
+    virtual ~Component();
     void set_transform(glm::mat4 in_transform);
     glm::mat4 get_transform();
     bool get_draw_flag();

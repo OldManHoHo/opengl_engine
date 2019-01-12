@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-#include "tgl/FastNoiseSIMD/FastNoiseSIMD.h"
+#include "FastNoiseSIMD/FastNoiseSIMD.h"
 #include "tmc/generator.h"
 
 namespace tmc

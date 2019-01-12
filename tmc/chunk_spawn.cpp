@@ -240,7 +240,7 @@ ChunkSpawn::ChunkSpawn():
     block_material = new tgl::Material;
 
     block_mesh_vertices =
-        new tgl::MeshVertices(useful_structures::vertex_data_block_small);
+        new tgl::MeshVertices(tgl::useful_structures::vertex_data_block_small);
 
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR)
@@ -536,8 +536,9 @@ void ChunkSpawn::tick(double time_delta)
                         new tmc::DroppedItem(
                             tgl::block_type_to_item_id(type_to_remove));
 #ifdef _TGL_CLIENT
-                    ((tgl::Mesh*)(added->get_components()[0]))->
-                        set_material(block_material,
+                    (std::dynamic_pointer_cast<tgl::Mesh>(
+                        added->get_components()[0]))->
+                            set_material(block_material,
                                      (e_block_type)(type_to_remove - 1));
 #endif
                     added->set_pos(hit.loc);
@@ -1459,7 +1460,7 @@ void ChunkSpawn::update_lights()
 
             for (auto comp : cur_chunk->get_components())
             {
-                tgl::Mesh * mesh = (tgl::Mesh*)comp;
+                std::shared_ptr<tgl::Mesh> mesh = std::dynamic_pointer_cast<tgl::Mesh>(comp);
                 std::vector <unsigned char> light_vals(
                                                 mesh->local_vbo_mem.size() / 3);
                 std::vector <GLfloat> light_vals_vec(

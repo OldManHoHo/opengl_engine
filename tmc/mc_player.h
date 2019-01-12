@@ -3,8 +3,9 @@
 
 #include <vector>
 
-#include "tgl/player.h"
+#include "tgl/base.h"
 #include "tmc/chunk_spawn.h"
+#include "tgl/player.h"
 
 namespace tmc
 {

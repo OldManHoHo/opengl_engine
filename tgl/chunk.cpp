@@ -1,6 +1,9 @@
 #include "tgl/chunk.h"
 #include "tgl/mesh.h"
 
+namespace tmc
+{
+
 Chunk::Chunk(tgl::MeshVertices * mesh_vertices,
              tgl::Material * block_material,
              int type_count,
@@ -33,7 +36,8 @@ Chunk::~Chunk()
 bool Chunk::remove_instance(int block_type, glm::vec3 loc)
 {
     std::vector <GLfloat>& fresh_instances =
-        ((tgl::Mesh*)components[block_type - 1])->get_instances();
+        (std::dynamic_pointer_cast<tgl::Mesh>(components[block_type - 1]))->
+            get_instances();
     int index = -1;
     for (int i = 0; i < fresh_instances.size(); i += 3)
     {
@@ -47,7 +51,8 @@ bool Chunk::remove_instance(int block_type, glm::vec3 loc)
     }
     if (index != -1)
     {
-        ((tgl::Mesh*)components[block_type - 1])->remove_instance(index);
+        (std::dynamic_pointer_cast<tgl::Mesh>(components[block_type - 1]))->
+            remove_instance(index);
         return true;
     }
     return false;
@@ -56,7 +61,8 @@ bool Chunk::remove_instance(int block_type, glm::vec3 loc)
 void Chunk::add_instance(int block_type, glm::vec3 loc)
 {
     std::vector <GLfloat>& fresh_instances =
-        ((tgl::Mesh*)components[block_type - 1])->get_instances();
+        (std::dynamic_pointer_cast<tgl::Mesh>(components[block_type - 1]))->
+            get_instances();
     for (int i = 0; i < fresh_instances.size(); i += 3)
     {
         if (fresh_instances[i] == static_cast<int>(loc.x) &&
@@ -66,7 +72,9 @@ void Chunk::add_instance(int block_type, glm::vec3 loc)
             return;
         }
     }
-    int index = ((tgl::Mesh*)components[block_type - 1])->add_instance(loc);
+    int index = 
+        (std::dynamic_pointer_cast<tgl::Mesh>(components[block_type - 1]))->
+           add_instance(loc);
     return;
 
     for (int i = 0; i < block_instances[block_type - 1].size(); i += 3)
@@ -78,7 +86,9 @@ void Chunk::add_instance(int block_type, glm::vec3 loc)
             return;
         }
     }
-    index = ((tgl::Mesh*)components[block_type - 1])->add_instance(loc);
+    index = 
+        (std::dynamic_pointer_cast<tgl::Mesh>(components[block_type - 1]))->
+            add_instance(loc);
     if (index < block_instances[block_type - 1].size())
     {
         block_instances[block_type - 1][3*index] = static_cast<int>(loc.x);
@@ -93,3 +103,5 @@ void Chunk::add_instance(int block_type, glm::vec3 loc)
         block_instances[block_type - 1][3 * index + 2] = static_cast<int>(loc.z);
     }
 }
+
+}  // namespace tmc

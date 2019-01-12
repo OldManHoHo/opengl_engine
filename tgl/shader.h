@@ -13,10 +13,10 @@ class Shader
     GLuint shader_object;
 
  public:
-    Shader(char * shader_file, GLuint shader_type);
+    Shader(const char * shader_file, GLuint shader_type);
     ~Shader();
 
-    void load_shader(char * shader_file, GLuint shader_type);
+    void load_shader(const char * shader_file, GLuint shader_type);
     GLuint get_shader_name();
 };
 

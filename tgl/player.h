@@ -10,7 +10,6 @@
 #include "tgl/inventory.h"
 #include "tgl/mesh.h"
 
-
 namespace tgl
 {
 

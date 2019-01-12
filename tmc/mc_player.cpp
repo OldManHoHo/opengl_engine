@@ -2,7 +2,7 @@
 #ifndef _EXCLUDE_TMC_DROPPED_ITEM
 #include "tmc/dropped_item.h"
 #endif
-#include "tmc/player.h"
+#include "tmc/mc_player.h"
 #include "tgl/useful_structures.h"
 
 extern tgl::Base gl_base;
@@ -183,8 +183,10 @@ void Player::tick(double time_delta)
         if (next_item != nullptr)
         {
             inventory_hud->sub_elements[index]->set_offsets(
-                useful_structures::item_id_to_texture_coords[next_item->type],
-                useful_structures::item_id_to_texture_coords[next_item->type] +
+                tgl::useful_structures::
+                    item_id_to_texture_coords[next_item->type],
+                tgl::useful_structures::
+                    item_id_to_texture_coords[next_item->type] +
                     glm::vec2(16, 16));
         }
         else

@@ -112,12 +112,12 @@ void RayBounce::init()
 
 
 
-    v_shader = new tgl::Shader("content/shaders/ray_bounce_vertex.glsl",
+    v_shader = new Shader("content/shaders/ray_bounce_vertex.glsl",
                                GL_VERTEX_SHADER);
-    f_shader = new tgl::Shader("content/shaders/ray_bounce_fragment.glsl",
+    f_shader = new Shader("content/shaders/ray_bounce_fragment.glsl",
                                GL_FRAGMENT_SHADER);
 
-    mat = new tgl::Material();
+    mat = new Material();
     mat->add_shader(v_shader);
     mat->add_shader(f_shader);
     mat->link_shader();

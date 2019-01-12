@@ -16,6 +16,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "tgl/material.h"
+#include "tgl/shader.h"
 
 namespace tgl
 {
@@ -89,9 +91,9 @@ GLFWwindow * Base::get_window()
     return window;
 }
 
-void Base::add_camera(TGLCamera * in_camera)
+void Base::add_camera(tgl::Camera * in_camera)
 {
-    active_camera = (tgl::Player*)in_camera;
+    active_camera = (tgl::Player*)(in_camera);
 }
 
 void Base::add_hud_element(tgl::HudElement * in_element)
@@ -103,7 +105,7 @@ void Base::apply_game_state(std::vector <char> * in_state)
 {
     // TODO(Teddy Walsh): change all types to precise size
     int offset = 1;
-    short actor_id = *static_cast<short*>(&(*in_state)[offset]);
+    short actor_id = *reinterpret_cast<short*>(&(*in_state)[offset]);
     tgl::Actor * cur_actor = nullptr;
     bool found = false;
     for (auto actor : actors)
@@ -155,11 +157,11 @@ void Base::apply_game_state(std::vector <char> * in_state)
             }
         }
     }
-    short num_actors = *static_cast<short*>(&(*in_state)[offset]);
+    short num_actors = *reinterpret_cast<short*>(&(*in_state)[offset]);
     offset += sizeof(short);
     for (int i = 0; i < num_actors; ++i)
     {
-        short actor_id = *static_cast<short*>(&(*in_state)[offset]);
+        short actor_id = *reinterpret_cast<short*>(&(*in_state)[offset]);
         offset += sizeof(short);
         for (auto actor : actors)
         {
@@ -168,7 +170,7 @@ void Base::apply_game_state(std::vector <char> * in_state)
                 cur_actor = actor;
             }
         }
-        short actor_type = *static_cast<short*>(&(*in_state)[offset]);
+        short actor_type = *reinterpret_cast<short*>(&(*in_state)[offset]);
         offset += sizeof(short);
 
         glm::vec3 actor_pos;
@@ -190,33 +192,33 @@ void Base::apply_game_state(std::vector <char> * in_state)
         cur_actor->set_scale(actor_scale);
         cur_actor->transform_calculated = true;
 
-        short num_int_props = *static_cast<short*>(&(*in_state)[offset]);
+        short num_int_props = *reinterpret_cast<short*>(&(*in_state)[offset]);
         offset += sizeof(short);
         for (int i = 0; i < num_int_props; ++i)
         {
-            short int_prop_id = *static_cast<short*>(&(*in_state)[offset]);
+            short int_prop_id = *reinterpret_cast<short*>(&(*in_state)[offset]);
             offset += sizeof(short);
-            int int_prop_val = *static_cast<int*>(&(*in_state)[offset]);
+            int int_prop_val = *reinterpret_cast<int*>(&(*in_state)[offset]);
             offset += sizeof(int);
         }
 
-        short num_float_props = *static_cast<short*>(&(*in_state)[offset]);
+        short num_float_props = *reinterpret_cast<short*>(&(*in_state)[offset]);
         offset += sizeof(short);
         for (int i = 0; i < num_int_props; ++i)
         {
             short int_prop_id =
-                *static_cast<short*>(&(*in_state)[offset]);
+                *reinterpret_cast<short*>(&(*in_state)[offset]);
             offset += sizeof(short);
             float int_prop_val =
-                *static_cast<float*>(&(*in_state)[offset]);
+                *reinterpret_cast<float*>(&(*in_state)[offset]);
             offset += sizeof(float);
         }
 
-        short num_vec3_props = *static_cast<short*>(&(*in_state)[offset]);
+        short num_vec3_props = *reinterpret_cast<short*>(&(*in_state)[offset]);
         offset += sizeof(short);
         for (int i = 0; i < num_int_props; ++i)
         {
-            short int_prop_id = *static_cast<short*>(&(*in_state)[offset]);
+            short int_prop_id = *reinterpret_cast<short*>(&(*in_state)[offset]);
             offset += sizeof(short);
             glm::vec3 vec3_prop_val;
             memcpy(glm::value_ptr(vec3_prop_val),
@@ -945,7 +947,7 @@ void Base::update()
                         continue;
                     }
                 }
-                std::vector <tgl::Component*> components =
+                std::vector <std::shared_ptr<tgl::Component>> components =
                         actors[i]->get_components();
 
                 for (auto mesh_it = components.end() - 1;
@@ -955,7 +957,8 @@ void Base::update()
                     int err;
                     if ((*mesh_it)->get_draw_flag())
                     {
-                        tgl::Mesh * mesh_comp = (tgl::Mesh*)(*mesh_it);
+                        std::shared_ptr<tgl::Mesh> mesh_comp = 
+                            std::dynamic_pointer_cast<tgl::Mesh>(*mesh_it);
                         glBindVertexArray(mesh_comp->get_VAO());
 
                         // Compute the MVP matrix from the light's point of view
@@ -1068,7 +1071,8 @@ void Base::update()
 #ifdef _TGL_CLIENT
                 if ((*mesh_it)->get_draw_flag())
                 {
-                    tgl::Mesh * mesh_comp = (tgl::Mesh*)(*mesh_it);
+                    std::shared_ptr<tgl::Mesh> mesh_comp = 
+                        std::dynamic_pointer_cast<tgl::Mesh>(*mesh_it);
                     glBindVertexArray(mesh_comp->get_VAO());
                     // glBindBuffer(GL_ARRAY_BUFFER,(*mesh_it)->get_VBO());
                     // std::vector <GLuint> attribs = mesh_comp->get_attribs();

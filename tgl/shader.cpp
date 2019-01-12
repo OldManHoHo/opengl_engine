@@ -8,7 +8,7 @@
 namespace tgl
 {
 
-Shader::Shader(char * shader_file, GLuint shader_type)
+Shader::Shader(const char * shader_file, GLuint shader_type)
 {
     load_shader(shader_file, shader_type);
 }
@@ -17,7 +17,7 @@ Shader::~Shader()
 {
 }
 
-void Shader::load_shader(char * shader_file, GLuint shader_type)
+void Shader::load_shader(const char * shader_file, GLuint shader_type)
 {
     std::ifstream t(shader_file);
     std::string str;

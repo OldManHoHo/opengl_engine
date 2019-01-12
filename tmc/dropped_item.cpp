@@ -11,7 +11,7 @@ DroppedItem::DroppedItem(tgl::ItemId in_item_type):
     mass = 10;
     {
 #ifdef _TGL_CLIENT
-        add_component(useful_structures::create_cube_mesh());
+        add_component(tgl::useful_structures::create_cube_mesh());
 #endif
         set_scale(glm::vec3(0.1, 0.1, 0.1));
     }

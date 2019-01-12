@@ -7,8 +7,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "tgl/tgl_gl.h"
-#include "tgl/tgl::Shader.h"
-#include "tgl/tgl::Material.h"
+#include "tgl/shader.h"
+#include "tgl/material.h"
 
 namespace tgl
 {

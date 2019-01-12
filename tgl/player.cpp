@@ -7,11 +7,10 @@
 #include "tgl/base.h"
 #include "tgl/useful_structures.h"
 
+extern tgl::Base gl_base;  // TODO(Teddy Walsh): Get rid of this global
+
 namespace tgl
 {
-
-// extern std::vector <GLfloat> vertex_data_block_small;
-extern tgl::Base gl_base;  // TODO(Teddy Walsh): Get rid of this global
 
 Player::Player() :
     inventory(10, 10),

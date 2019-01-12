@@ -2,9 +2,6 @@
 #ifndef TGL_MESH_H_
 #define TGL_MESH_H_
 
-
-
-
 #include <set>
 #include <vector>
 

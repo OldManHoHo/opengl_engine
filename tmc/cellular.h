@@ -2,7 +2,7 @@
 #define TMC_CELLULAR_H_
 
 #pragma once
-#include "tgl/FastNoiseSIMD/FastNoiseSIMD.h"
+#include "FastNoiseSIMD/FastNoiseSIMD.h"
 #include "tmc/generator.h"
 
 namespace tmc

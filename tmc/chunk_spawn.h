@@ -111,7 +111,7 @@ class ChunkSpawn : public tgl::Actor
                       glm::vec3 player,
                       glm::vec3 player_forward);
 #ifdef _TGL_CLIENT
-    std::vector <GLshort> tmc::ChunkSpawn::get_block_light_value(int in_x,
+    std::vector <GLshort> get_block_light_value(int in_x,
                                                                  int in_y,
                                                                  int in_z);
 #endif

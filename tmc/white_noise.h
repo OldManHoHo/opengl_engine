@@ -2,7 +2,7 @@
 #ifndef TMC_WHITE_NOISE_H_
 #define TMC_WHITE_NOISE_H_
 
-#include "tgl/FastNoiseSIMD/FastNoiseSIMD.h"
+#include "FastNoiseSIMD/FastNoiseSIMD.h"
 #include "tmc/generator.h"
 
 namespace tmc

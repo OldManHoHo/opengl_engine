@@ -5,7 +5,7 @@
 
 #include "tgl/base.h"
 #include "tgl/camera.h"
-#include "tmc/player.h"
+#include "tmc/mc_player.h"
 #include "tmc/chunk_spawn.h"
 #include "tgl/useful_structures.h"
 
@@ -81,7 +81,7 @@ int main()
 	tgl::HudElement depth_buffer_display2(500, 500, glm::vec2(100, 1050), glm::vec3(0, 0, 0), "content/textures/mc.png");
 	depth_buffer_display2.tex->texture = gl_base.ray_bounce.depthTexture2;
 
-	debug_actor.add_component(useful_structures::create_cube_mesh());
+	debug_actor.add_component(tgl::useful_structures::create_cube_mesh());
 #endif
 	debug_actor.set_scale(glm::vec3(0.1,0.1,0.1));
 

@@ -2,7 +2,7 @@
 #define TGL_USER_CLASSES_H_
 
 #define USER_PLAYER_CLASS tmc::Player
-#include "tmc/player.h"
+#include "tmc/mc_player.h"
 
 #define USER_WORLD_CLASS tmc::ChunkSpawn
 #include "tmc/chunk_spawn.h"

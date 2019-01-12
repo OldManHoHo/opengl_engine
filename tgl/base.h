@@ -6,6 +6,7 @@
 #include <deque>
 #include <iostream>
 #include <map>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -161,7 +162,7 @@ class Base
     bool glad_init();
     void processInput(GLFWwindow *window);
     GLFWwindow * get_window();
-    void add_camera(TGLCamera * in_camera);
+    void add_camera(Camera * in_camera);
     void add_hud_element(tgl::HudElement * in_element);
     void apply_game_state(std::vector <char> * in_state);
     void process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair);

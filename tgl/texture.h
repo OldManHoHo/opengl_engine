@@ -9,22 +9,21 @@ namespace tgl
 
 class Texture
 {
-	static GLuint texture_count;
-	
-	int nrChannels;
-	
-public:
-	GLuint texture;
-	int width;
-	int height;
+    static GLuint texture_count;
 
-	GLuint texture_id;
-	Texture(char * filename);
-	~Texture();
-	GLuint get_name();
+    int nrChannels;
 
+ public:
+    GLuint texture;
+    int width;
+    int height;
+
+    GLuint texture_id;
+    explicit Texture(char * filename);
+    ~Texture();
+    GLuint get_name();
 };
 
-}
+}  // namespace tgl
 
-#endif
+#endif  // TGL_TEXTURE_H_

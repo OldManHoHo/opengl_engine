@@ -1,11 +1,11 @@
 #pragma once
-#ifndef TGL_RAYBOUNCE_H_
-#define TGL_RAYBOUNCE_H_
+#ifndef TGL_RAY_BOUNCE_H_
+#define TGL_RAY_BOUNCE_H_
 
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "tgl/tgl_gl.h"
 #include "tgl/tgl::Shader.h"
 #include "tgl/tgl::Material.h"
@@ -15,30 +15,29 @@ namespace tgl
 
 class RayBounce
 {
+    tgl::Shader * v_shader;
+    tgl::Shader * f_shader;
 
-	tgl::Shader * v_shader;
-	tgl::Shader * f_shader;
-	
-	int swapper;
+    int swapper;
 
-public:
-	unsigned int shadow_map_size;
+ public:
+    unsigned int shadow_map_size;
 
-	tgl::Material * mat;
-	GLuint depthTexture;
-	GLuint depthTexture2;
-	GLuint FramebufferName;
-	GLuint FramebufferName2;
+    tgl::Material * mat;
+    GLuint depthTexture;
+    GLuint depthTexture2;
+    GLuint FramebufferName;
+    GLuint FramebufferName2;
 
-	RayBounce();
-	~RayBounce();
-	void init();
-	void set_up();
-	void swap_buffers();
-	GLuint get_texture();
-	GLuint get_framebuffer();
+    RayBounce();
+    ~RayBounce();
+    void init();
+    void set_up();
+    void swap_buffers();
+    GLuint get_texture();
+    GLuint get_framebuffer();
 };
 
-} // namespace tgl
+}  // namespace tgl
 
-#endif
+#endif  // TGL_RAY_BOUNCE_H_

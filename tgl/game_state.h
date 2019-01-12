@@ -6,15 +6,15 @@
 //
 //
 
-#ifndef TGL_GAMESTATE_H_
-#define TGL_GAMESTATE_H_
+#ifndef TGL_GAME_STATE_H_
+#define TGL_GAME_STATE_H_
 
 #include <stdio.h>
 #include <vector>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace tgl
 {
@@ -30,7 +30,7 @@ enum NetMsgType
 
 class Property
 {
-public:
+ public:
     char prop_id;
     union prop_val
     {
@@ -42,7 +42,7 @@ public:
 
 class ActorState
 {
-public:
+ public:
     int id;
     ActorType type;
     glm::mat4 transform;
@@ -51,7 +51,7 @@ public:
 
 class GameState
 {
-public:
+ public:
     std::vector <ActorState> actor_states;
 };
 
@@ -71,6 +71,6 @@ public:
 //         short vec3_prop_id
 //         vec3 vec3_prop_val
 
-} // namespace tgl
+}  // namespace tgl
 
-#endif /* defined(__TGL_Server__TGLGameState__) */
+#endif  // TGL_GAME_STATE_H_

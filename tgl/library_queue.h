@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef TGL_LIBRARYQUEUE_H_
-#define TGL_LIBRARYQUEUE_H_
+#ifndef TGL_LIBRARY_QUEUE_H_
+#define TGL_LIBRARY_QUEUE_H_
 
 #include <stdio.h>
 #include <deque>
@@ -26,7 +26,7 @@ class LibraryQueue
 
     T prototype;
 
-public:
+ public:
     LibraryQueue();
     void init_memory(int queue_length, T& item_prototype);
     void check_out_memory(T *& out_item);
@@ -34,14 +34,6 @@ public:
     void pop_back(T *& out_item);
     void check_in_memory(T *& in_item);
 };
-
-//
-//  LibraryQueue.cpp
-//  TGL_Server
-//
-//  Created by Teddy Walsh on 12/17/18.
-//
-//
 
 template <class T>
 LibraryQueue<T>::LibraryQueue()
@@ -69,7 +61,9 @@ void LibraryQueue<T>::check_out_memory(T *& out_item)
         T * temp_item = new T;
         *temp_item = prototype;
         memory_queue.push_back(temp_item);
-	std::cout << "tgl/LibraryQueue: Maxed out memory queue. New entry created." << "\n";
+        std::cout <<
+            "tgl/LibraryQueue: Maxed out memory queue. New entry created." <<
+            "\n";
     }
     out_item = memory_queue.front();
     memory_queue.pop_front();
@@ -106,6 +100,6 @@ void LibraryQueue<T>::check_in_memory(T *& in_item)
     in_item = nullptr;
 }
 
-} // namespace tgl
+}  // namespace tgl
 
-#endif /* defined(__TGL_Server__LibraryQueue__) */
+#endif  // TGL_LIBRARY_QUEUE_H_

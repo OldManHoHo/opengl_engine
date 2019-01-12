@@ -10,16 +10,16 @@ namespace tgl
 
 class Shader
 {
-	GLuint shader_object;
+    GLuint shader_object;
 
-public:
-	Shader(char * shader_file, GLuint shader_type);
-	~Shader();
+ public:
+    Shader(char * shader_file, GLuint shader_type);
+    ~Shader();
 
-	void load_shader(char * shader_file, GLuint shader_type);
-	GLuint get_shader_name();
+    void load_shader(char * shader_file, GLuint shader_type);
+    GLuint get_shader_name();
 };
 
-} // namespace tgl
+}  // namespace tgl
 
-#endif
+#endif  // TGL_SHADER_H_

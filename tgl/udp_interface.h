@@ -17,7 +17,9 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include "tgl/library_queue.h"

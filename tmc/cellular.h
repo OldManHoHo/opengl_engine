@@ -9,22 +9,22 @@ namespace tmc
 {
 
 class Cellular :
-	public Generator
+    public Generator
 {
-	FastNoiseSIMD* myNoise;
-	float* noiseSet;
-	float scale;
+    FastNoiseSIMD* myNoise;
+    float* noiseSet;
+    float scale;
 
-public:
-	Cellular(int in_seed, float in_scale = 0);
-	~Cellular();
+ public:
+    Cellular(int in_seed, float in_scale = 0);
+    ~Cellular();
 
-	float get_point(int in_x, int in_y, int in_z);
-	float get_point_2d(int in_x, int in_y);
-	float * get_points(int in_x, int in_y, int in_z, int division);
-	float * get_points_2d(int in_x, int in_y, int division);
+    float get_point(int in_x, int in_y, int in_z);
+    float get_point_2d(int in_x, int in_y);
+    float * get_points(int in_x, int in_y, int in_z, int division);
+    float * get_points_2d(int in_x, int in_y, int division);
 };
 
-} // namespace tmc
+}  // namespace tmc
 
-#endif
+#endif  // TMC_CELLULAR_H_

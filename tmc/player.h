@@ -1,6 +1,8 @@
 #ifndef TMC_PLAYER_H_
 #define TMC_PLAYER_H_
 
+#include <vector>
+
 #include "tgl/player.h"
 #include "tmc/chunk_spawn.h"
 

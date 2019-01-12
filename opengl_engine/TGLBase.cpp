@@ -219,6 +219,20 @@ void TGLBase::apply_game_state(std::vector <char> * in_state)
 		}
 	}
 	
+	int num_block_changes = *(int*)&(*in_state)[offset];
+	offset += sizeof(int);
+	for (int i = 0; i < num_block_changes; ++i)
+	{
+		e_block_type block_type = (e_block_type)(*in_state)[offset];
+		offset += sizeof(char);
+		float x_pos = *(float*)&(*in_state)[offset];
+		offset += sizeof(float);
+		float y_pos = *(float*)&(*in_state)[offset];
+		offset += sizeof(float);
+		float z_pos = *(float*)&(*in_state)[offset];
+		offset += sizeof(float);
+		((TGLChunkSpawn*)chunks_spawner)->set_point(x_pos, y_pos, z_pos, block_type);
+	}
 	// for (auto as : last_received_game_state.actors())
 	// {
 	// 	for (auto actor : actors)

@@ -3,7 +3,7 @@
 
 #include <fstream>
 #include <iostream>
-#include <map>
+#include <unordered_map>
 #include <string>
 
 #include "tmc/coord_types.h"
@@ -18,10 +18,10 @@ class ChunkDatabase
     ChunkDatabase();
     void load_chunk(int chunk_x,
             int chunk_y,
-            std::map <chunk_coord, std::map<block_coord, block_def>>& world_mods);
+            std::unordered_map <chunk_coord, std::unordered_map<block_coord, block_def>>& world_mods);
     void save_chunk(int chunk_x,
             int chunk_y,
-            std::map <chunk_coord, std::map<block_coord, block_def>>& world_mods);
+            std::unordered_map <chunk_coord, std::unordered_map<block_coord, block_def>>& world_mods);
 };
 
 }  // namespace tmc

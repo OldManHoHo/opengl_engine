@@ -12,16 +12,17 @@
 #pragma once
 #include <map>
 #include <mutex>
+#include <unordered_map>
 #include <vector>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "tmc/cellular.h"
-#include "tmc/generator.h"
-#include "tmc/simplex.h"
 #include "tmc/chunk_database.h"
 #include "tmc/coord_types.h"
+#include "tmc/generator.h"
+#include "tmc/simplex.h"
 #include "tmc/white_noise.h"
 
 namespace tmc
@@ -52,13 +53,16 @@ class BlockGenerator
     bool test_gen;
 
     // Player made modification storage
-    std::map <chunk_coord, std::map<block_coord, block_def>> world_mods;
+    std::unordered_map <chunk_coord, std::unordered_map<block_coord, block_def>> world_mods;
+    std::unordered_map <chunk_coord, std::vector<char>> mod_flags;
 
     // Player made modification file storage access
     tmc::ChunkDatabase chunk_db;
 
     // Single mutex used for access of whole object
     std::recursive_mutex access_mutex;
+    std::mutex mod_mutex;
+    std::mutex blocks_mutex;
 
  public:
     // BlockStore block_file;

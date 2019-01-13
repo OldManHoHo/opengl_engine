@@ -37,7 +37,6 @@ BlockGenerator::~BlockGenerator()
 // in_x, in_y, in_z. No get_points call is required before this.
 e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 {
-    std::lock_guard<std::recursive_mutex> Lock(access_mutex);
     // Non-random generation used for testing
     if (test_gen)
     {
@@ -84,16 +83,16 @@ e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
     // fprintf(outfile, "%i, %i, %i, %f\n", j, k, i,
     //         caves_noise[j*division * 256 + k * 256 + i])
     // return int(height_draw);
-    /*
-    if (int(in_z) == height_draw)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-    */
+    
+    //if (int(in_z) == height_draw)
+    //{
+    //    return 1;
+    //}
+    //else
+    //{
+    //    return 0;
+    //}
+    
 
     if (block > 0 && block < 8)
     {
@@ -172,7 +171,6 @@ e_block_type * BlockGenerator::get_points(int in_x,
                                           int in_z,
                                           int division)
 {
-    std::lock_guard<std::recursive_mutex> Lock(access_mutex);
     if (blocks != nullptr)
     {
         delete[] blocks;
@@ -312,16 +310,16 @@ e_block_type * BlockGenerator::get_points(int in_x,
             }
         }
     }
-    /*
-    if (block_file.has_chunk(in_x, in_y))
-    {
-        auto chunk = block_file.get_chunk(in_x, in_y);
-        for (auto it = chunk->begin(); it != chunk->end(); ++it)
-        {
-            blocks[it->x*division * 256 + it->y * 256 + it->z] = it->value;
-        }
-    }
-    */
+    
+    //if (block_file.has_chunk(in_x, in_y))
+    //{
+     //   auto chunk = block_file.get_chunk(in_x, in_y);
+      //  for (auto it = chunk->begin(); it != chunk->end(); ++it)
+       // {
+        //    blocks[it->x*division * 256 + it->y * 256 + it->z] = it->value;
+        //}
+    //}
+    
     return blocks;
 }
 
@@ -338,10 +336,15 @@ void BlockGenerator::set_point(e_block_type in_block_type,
                                int in_y,
                                int in_z)
 {
-    std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+    std::lock_guard<std::mutex> Lock(mod_mutex);
     int chunk_x = floor(in_x / 16.0);
     int chunk_y = floor(in_y / 16.0);
     chunk_coord chunk_loc(chunk_x, chunk_y);
+    int local_x = in_x - chunk_x * 16;
+    int local_y = in_y - chunk_y * 16;
+    int block_pos = local_x * 256 * 16 + local_y * 256 + in_z;
+    int byte_pos = floor(block_pos / 8);
+    int bit_pos = block_pos - byte_pos * 8;
     if (world_mods.find(chunk_loc) != world_mods.end())
     {
         block_def def;
@@ -350,26 +353,31 @@ void BlockGenerator::set_point(e_block_type in_block_type,
         // auto ind = std::find(world_mods[chunk_loc].begin(),
         //                      world_mods[chunk_loc].end(),
         //                      def);
-
-        if (world_mods[chunk_loc].find(def.loc) != world_mods[chunk_loc].end())
+        
+        //if (world_mods[chunk_loc].find(def.loc) != world_mods[chunk_loc].end())
+        if ((mod_flags[chunk_loc][byte_pos] & (1 << bit_pos)))
         {
-            // (*ind).type = in_block_type;
-            world_mods[chunk_loc][def.loc].type = in_block_type;
+            //(*ind).type = in_block_type;
+            world_mods[chunk_loc][block_coord(0, 0, 0)].type = in_block_type;
         }
         else
         {
-            // world_mods[chunk_loc].push_back(def);
+            //world_mods[chunk_loc].push_back(def);
             world_mods[chunk_loc][def.loc] = def;
         }
+        
     }
     else
     {
         block_def def;
         def.loc = block_coord(in_x - chunk_x * 16, in_y - chunk_y * 16, in_z);
         def.type = in_block_type;
-        world_mods[chunk_loc] = std::map<block_coord, block_def>();
+        world_mods[chunk_loc] = std::unordered_map<block_coord, block_def>();
+        mod_flags[chunk_loc] = std::vector<char>(8192,0);
         world_mods[chunk_loc][def.loc] = def;
     }
+    
+    mod_flags[chunk_loc][byte_pos] = mod_flags[chunk_loc][byte_pos] | (1 << bit_pos);
 }
 
 // check_for_mod
@@ -378,20 +386,27 @@ void BlockGenerator::set_point(e_block_type in_block_type,
 // coordinate exists in the user set blocks, it returns the block type.
 e_block_type BlockGenerator::check_for_mod(int in_x, int in_y, int in_z)
 {
-    std::lock_guard<std::recursive_mutex> Lock(access_mutex);
+    std::lock_guard<std::mutex> Lock(mod_mutex);
     int chunk_x = floor(in_x / 16.0);
     int chunk_y = floor(in_y / 16.0);
     chunk_coord chunk_loc(chunk_x, chunk_y);
+    int local_x = in_x - chunk_x * 16;
+    int local_y = in_y - chunk_y * 16;
+    int block_pos = local_x * 256 * 16 + local_y * 256 + in_z;
+    int byte_pos = floor(block_pos / 8);
+    int bit_pos = block_pos - byte_pos * 8;
     if (world_mods.find(chunk_loc) != world_mods.end())
     {
         block_def def;
         def.loc = block_coord(in_x - chunk_x * 16, in_y - chunk_y * 16, in_z);
-        if (world_mods[chunk_loc].size())
+        //if (world_mods[chunk_loc].size())
         {
             // auto ind = std::find(world_mods[chunk_loc].begin(),
             //                      world_mods[chunk_loc].end(), def);
-            if (world_mods[chunk_loc].find(def.loc) !=
-                world_mods[chunk_loc].end())
+            //if (world_mods[chunk_loc].find(def.loc) !=
+            //    world_mods[chunk_loc].end())
+            if ((mod_flags[chunk_loc][byte_pos] & (1 << bit_pos)))
+            //if (world_mods[chunk_loc].count(def.loc))
             {
                 // return (*ind).type;
                 return world_mods[chunk_loc][def.loc].type;
@@ -411,7 +426,6 @@ e_block_type BlockGenerator::check_for_mod(int in_x, int in_y, int in_z)
 // the input coordinate to index would be 4-2, 8-5, 1-1 = 2, 3, 0
 e_block_type BlockGenerator::index(int in_x, int in_y, int in_z)
 {
-    std::lock_guard<std::recursive_mutex> Lock(access_mutex);
     e_block_type retval = blocks[(size_x*256*in_x) + (256*in_y) + in_z];
     return retval;
 }
@@ -428,7 +442,6 @@ e_block_type BlockGenerator::index(int in_x, int in_y, int in_z)
 // The a block that is considered to have a status of visible
 bool BlockGenerator::is_visible(int in_x, int in_y, int in_z)
 {
-    std::lock_guard<std::recursive_mutex> Lock(access_mutex);
     if (index(in_x, in_y, in_z + 1) != bt_air && index(in_x, in_y, in_z + 1) != bt_water && index(in_x, in_y, in_z + 1) != bt_leaves)  // && index(in_x, in_y, in_z + 1) != 5 && index(in_x, in_y, in_z + 1) != 6 )
     {
         if (index(in_x, in_y, in_z - 1) != bt_air && index(in_x, in_y, in_z - 1) != bt_water && index(in_x, in_y, in_z - 1) != bt_leaves)  // && index(in_x, in_y, in_z - 1) != 5 && index(in_x, in_y, in_z - 1) != 6 )
@@ -459,8 +472,6 @@ void BlockGenerator::get_tree(float * in_noise,
                               int chunk_x,
                               int chunk_y)
 {
-    std::lock_guard<std::recursive_mutex> Lock(access_mutex);
-
     if (in_x == 0 || in_x == 17 || in_y == 0 || in_y == 17)
     {
         return;

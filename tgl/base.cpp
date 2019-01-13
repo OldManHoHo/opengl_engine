@@ -521,9 +521,16 @@ int Base::init()
         udp_interface.s_send(handshake,
                              server_ip_address,
                              server_udp_receive_port);
-        udp_interface.return_msg(net_msg);
+        if (net_msg != nullptr)
+        {
+            udp_interface.return_msg(net_msg);
+        }
         udp_interface.pop_msg(net_msg);
         Sleep(1000);
+    }
+    if (net_msg != nullptr)
+    {
+        udp_interface.return_msg(net_msg);
     }
     printf("Connected");
     ray_bounce.init();
@@ -950,9 +957,12 @@ void Base::update()
                 std::vector <std::shared_ptr<tgl::Component>> components =
                         actors[i]->get_components();
 
-                for (auto mesh_it = components.end() - 1;
-                     mesh_it != components.begin() - 1;
-                     --mesh_it)
+                //for (auto mesh_it = components.end() - 1;
+                //     mesh_it != components.begin() - 1;
+                //     --mesh_it)
+                for (auto mesh_it = components.begin();
+                     mesh_it != components.end();
+                     ++mesh_it)
                 {
                     int err;
                     if ((*mesh_it)->get_draw_flag())
@@ -1064,9 +1074,12 @@ void Base::update()
                     actors[i]->get_components();
             // std::vector <tgl::Component*> components =
             //      (*actor_it)->get_components();
-            for (auto mesh_it = components.end() - 1;
-                 mesh_it != components.begin() - 1;
-                 --mesh_it)
+            //for (auto mesh_it = components.end() - 1;
+            //     mesh_it != components.begin() - 1;
+            //     --mesh_it)
+            for (auto mesh_it = components.begin();
+                 mesh_it != components.end();
+                 ++mesh_it)
             {
 #ifdef _TGL_CLIENT
                 if ((*mesh_it)->get_draw_flag())

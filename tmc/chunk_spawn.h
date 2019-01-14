@@ -60,6 +60,7 @@ class ChunkSpawn : public tgl::Actor
 
     std::vector <tgl::Mesh*> meshes;
     std::vector <chunk_coord> chunks_to_load;
+    std::vector <chunk_coord> chunks_to_request;
 
     std::deque <BlockHit> posted_hits;
     static const unsigned int hits_to_break = 1;
@@ -120,6 +121,7 @@ class ChunkSpawn : public tgl::Actor
     void set_sun_dir(glm::vec3 in_dir);
     std::vector <block_def>& get_block_changes();
     void clear_block_changes();
+    void generate_chunk_request(std::vector <char> & chunk_mod_msg);
 };
 
 }  // namespace tmc

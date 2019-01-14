@@ -25,8 +25,6 @@
 #endif
 #include "tgl/udp_interface.h"
 
-
-
 namespace tgl
 {
 
@@ -36,6 +34,7 @@ class TGLClientStatus
  public:
     int actor_id;
     std::chrono::steady_clock::time_point time_of_last_heartbeat;
+    std::deque <tgl::ChunkCoord> chunks_to_send;
 };
 #endif
 
@@ -71,6 +70,7 @@ class Base
 
     std::vector <char> game_state_buf;
     std::vector <char> player_input_buf;
+    std::vector <char> chunk_request_buf;
 #ifdef _TGL_CLIENT
     GLFWwindow* window;
 #else

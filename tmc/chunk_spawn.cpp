@@ -716,7 +716,12 @@ void ChunkSpawn::tick(double time_delta)
                                               next_start_point,
                                               next_ray_chunk);
             next_start_point = chunk_pos + next_ray_chunk*1.01f;
-            chunks_to_load.push_back(chunk_coord(out_chunk.x, out_chunk.z));
+            chunk_coord to_spawn(out_chunk.x, out_chunk.z);
+            if (chunks.find(to_spawn) == chunks.end())
+            {
+                chunks_to_load.push_back(to_spawn);
+                chunks_to_request.push_back(to_spawn);
+            }
         }
 
         /*
@@ -1176,7 +1181,86 @@ e_block_type ChunkSpawn::get_point(int x, int y, int z)
 
 void ChunkSpawn::set_point(int x, int y, int z, e_block_type b_type)
 {
-    block_generator->set_point(b_type, x, z, y);
+    glm::vec3 in_point(x, y, z);
+
+    e_block_type old_block_type = get_point(x, y, z);
+    int chunk_x, chunk_y;
+    get_chunk_of_point(in_point, chunk_x, chunk_y);
+    glm::vec3 to_remove((unsigned int)(in_point.x - chunk_x * 16), (unsigned int)(in_point.y), (unsigned int)(in_point.z - chunk_y * 16));
+    //chunks[chunk_coord(chunk_x, chunk_y)]->remove_instance(old_block_type, to_remove);
+    if (b_type != bt_air)
+    {
+        chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(b_type, to_remove);
+    }
+    //block_generator->set_point(b_type, x, z, y);
+
+    e_block_type type_to_remove = get_point(x, y, z);
+    if (type_to_remove != bt_air)
+    {
+        bool was_deleted = true;
+#ifdef _TGL_CLIENT
+        was_deleted = chunks[chunk_coord(chunk_x, chunk_y)]->remove_instance(type_to_remove, to_remove);
+#endif
+        if (was_deleted)
+        {
+            block_generator->set_point(b_type, in_point.x, in_point.z, in_point.y);
+#ifdef _TGL_SERVER
+            new_block_changes.push_back(block_def(in_point.x, in_point.y, in_point.z, bt_air));
+#endif
+            std::cout << "SET POINT" << "\n";
+        }
+
+#ifdef _TGL_CLIENT
+        //glm::vec3 to_add(to_remove.x + 1, to_remove.y, to_remove.z);
+        get_chunk_of_point(in_point + glm::vec3(1, 0, 0), chunk_x, chunk_y);
+        glm::vec3 to_add((unsigned int)(in_point.x + 1 - chunk_x * 16), (unsigned int)(in_point.y), (unsigned int)(in_point.z - chunk_y * 16));
+        int new_block_type = block_generator->get_point(in_point.x + 1, in_point.z, in_point.y);
+        if (new_block_type != 0)
+        {
+            chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+        }
+        get_chunk_of_point(in_point + glm::vec3(-1, 0, 0), chunk_x, chunk_y);
+        //to_add = glm::vec3(to_remove.x - 1, to_remove.y, to_remove.z);
+        to_add = glm::vec3((unsigned int)(in_point.x - 1 - chunk_x * 16), (unsigned int)(in_point.y), (unsigned int)(in_point.z - chunk_y * 16));
+        new_block_type = block_generator->get_point(in_point.x - 1, in_point.z, in_point.y);
+        if (new_block_type != 0)
+        {
+            chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+        }
+        get_chunk_of_point(in_point + glm::vec3(0, 1, 0), chunk_x, chunk_y);
+        //to_add = glm::vec3(to_remove.x, to_remove.y + 1, to_remove.z);
+        to_add = glm::vec3((unsigned int)(in_point.x - chunk_x * 16), (unsigned int)(in_point.y + 1), (unsigned int)(in_point.z - chunk_y * 16));
+        new_block_type = block_generator->get_point(in_point.x, in_point.z, in_point.y + 1);
+        if (new_block_type != 0)
+        {
+            chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+        }
+        get_chunk_of_point(in_point + glm::vec3(0, -1, 0), chunk_x, chunk_y);
+        //to_add = glm::vec3(to_remove.x, to_remove.y - 1, to_remove.z);
+        to_add = glm::vec3((unsigned int)(in_point.x - chunk_x * 16), (unsigned int)(in_point.y - 1), (unsigned int)(in_point.z - chunk_y * 16));
+        new_block_type = block_generator->get_point(in_point.x, in_point.z, in_point.y - 1);
+        if (new_block_type != 0)
+        {
+            chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+        }
+        get_chunk_of_point(in_point + glm::vec3(0, 0, 1), chunk_x, chunk_y);
+        //to_add = glm::vec3(to_remove.x, to_remove.y, to_remove.z + 1);
+        to_add = glm::vec3((unsigned int)(in_point.x - chunk_x * 16), (unsigned int)(in_point.y), (unsigned int)(in_point.z + 1 - chunk_y * 16));
+        new_block_type = block_generator->get_point(in_point.x, in_point.z + 1, in_point.y);
+        if (new_block_type != 0)
+        {
+            chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+        }
+        get_chunk_of_point(in_point + glm::vec3(0, 0, -1), chunk_x, chunk_y);
+        //to_add = glm::vec3(to_remove.x, to_remove.y, to_remove.z - 1);
+        to_add = glm::vec3((unsigned int)(in_point.x - chunk_x * 16), (unsigned int)(in_point.y), (unsigned int)(in_point.z - 1 - chunk_y * 16));
+        new_block_type = block_generator->get_point(in_point.x, in_point.z - 1, in_point.y);
+        if (new_block_type != 0)
+        {
+            chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(new_block_type, to_add);
+        }
+#endif 
+    }
 }
 
 e_block_type * ChunkSpawn::get_points(int x, int y, int division)
@@ -1526,6 +1610,28 @@ std::vector <block_def>& ChunkSpawn::get_block_changes()
 void ChunkSpawn::clear_block_changes()
 {
     new_block_changes.clear();
+}
+
+void ChunkSpawn::generate_chunk_request(std::vector <char> & chunk_mod_msg)
+{
+    if (chunk_mod_msg.size() < 1024)
+    {
+        chunk_mod_msg.resize(1024);
+    }
+    int offset = 0;
+    chunk_mod_msg[offset] = 
+        static_cast<unsigned char>(tgl::NetMsgType::ChunkRequest);
+    offset += sizeof(unsigned char);
+    *(uint32_t*)&chunk_mod_msg[offset] = 
+        static_cast<uint32_t>(chunks_to_request.size());
+    offset += sizeof(uint32_t);
+    for (auto chunk : chunks_to_request)
+    {
+        *(int32_t*)&chunk_mod_msg[offset] = static_cast<int32_t>(chunk.x);
+        offset += sizeof(int32_t);
+        *(int32_t*)&chunk_mod_msg[offset] = static_cast<int32_t>(chunk.y);
+        offset += sizeof(int32_t);
+    }
 }
 
 }  // namespace tmc

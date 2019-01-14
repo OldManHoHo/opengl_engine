@@ -25,7 +25,8 @@ enum NetMsgType
 {
     Heartbeat,
     GameState,
-    PlayerInput
+    PlayerInput,
+    ChunkRequest,
 };
 
 class Property

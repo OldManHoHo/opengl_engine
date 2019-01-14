@@ -222,6 +222,7 @@ void Player::generate_input_msg(std::vector <char> & input_msg)
             std::cout << "KEY PRESSED" << "\n";
         }
     }
+    input_msg.resize(offset);
 }
 
 void Player::apply_input_msg(std::vector <char> & input_msg)

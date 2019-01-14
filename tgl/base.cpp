@@ -234,7 +234,49 @@ void Base::apply_game_state(std::vector <char> * in_state)
             }
         }
     }
-
+    int num_block_changes = *reinterpret_cast<int*>(&(*in_state)[offset]);
+    offset += sizeof(int);
+    for (int i = 0; i < num_block_changes; ++i)
+    {
+        e_block_type block_type = (e_block_type)(*in_state)[offset];
+        offset += sizeof(char);
+        float x_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
+        offset += sizeof(float);
+        float y_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
+        offset += sizeof(float);
+        float z_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
+        offset += sizeof(float);
+        dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->set_point(x_pos, 
+                                                    y_pos, 
+                                                    z_pos, 
+                                                    block_type);
+    }
+    int num_chunk_loads = *reinterpret_cast<uint32_t*>(&(*in_state)[offset]);
+    offset += sizeof(uint32_t);
+    for (int i = 0; i < num_chunk_loads; ++i)
+    {
+        int chunk_coord_x = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
+        offset += sizeof(int32_t);
+        int chunk_coord_y = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
+        offset += sizeof(int32_t);
+        int block_num = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
+        offset += sizeof(int32_t);
+        for (int j = 0; j < block_num; ++i)
+        {
+            e_block_type block_type = (e_block_type)(*in_state)[offset];
+            offset += sizeof(char);
+            float x_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
+            offset += sizeof(float);
+            float y_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
+            offset += sizeof(float);
+            float z_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
+            offset += sizeof(float);
+            dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->set_point(x_pos,
+                y_pos,
+                z_pos,
+                block_type);
+        }
+    }
     // for (auto as : last_received_game_state.actors())
     // {
     //  for (auto actor : actors)
@@ -268,7 +310,12 @@ void Base::send_input_update()
     if (time_since*1.0 / 1000000 > 1.0 / client_input_update_rate)
     {
         active_camera->generate_input_msg(player_input_buf);
+        dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->
+            generate_chunk_request(chunk_request_buf);
         udp_interface.s_send(player_input_buf,
+                             server_ip_address,
+                             server_udp_receive_port);
+        udp_interface.s_send(chunk_request_buf,
                              server_ip_address,
                              server_udp_receive_port);
         time_of_last_input_send = std::chrono::steady_clock::now();
@@ -371,11 +418,41 @@ void Base::update_clients()
         generate_game_state(true);
         // std::vector<char> buffer(size);
         // last_generated_game_state.SerializeToArray(&buffer[0], size);
+        int pre_client_offset = game_state_buf.size();
         for (auto client : clients)
         {
+            int offset = pre_client_offset;
             // printf("GLIENCTS %u\n", ntohs(client.first.addr.sin_port));
             *(short*)&game_state_buf[1] = client.second.actor_id;
-
+            *(uint32_t*)&game_state_buf[offset] = client.second.chunks_to_send.size();
+            offset += sizeof(uint32_t);
+            for (auto chunk_coord_to_send : client.second.chunks_to_send)
+            {
+                std::unordered_map<block_coord, block_def>& block_defs =
+                    dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->
+                        get_mods(chunk_coord_to_send);
+                
+                *(int32_t*)&game_state_buf[offset] = chunk_coord_to_send.x;
+                offset += sizeof(int32_t);
+                *(int32_t*)&game_state_buf[offset] = chunk_coord_to_send.y;
+                offset += sizeof(int32_t);
+                *(int32_t*)&game_state_buf[offset] =
+                    static_cast<int32_t>(block_defs.size());
+                offset += sizeof(int32_t);
+                for (auto block_def_to_send : block_defs)
+                {
+                    *(char*)&game_state_buf[offset] =
+                        static_cast<char>(block_def_to_send.loc.type);
+                    offset += sizeof(char);
+                    *(float*)&game_state_buf[offset] = block_def_to_send.loc.x;
+                    offset += sizeof(float);
+                    *(float*)&game_state_buf[offset] = block_def_to_send.loc.y;
+                    offset += sizeof(float);
+                    *(float*)&game_state_buf[offset] = block_def_to_send.loc.z;
+                    offset += sizeof(float);
+                    
+                }
+            }
             udp_interface.s_send(game_state_buf, client.first.addr);
         }
         time_of_last_send = std::chrono::steady_clock::now();
@@ -454,6 +531,27 @@ void Base::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
                 in_pair->first.sin_addr.s_addr <<
                 "\n";
         }
+    }
+    else if ((tgl::NetMsgType)in_pair->second[0] ==
+        tgl::NetMsgType::ChunkRequest)
+    {
+        int offset = 1;
+        uint32_t chunk_count = 
+            *reinterpret_cast<uint32_t*>(&in_pair->second[offset]);
+        offset += sizeof(uint32_t);
+        for (int i = 0; i < chunk_count; ++i)
+        {
+            chunk_coord coord_to_load;
+            coord_to_load.x =
+                *reinterpret_cast<uint32_t*>(&in_pair->second[offset]);
+            offset += sizeof(uint32_t);
+            coord_to_load.y =
+                *reinterpret_cast<uint32_t*>(&in_pair->second[offset]);
+            offset += sizeof(uint32_t);
+            clients[client_addr].chunks_to_send.push_back(coord_to_load);
+        }
+        
+        // dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->
     }
     else if (in_pair->second[0] == 'x')
     {

@@ -122,6 +122,7 @@ class ChunkSpawn : public tgl::Actor
     std::vector <block_def>& get_block_changes();
     void clear_block_changes();
     void generate_chunk_request(std::vector <char> & chunk_mod_msg);
+    std::unordered_map<block_coord, block_def>& get_mods(chunk_coord to_send);
 };
 
 }  // namespace tmc

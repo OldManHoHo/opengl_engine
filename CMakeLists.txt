@@ -5,6 +5,7 @@ project (TGL_Server)
 set (top "./")
 set (tgl "./tgl")
 set (tmc "./tmc")
+set (fnsd "./FastNoiseSIMD")
 include_directories(${top}/)
 include_directories(${top}/include)
 include_directories(${tgl}/glm-0.9.9-a2)
@@ -16,7 +17,7 @@ set (SRC ${tmc}/main.cpp
 	${tgl}/actor.cpp
 	${tgl}/useful_structures.cpp
 	${tmc}/chunk_spawn.cpp
-	${tmc}/player.cpp
+	${tmc}/mc_player.cpp
 	${tmc}/chunk_database.cpp
 	${tgl}/player.cpp
 	${tgl}/physics_engine.cpp
@@ -31,17 +32,17 @@ set (SRC ${tmc}/main.cpp
 	${tgl}/game_state.cpp
 	${tmc}/simplex.cpp
 	${tmc}/white_noise.cpp
-	${tgl}/FastNoiseSIMD/FastNoiseSIMD.cpp
-	${tgl}/FastNoiseSIMD/FastNoiseSIMD_internal.cpp
-	${tgl}/FastNoiseSIMD/FastNoiseSIMD_sse2.cpp
-	${tgl}/FastNoiseSIMD/FastNoiseSIMD_sse41.cpp
+	${fnsd}/FastNoiseSIMD.cpp
+	${fnsd}/FastNoiseSIMD_internal.cpp
+	${fnsd}/FastNoiseSIMD_sse2.cpp
+	${fnsd}/FastNoiseSIMD_sse41.cpp
 	${tmc}/generator.cpp
 	)
 
 #	${tgl}/FastNoiseSIMD/FastNoiseSIMD_avx2.cpp
 #	${tgl}/FastNoiseSIMD/FastNoiseSIMD_avx512.cpp
 #	${tgl}/FastNoiseSIMD/FastNoiseSIMD_neon.cpp
-add_compile_options(-std=c++11 -O3 )
+add_compile_options(-std=c++11 -ggdb)
 add_compile_options(-D_TGL_SERVER)
 add_compile_options(-DGLM_ENABLE_EXPERIMENTAL)
 #add_compile_options(-D_UNIT_TEST)

@@ -30,7 +30,7 @@ Base::Base():
     shadow_map_interval(0.5),
 #endif
     default_shader_program(0),
-    game_state_buf(1024,0),
+    game_state_buf(1460,0),
     shadow_maps_enabled(true)
 {
     srand(0);
@@ -332,7 +332,7 @@ void Base::send_game_state_to_all()  // TODO(Teddy Walsh): implement or remove
 
 void Base::generate_game_state(bool full)
 {
-    game_state_buf.resize(1024);
+    game_state_buf.resize(1460);
     int offset = 0;
     game_state_buf[offset] = (unsigned char)(tgl::NetMsgType::GameState);
     offset += sizeof(char);
@@ -416,44 +416,68 @@ void Base::update_clients()
     if (time_since*1.0/1000000 > 1.0/tick_rate)
     {
         generate_game_state(true);
-        // std::vector<char> buffer(size);
-        // last_generated_game_state.SerializeToArray(&buffer[0], size);
-        int pre_client_offset = game_state_buf.size();
+        int pre_client_offset = 0;
         for (auto client : clients)
         {
+	    if (chunk_update_buf.size() < 1460)
+	    {
+	        chunk_update_buf.resize(1460);
+            }
             int offset = pre_client_offset;
+	    chunk_update_buf[offset] = 
+		static_cast<char>(tgl::NetMsgType::ChunkUpdate);
+	    offset += sizeof(char);
             // printf("GLIENCTS %u\n", ntohs(client.first.addr.sin_port));
-            *(short*)&game_state_buf[1] = client.second.actor_id;
-            *(uint32_t*)&game_state_buf[offset] = client.second.chunks_to_send.size();
+            *(uint32_t*)&chunk_update_buf[offset] = client.second.chunks_to_send.size();
             offset += sizeof(uint32_t);
+	    int previous_chunk_offset = offset;
             for (auto chunk_coord_to_send : client.second.chunks_to_send)
+	    while (client.second.chunks_to_send.size())
             {
+		auto chunk_coord_to_send = client.second.chunks_to_send.front();
                 std::unordered_map<block_coord, block_def>& block_defs =
                     dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->
                         get_mods(chunk_coord_to_send);
-                
-                *(int32_t*)&game_state_buf[offset] = chunk_coord_to_send.x;
+                *(int32_t*)&chunk_update_buf[offset] = chunk_coord_to_send.x;
                 offset += sizeof(int32_t);
-                *(int32_t*)&game_state_buf[offset] = chunk_coord_to_send.y;
+                *(int32_t*)&chunk_update_buf[offset] = chunk_coord_to_send.y;
                 offset += sizeof(int32_t);
-                *(int32_t*)&game_state_buf[offset] =
+                *(int32_t*)&chunk_update_buf[offset] =
                     static_cast<int32_t>(block_defs.size());
                 offset += sizeof(int32_t);
                 for (auto block_def_to_send : block_defs)
                 {
-                    *(char*)&game_state_buf[offset] =
-                        static_cast<char>(block_def_to_send.loc.type);
+                    *(char*)&chunk_update_buf[offset] =
+                        static_cast<char>(block_def_to_send.second.type);
                     offset += sizeof(char);
-                    *(float*)&game_state_buf[offset] = block_def_to_send.loc.x;
+                    *(float*)&chunk_update_buf[offset] =
+				block_def_to_send.second.loc.x;
                     offset += sizeof(float);
-                    *(float*)&game_state_buf[offset] = block_def_to_send.loc.y;
+                    *(float*)&chunk_update_buf[offset] =
+				block_def_to_send.second.loc.y;
                     offset += sizeof(float);
-                    *(float*)&game_state_buf[offset] = block_def_to_send.loc.z;
+                    *(float*)&chunk_update_buf[offset] =
+				block_def_to_send.second.loc.z;
                     offset += sizeof(float);
-                    
                 }
+		if (offset > 1460)
+		{
+		    offset = previous_chunk_offset;
+		    break;	
+		}
+		else
+		{
+		    client.second.chunks_to_send.pop_front(); 
+		    previous_chunk_offset = offset;
+		}
             }
+	    client.second.chunks_to_send.clear();
             udp_interface.s_send(game_state_buf, client.first.addr);
+	    chunk_update_buf.resize(offset);
+	    if (chunk_update_buf.size() > 5)
+	    {
+            	udp_interface.s_send(chunk_update_buf, client.first.addr);
+	    }
         }
         time_of_last_send = std::chrono::steady_clock::now();
     }
@@ -505,6 +529,8 @@ void Base::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
         clients[client_addr].time_of_last_heartbeat =
             std::chrono::steady_clock::now();
         // udp_interface.s_send(in_pair->second,in_pair->first);
+	std::vector<char> heartbeat(1, tgl::NetMsgType::Heartbeat);
+	udp_interface.s_send(heartbeat, in_pair->first);
     }
     else if ((tgl::NetMsgType)in_pair->second[0] ==
             tgl::NetMsgType::PlayerInput)
@@ -535,13 +561,14 @@ void Base::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
     else if ((tgl::NetMsgType)in_pair->second[0] ==
         tgl::NetMsgType::ChunkRequest)
     {
+	std::cout << "CHUNK REQUEST" << "\n";
         int offset = 1;
         uint32_t chunk_count = 
             *reinterpret_cast<uint32_t*>(&in_pair->second[offset]);
         offset += sizeof(uint32_t);
         for (int i = 0; i < chunk_count; ++i)
         {
-            chunk_coord coord_to_load;
+            chunk_coord coord_to_load(0, 0);
             coord_to_load.x =
                 *reinterpret_cast<uint32_t*>(&in_pair->second[offset]);
             offset += sizeof(uint32_t);
@@ -550,8 +577,8 @@ void Base::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
             offset += sizeof(uint32_t);
             clients[client_addr].chunks_to_send.push_back(coord_to_load);
         }
-        
         // dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->
+	std::cout << "END CHUNK REQUEST" << "\n";
     }
     else if (in_pair->second[0] == 'x')
     {

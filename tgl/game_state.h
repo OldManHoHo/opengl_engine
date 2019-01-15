@@ -27,6 +27,7 @@ enum NetMsgType
     GameState,
     PlayerInput,
     ChunkRequest,
+    ChunkUpdate
 };
 
 class Property

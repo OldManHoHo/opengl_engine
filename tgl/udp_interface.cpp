@@ -19,7 +19,7 @@ UDPInterface::UDPInterface()
         printf("WSAStartup failed: %d\n", iResult);
     }
 #endif
-    std::vector <char> proto_buf(1024);
+    std::vector <char> proto_buf(1460);
     sockaddr_in proto_addr;
     std::pair<sockaddr_in, std::vector <char>> proto_pair(proto_addr, proto_buf);
     buffer_queue.init_memory(10, proto_pair);

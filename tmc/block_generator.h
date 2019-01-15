@@ -52,10 +52,12 @@ class BlockGenerator
 
     bool test_gen;
 
+public:
     // Player made modification storage
     std::unordered_map <chunk_coord, std::unordered_map<block_coord, block_def>> world_mods;
     std::unordered_map <chunk_coord, std::vector<char>> mod_flags;
 
+private:
     // Player made modification file storage access
     tmc::ChunkDatabase chunk_db;
 

@@ -1188,10 +1188,12 @@ void ChunkSpawn::set_point(int x, int y, int z, e_block_type b_type)
     get_chunk_of_point(in_point, chunk_x, chunk_y);
     glm::vec3 to_remove((unsigned int)(in_point.x - chunk_x * 16), (unsigned int)(in_point.y), (unsigned int)(in_point.z - chunk_y * 16));
     //chunks[chunk_coord(chunk_x, chunk_y)]->remove_instance(old_block_type, to_remove);
+#ifdef _TGL_CLIENT
     if (b_type != bt_air)
     {
         chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(b_type, to_remove);
     }
+#endif
     //block_generator->set_point(b_type, x, z, y);
 
     e_block_type type_to_remove = get_point(x, y, z);
@@ -1632,6 +1634,13 @@ void ChunkSpawn::generate_chunk_request(std::vector <char> & chunk_mod_msg)
         *(int32_t*)&chunk_mod_msg[offset] = static_cast<int32_t>(chunk.y);
         offset += sizeof(int32_t);
     }
+}
+
+
+std::unordered_map<block_coord, block_def>& ChunkSpawn::get_mods(
+						chunk_coord to_send)
+{
+	return block_generator->world_mods[to_send];
 }
 
 }  // namespace tmc

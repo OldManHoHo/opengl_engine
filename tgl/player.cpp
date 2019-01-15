@@ -195,9 +195,9 @@ bool Player::change_inventory_amount(tgl::ItemId item_type, int in_amount)
 void Player::generate_input_msg(std::vector <char> & input_msg)
 {
     // std::vector <unsigned char> input_msg(1024);
-    if (input_msg.size() < 1024)
+    if (input_msg.size() < 1460)
     {
-        input_msg.resize(1024);
+        input_msg.resize(1460);
     }
     int offset = 0;
     input_msg[offset] = (unsigned char)(tgl::NetMsgType::PlayerInput);
@@ -205,21 +205,24 @@ void Player::generate_input_msg(std::vector <char> & input_msg)
     input_msg[offset] = equipped_index;
     offset += sizeof(unsigned char);
     auto rot_p = glm::value_ptr(rot);
-    memcpy(&input_msg[offset], rot_p, 16*sizeof(GLfloat));
-    offset += sizeof(GLfloat)*16;
+    memcpy(&input_msg[offset], rot_p, 16 * sizeof(GLfloat));
+    offset += sizeof(GLfloat) * 16;
     unsigned short * key_state_count = (unsigned short*)&input_msg[offset];
     *key_state_count = 0;
     offset += sizeof(unsigned short);
-    for (auto key_state : input_handler.key_states)
+    if (0)
     {
-        input_msg[offset] = key_state.first;
-        offset += sizeof(unsigned char);
-        input_msg[offset] = (unsigned char)key_state.second;
-        offset += sizeof(unsigned char);
-        *key_state_count += 1;
-        if (key_state.second)
+        for (auto key_state : input_handler.key_states)
         {
-            std::cout << "KEY PRESSED" << "\n";
+            input_msg[offset] = key_state.first;
+            offset += sizeof(unsigned char);
+            input_msg[offset] = (unsigned char)key_state.second;
+            offset += sizeof(unsigned char);
+            *key_state_count += 1;
+            if (key_state.second)
+            {
+                std::cout << "KEY PRESSED" << "\n";
+            }
         }
     }
     input_msg.resize(offset);

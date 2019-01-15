@@ -1616,9 +1616,9 @@ void ChunkSpawn::clear_block_changes()
 
 void ChunkSpawn::generate_chunk_request(std::vector <char> & chunk_mod_msg)
 {
-    if (chunk_mod_msg.size() < 1024)
+    if (chunk_mod_msg.size() < 1460)
     {
-        chunk_mod_msg.resize(1024);
+        chunk_mod_msg.resize(1460);
     }
     int offset = 0;
     chunk_mod_msg[offset] = 
@@ -1634,6 +1634,7 @@ void ChunkSpawn::generate_chunk_request(std::vector <char> & chunk_mod_msg)
         *(int32_t*)&chunk_mod_msg[offset] = static_cast<int32_t>(chunk.y);
         offset += sizeof(int32_t);
     }
+    chunks_to_request.clear();
 }
 
 

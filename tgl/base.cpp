@@ -291,13 +291,54 @@ void Base::apply_game_state(std::vector <char> * in_state)
     //  }
 }
 
+void Base::apply_chunk_update(std::vector <char> * in_state)
+{
+    int offset = 1;
+    int num_chunk_loads = *reinterpret_cast<uint32_t*>(&(*in_state)[offset]);
+    offset += sizeof(uint32_t);
+    for (int i = 0; i < num_chunk_loads; ++i)
+    {
+        int chunk_coord_x = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
+        offset += sizeof(int32_t);
+        int chunk_coord_y = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
+        offset += sizeof(int32_t);
+        int block_num = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
+        offset += sizeof(int32_t);
+        for (int j = 0; j < block_num; ++i)
+        {
+            e_block_type block_type = (e_block_type)(*in_state)[offset];
+            offset += sizeof(char);
+            float x_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
+            offset += sizeof(float);
+            float y_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
+            offset += sizeof(float);
+            float z_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
+            offset += sizeof(float);
+            dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->set_point(x_pos,
+                y_pos,
+                z_pos,
+                block_type);
+        }
+    }
+}
+
 void Base::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
 {
     //  std::string message_string(in_pair->second.begin(),
     //                             in_pair->second.end());
     //  last_received_game_state.ParseFromString(message_string);
-
-    apply_game_state(&in_pair->second);
+    if ((tgl::NetMsgType)in_pair->second[0] == tgl::NetMsgType::Heartbeat)
+    {
+        std::cout << "received heartbeat" << "\n";
+    }
+    else if ((tgl::NetMsgType)in_pair->second[0] == tgl::NetMsgType::GameState)
+    {
+        apply_game_state(&in_pair->second);
+    }
+    else if ((tgl::NetMsgType)in_pair->second[0] == tgl::NetMsgType::ChunkUpdate)
+    {
+        apply_chunk_update(&in_pair->second);
+    }
 }
 
 
@@ -641,13 +682,18 @@ int Base::init()
     std::pair<sockaddr_in, std::vector <char>> * net_msg;
     std::vector<char>handshake(1, tgl::NetMsgType::Heartbeat);
     udp_interface.pop_msg(net_msg);
-    while (net_msg == nullptr)
+    while (1)
     {
         udp_interface.s_send(handshake,
                              server_ip_address,
                              server_udp_receive_port);
         if (net_msg != nullptr)
         {
+            if (net_msg->second[0] == tgl::NetMsgType::Heartbeat)
+            {
+                udp_interface.return_msg(net_msg);
+                break;
+            }
             udp_interface.return_msg(net_msg);
         }
         udp_interface.pop_msg(net_msg);

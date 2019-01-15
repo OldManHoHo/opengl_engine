@@ -166,6 +166,7 @@ class Base
     void add_camera(Camera * in_camera);
     void add_hud_element(tgl::HudElement * in_element);
     void apply_game_state(std::vector <char> * in_state);
+    void apply_chunk_update(std::vector <char> * in_state);
     void process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair);
     void send_input_update();
 #else

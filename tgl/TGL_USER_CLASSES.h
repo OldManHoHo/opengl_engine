@@ -10,4 +10,7 @@
 #define USER_PHYSICS_CLASS tgl::PhysicsEngine
 #include "tgl/physics_engine.h"
 
+#define USER_INTERACTION_MANAGER_CLASS tmc::InteractionManager
+#include "tmc/mc_interaction_manager.h"
+
 #endif

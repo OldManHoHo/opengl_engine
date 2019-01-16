@@ -85,34 +85,12 @@ void Player::tick(double time_delta)
             // forward_vector += glm::vec3(0.0, 0.5, 0);
 
             set_hitting(forward_vector);
-            e_block_type hit_type;
-            glm::vec3 block_to_add;
-            glm::vec3 intersect_point;
-            std::cout << "POSTED HIT " << eye_loc.y << "\n";
-            glm::vec3 hit_block =
-                chunk_spawn->get_block_pointed_at(eye_loc,
-                                                  forward_vector,
-                                                  max_hit_distance,
-                                                  hit_type,
-                                                  block_to_add,
-                                                  intersect_point);
-            if (chunk_spawn != nullptr)
+            tgl::InventoryItem& check = get_equipped();
+            if (check.type != tgl::ItemId::none)
             {
-                tgl::InventoryItem& check = get_equipped();
-                if (check.type != tgl::ItemId::none)
-                {
-                    tmc::HitProperties props =
-                        get_equipped().get_HitProperties();
-                    tmc::BlockHit hit_to_post;
-                    hit_to_post.loc = hit_block;
-                    hit_to_post.props = props;
-                    hit_to_post.type =
-                        item_id_to_block_type(get_equipped().type);
 #ifdef _TGL_SERVER
-                    chunk_spawn->post_hit(hit_to_post);
+                hits.push_back(forward_vector);
 #endif
-                    // std::cout << "POSTED HIT" << "\n";
-                }
             }
             time_since_last_left = 0;
         }
@@ -208,6 +186,11 @@ void Player::set_chunk_spawn(tmc::ChunkSpawn * in_chunk_spawn)
 
 void Player::add_quick_slot()
 {
+}
+
+std::vector<glm::vec3> Player::fetch_hits()
+{
+    return hits;
 }
 
 }  // namespace tmc

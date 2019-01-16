@@ -13,6 +13,7 @@
 #include "tgl/actor.h"
 #include "tgl/chunk.h"
 #include "tgl/mesh.h"
+#include "tmc/mc_items.h"
 #include "tmc/block_generator.h"
 // #include "TMCDroppedItem.h"
 
@@ -26,13 +27,10 @@ struct face_map_pair
     int y;
 };
 
-typedef double HitProperties;
-
 struct BlockHit
 {
+    float damage;
     glm::vec3 loc;
-    e_block_type type;
-    HitProperties props;
 };
 
 template <class keyClass, class elementClass>
@@ -63,6 +61,7 @@ class ChunkSpawn : public tgl::Actor
     std::vector <chunk_coord> chunks_to_request;
 
     std::deque <BlockHit> posted_hits;
+    std::map <chunk_coord, std::map<block_coord, float>> stored_damage;
     static const unsigned int hits_to_break = 1;
     std::deque <block_def> posted_placements;
     // td::unordered_map <chunk_coord, std::vector<tgl::Actor*>> dropped_items;

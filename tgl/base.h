@@ -80,6 +80,7 @@ class Base
     double heartbeat_period;
     double tick_rate;
     double client_input_update_rate;
+    bool server_processing;
     std::chrono::steady_clock::time_point time_of_last_send;
     std::chrono::steady_clock::time_point time_of_last_input_send;
 

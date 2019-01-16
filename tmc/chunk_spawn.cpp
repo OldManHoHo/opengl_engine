@@ -463,6 +463,7 @@ void ChunkSpawn::tick(double time_delta)
         tgl::Player * player = gl_base.get_player();
 
         // 3D Crosshair
+        // TODO(Teddy Walsh): Should not be here!
         glm::vec3 next_ray_crosshair = player->crosshair*0.01f;
         e_block_type block_type_crosshair = bt_air;
         glm::vec3 next_block_crosshair = player->get_pos();
@@ -508,6 +509,7 @@ void ChunkSpawn::tick(double time_delta)
                 ", " <<
                 hit.loc.z <<
                 "\n";
+            
             std::cout << "from chunk " << chunk_x << ", " << chunk_y << "\n";
             if (type_to_remove != bt_air)
             {
@@ -532,6 +534,7 @@ void ChunkSpawn::tick(double time_delta)
                     std::cout << "SET POINT" << "\n";
 
 #ifndef _EXCLUDE_TMC_DROPPED_ITEM
+                    // TODO(Teddy Walsh): should not have this logic here.
                     tmc::DroppedItem * added =
                         new tmc::DroppedItem(
                             tgl::block_type_to_item_id(type_to_remove));

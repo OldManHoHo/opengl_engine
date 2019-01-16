@@ -255,4 +255,9 @@ void Player::apply_input_msg(std::vector <char> & input_msg)
     }
 }
 
+glm::vec3 Player::get_eye_loc()
+{
+    return eye_loc;
+}
+
 }  // namespace tgl

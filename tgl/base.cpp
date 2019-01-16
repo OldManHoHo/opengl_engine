@@ -675,35 +675,38 @@ int Base::init()
     default_material->add_shader(&f_shader);
     default_material->link_shader();
     default_shader_program = default_material->get_shader_program();
-    udp_interface.s_bind(client_ip_address,
-                         client_udp_receive_port,
-                         client_udp_send_port);
-    udp_interface.start_receive_thread();
-    std::pair<sockaddr_in, std::vector <char>> * net_msg;
-    std::vector<char>handshake(1, tgl::NetMsgType::Heartbeat);
-    udp_interface.pop_msg(net_msg);
-    while (1)
+    if (server_processing)
     {
-        udp_interface.s_send(handshake,
-                             server_ip_address,
-                             server_udp_receive_port);
+        udp_interface.s_bind(client_ip_address,
+                             client_udp_receive_port,
+                             client_udp_send_port);
+        udp_interface.start_receive_thread();
+        std::pair<sockaddr_in, std::vector <char>> * net_msg;
+        std::vector<char>handshake(1, tgl::NetMsgType::Heartbeat);
+        udp_interface.pop_msg(net_msg);
+        while (1)
+        {
+            udp_interface.s_send(handshake,
+                                 server_ip_address,
+                                 server_udp_receive_port);
+            if (net_msg != nullptr)
+            {
+                if (net_msg->second[0] == tgl::NetMsgType::Heartbeat)
+                {
+                    udp_interface.return_msg(net_msg);
+                    break;
+                }
+                udp_interface.return_msg(net_msg);
+            }
+            udp_interface.pop_msg(net_msg);
+            Sleep(1000);
+        }
         if (net_msg != nullptr)
         {
-            if (net_msg->second[0] == tgl::NetMsgType::Heartbeat)
-            {
-                udp_interface.return_msg(net_msg);
-                break;
-            }
             udp_interface.return_msg(net_msg);
         }
-        udp_interface.pop_msg(net_msg);
-        Sleep(1000);
+        printf("Connected");
     }
-    if (net_msg != nullptr)
-    {
-        udp_interface.return_msg(net_msg);
-    }
-    printf("Connected");
     ray_bounce.init();
 
 #else
@@ -862,6 +865,7 @@ void Base::read_conf()
     conf_float_values["water_speed_multiplier"] = &water_speed_multiplier;
     conf_bool_values["debug_console_enabled"] = &debug_console_enabled;
     conf_double_values["client_input_update_rate"] = &client_input_update_rate;
+    conf_bool_values["server_processing"] = &server_processing;
 
     *conf_double_values["heartbeat_period"] = 1.0;
     *conf_double_values["tick_rate"] = 30;
@@ -904,6 +908,7 @@ void Base::read_conf()
     *conf_float_values["water_speed_multiplier"] = 0.25;
     *conf_bool_values["debug_console_enabled"] = false;
     *conf_double_values["client_input_update_rate"] = tick_rate;
+    *conf_bool_values["server_processing"] = false;
 
     std::ifstream infile("global.conf");
     std::string line;
@@ -1223,6 +1228,7 @@ void Base::update()
         for (int i = 0; i < actors.size(); ++i)
         {
 #ifdef _TGL_CLIENT
+            // Don't draw chunks that aren't in player's field of view
             if (actors[i]->is_chunk)
             {
                 tmc::Chunk * act_chunk = (tmc::Chunk*)actors[i];
@@ -1253,6 +1259,7 @@ void Base::update()
                  ++mesh_it)
             {
 #ifdef _TGL_CLIENT
+                // If component is to be drawn
                 if ((*mesh_it)->get_draw_flag())
                 {
                     std::shared_ptr<tgl::Mesh> mesh_comp = 
@@ -1483,11 +1490,14 @@ void Base::update()
 
 ///////////////////////////////////////////
 // PHYSICS UPDATE
-#ifdef _TGL_SERVER
-        physics_engine.tick(time_delta,
-                            actors,
-                            (tmc::ChunkSpawn*)chunks_spawner, gravity_enabled);
-#endif
+// #ifdef _TGL_SERVER
+        if (server_processing)
+        {
+            physics_engine.tick(time_delta,
+                                actors,
+                                (tmc::ChunkSpawn*)chunks_spawner, gravity_enabled);
+        }
+// #endif
 
 // check and call events and swap the buffers
 #ifdef _TGL_CLIENT
@@ -1563,6 +1573,8 @@ void Base::add_actor(tgl::Actor * in_actor)
         "\n";
 }
 
+// remove_actor currently only removes reference in base. Does not 
+// free memory
 void Base::remove_actor(tgl::Actor * in_actor)
 {
     for (int i = 0; i < actors.size(); ++i)
@@ -1590,6 +1602,7 @@ void Base::set_world_actor(tgl::Actor * in_actor)
     chunks_spawner = in_actor;
 }
 
+// TODO(Teddy Walsh): remove or implement
 void Base::get_game_state()
 {
     for (auto actor : actors)

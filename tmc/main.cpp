@@ -7,6 +7,7 @@
 #include "tgl/camera.h"
 #include "tmc/mc_player.h"
 #include "tmc/chunk_spawn.h"
+#include "tmc/mc_interaction_manager.h"
 #include "tgl/useful_structures.h"
 
 #ifdef _UNIT_TEST
@@ -90,6 +91,7 @@ int main()
 
 	//tgl::Player main_cam;
 	tmc::Player main_cam;
+	tmc::InteractionManager interaction_manager;
 	// TMCPlayer p1;
 	// TMCPlayer p2;
 	// TMCPlayer p3;

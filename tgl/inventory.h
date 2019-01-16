@@ -6,26 +6,10 @@
 
 #include "tmc/block_generator.h"
 #include "tmc/chunk_spawn.h"
+#include "tmc/mc_items.h"
 
 namespace tgl
 {
-
-enum ItemId
-{
-    none,
-    iid_dirt_with_grass_block,
-    iid_dirt_block,
-    iid_stone_block,
-    iid_tree_block,
-    iid_leaves_block,
-    iid_water_block,
-    iid_sand_block,
-    pickaxe
-};
-
-e_block_type item_id_to_block_type(ItemId item_id);
-// TODO(Teddy Walsh): this stuff should not be in TGL
-ItemId block_type_to_item_id(e_block_type in_block_type);
 
 class InventoryCoords
 {
@@ -47,8 +31,6 @@ class InventoryItem
 
     bool operator== (const InventoryItem& item_b);
     bool operator!= (const InventoryItem& item_b);
-
-    tmc::HitProperties get_HitProperties();
 };
 
 

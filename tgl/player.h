@@ -50,6 +50,7 @@ class Player : public tgl::Camera
     bool change_inventory_amount(tgl::ItemId item_type, int in_amount);
     void generate_input_msg(std::vector <char> & input_msg);
     void apply_input_msg(std::vector <char> & input_msg);
+    glm::vec3 get_eye_loc();
 };
 
 }  // namespace tgl

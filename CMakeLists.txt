@@ -8,7 +8,7 @@ set (tmc "./tmc")
 set (fnsd "./FastNoiseSIMD")
 include_directories(${top}/)
 include_directories(${top}/include)
-include_directories(${tgl}/glm-0.9.9-a2)
+include_directories(${top}/glm-0.9.9-a2)
 #include_directories(${tmc})
 include_directories(${top}/FastNoiseSIMD)
 
@@ -37,6 +37,8 @@ set (SRC ${tmc}/main.cpp
 	${fnsd}/FastNoiseSIMD_sse2.cpp
 	${fnsd}/FastNoiseSIMD_sse41.cpp
 	${tmc}/generator.cpp
+	${tmc}/mc_items.cpp
+	${tmc}/mc_interaction_manager.cpp
 	)
 
 #	${tgl}/FastNoiseSIMD/FastNoiseSIMD_avx2.cpp

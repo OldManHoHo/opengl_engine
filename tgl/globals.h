@@ -10,7 +10,7 @@ namespace global
 {
 
 #ifdef _TGL_CLIENT
-extern GLFWwindow * window = nullptr;
+extern GLFWwindow * window;
 #endif
 extern bool server_processing;
 

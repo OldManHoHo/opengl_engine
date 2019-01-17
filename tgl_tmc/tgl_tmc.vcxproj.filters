@@ -138,6 +138,15 @@
     <ClCompile Include="..\tmc\mc_player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\tgl\globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tmc\mc_items.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tmc\mc_interaction_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\tgl\actor.h">
@@ -249,6 +258,18 @@
       <Filter>FastNoiseSIMD</Filter>
     </ClInclude>
     <ClInclude Include="..\tmc\mc_player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tmc\mc_items.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tmc\mc_interaction_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tgl\interaction_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tgl\globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

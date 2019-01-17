@@ -695,12 +695,14 @@ int Base::init()
         printf("Connected");
     }
     ray_bounce.init();
+    return 1;
 #else
     udp_interface.s_bind(server_ip_address,
                          server_udp_receive_port,
                          server_udp_send_port);
     udp_interface.start_receive_thread();
     time_of_last_send = std::chrono::steady_clock::now();
+    return 1;
 #endif
 }
 
@@ -894,7 +896,7 @@ void Base::read_conf()
     *conf_float_values["water_speed_multiplier"] = 0.25;
     *conf_bool_values["debug_console_enabled"] = false;
     *conf_double_values["client_input_update_rate"] = tick_rate;
-    *conf_bool_values["server_processing"] = false;
+    *conf_bool_values["server_processing"] = true;
 
     std::ifstream infile("global.conf");
     std::string line;
@@ -1115,9 +1117,9 @@ void Base::update()
 ///////////////////////////////////////////
 // HUD DRAWING
 #ifdef _TGL_CLIENT
-        for (int i = 0; i < HUD_elements.size(); ++i)
+        for (int i = 0; i < active_camera->hud.size(); ++i)
         {
-            draw_hud_element(HUD_elements[i]);
+            draw_hud_element(active_camera->hud[i]);
         }
 #endif
 
@@ -1457,7 +1459,7 @@ void Base::draw_actor(Actor * actor)
             active_camera->get_pos(),
             ((tgl::Player*)active_camera)->forward_vec))
         {
-            continue;
+            return;
         }
     }
 #endif

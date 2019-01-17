@@ -1,3 +1,4 @@
+#include "tgl/globals.h"
 #include "tmc/mc_interaction_manager.h"
 #include "tmc/dropped_item.h"
 
@@ -6,7 +7,13 @@ namespace tmc
 
 void InteractionManager::tick(double time_delta, std::vector<tgl::Actor*>& actors)
 {
-    
+    for (auto actor : actors)
+    {
+        if (dynamic_cast<tmc::ChunkSpawn*>(actor) != nullptr)
+        {
+            chunk_spawn = dynamic_cast<tmc::ChunkSpawn*>(actor);
+        }
+    }
     for (auto actor : actors)
     {
         if (dynamic_cast<tmc::Player*>(actor) != nullptr)
@@ -35,9 +42,10 @@ void InteractionManager::tick(double time_delta, std::vector<tgl::Actor*>& actor
                     {
                         tmc::BlockHit hit_to_post;
                         hit_to_post.loc = hit_block;
-#ifdef _TGL_SERVER
-                        chunk_spawn->post_hit(hit_to_post);
-#endif
+                        if (tgl::global::server_processing)
+                        {
+                            chunk_spawn->post_hit(hit_to_post);
+                        }
                         // std::cout << "POSTED HIT" << "\n";
                     }
                 }
@@ -69,9 +77,10 @@ void InteractionManager::tick(double time_delta, std::vector<tgl::Actor*>& actor
                         block_to_place.loc = block_coord(block_to_add_loc);
                         block_to_place.type = 
                             item_id_to_block_type(check.type);
-#ifdef _TGL_SERVER
-                        chunk_spawn->post_placement(block_to_place);
-#endif
+                        if (tgl::global::server_processing)
+                        {
+                            chunk_spawn->post_placement(block_to_place);
+                        }
                     }
                 }
             }

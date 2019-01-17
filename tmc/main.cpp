@@ -5,6 +5,7 @@
 
 #include "tgl/base.h"
 #include "tgl/camera.h"
+#include "tgl/globals.h"
 #include "tmc/mc_player.h"
 #include "tmc/chunk_spawn.h"
 #include "tmc/mc_interaction_manager.h"
@@ -91,7 +92,6 @@ int main()
 
 	//tgl::Player main_cam;
 	tmc::Player main_cam;
-	tmc::InteractionManager interaction_manager;
 	// TMCPlayer p1;
 	// TMCPlayer p2;
 	// TMCPlayer p3;
@@ -100,9 +100,13 @@ int main()
 	// TMCPlayer p6;
 	
 	main_cam.set_chunk_spawn(&chunk_spawn);
-	
-	
-	//gl_base.add_actor(&main_cam);
+
+#ifdef _TGL_CLIENT
+    if (tgl::global::server_processing)
+    {
+        gl_base.add_actor(&main_cam);
+    }
+#endif
 	// gl_base.add_actor(&p1);
 	// gl_base.add_actor(&p2);
 	// gl_base.add_actor(&p3);
@@ -112,7 +116,10 @@ int main()
 	gl_base.add_actor(&chunk_spawn);
 	gl_base.add_actor(&debug_actor);
 #ifdef _TGL_CLIENT
-	//gl_base.add_camera(&main_cam);
+    if (tgl::global::server_processing)
+    {
+        gl_base.add_camera(&main_cam);
+    }
 	//main_cam.add_hud(&inventory);
 	//gl_base.add_hud_element(&inventory);
 	//gl_base.add_hud_element(&depth_buffer_display);

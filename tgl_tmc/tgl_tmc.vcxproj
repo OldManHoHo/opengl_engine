@@ -141,6 +141,7 @@
     <ClCompile Include="..\tgl\chunk.cpp" />
     <ClCompile Include="..\tgl\component.cpp" />
     <ClCompile Include="..\tgl\game_state.cpp" />
+    <ClCompile Include="..\tgl\globals.cpp" />
     <ClCompile Include="..\tgl\hud_element.cpp" />
     <ClCompile Include="..\tgl\input_handler.cpp" />
     <ClCompile Include="..\tgl\inventory.cpp" />
@@ -162,6 +163,8 @@
     <ClCompile Include="..\tmc\dropped_item.cpp" />
     <ClCompile Include="..\tmc\generator.cpp" />
     <ClCompile Include="..\tmc\main.cpp" />
+    <ClCompile Include="..\tmc\mc_interaction_manager.cpp" />
+    <ClCompile Include="..\tmc\mc_items.cpp" />
     <ClCompile Include="..\tmc\mc_player.cpp" />
     <ClCompile Include="..\tmc\simplex.cpp" />
     <ClCompile Include="..\tmc\white_noise.cpp" />
@@ -176,9 +179,11 @@
     <ClInclude Include="..\tgl\chunk.h" />
     <ClInclude Include="..\tgl\component.h" />
     <ClInclude Include="..\tgl\game_state.h" />
+    <ClInclude Include="..\tgl\globals.h" />
     <ClInclude Include="..\tgl\hud.h" />
     <ClInclude Include="..\tgl\hud_element.h" />
     <ClInclude Include="..\tgl\input_handler.h" />
+    <ClInclude Include="..\tgl\interaction_manager.h" />
     <ClInclude Include="..\tgl\inventory.h" />
     <ClInclude Include="..\tgl\library_queue.h" />
     <ClInclude Include="..\tgl\material.h" />
@@ -201,6 +206,8 @@
     <ClInclude Include="..\tmc\coord_types.h" />
     <ClInclude Include="..\tmc\dropped_item.h" />
     <ClInclude Include="..\tmc\generator.h" />
+    <ClInclude Include="..\tmc\mc_interaction_manager.h" />
+    <ClInclude Include="..\tmc\mc_items.h" />
     <ClInclude Include="..\tmc\mc_player.h" />
     <ClInclude Include="..\tmc\simplex.h" />
     <ClInclude Include="..\tmc\white_noise.h" />

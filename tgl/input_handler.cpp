@@ -108,7 +108,7 @@ void InputHandler::set_cursor_enabled(bool cursor_enabled)
 #ifdef _TGL_CLIENT
     if (cursor_enabled)
     {
-        glfwSetInputMode(global::window, GLFW_CURSOR, GLFW_CURSOR_ENABLED);
+        glfwSetInputMode(global::window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
     else
     {

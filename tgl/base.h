@@ -15,7 +15,7 @@
 #include "tgl/tgl_gl.h"
 #include "tgl/TGL_USER_CLASSES.h"
 #include "tgl/camera.h"
-#include "tgl/game_state.h"
+#include "tgl/globals.h"
 #include "tgl/hud_element.h"
 #include "tgl/mesh.h"
 #include "tgl/physics_engine.h"
@@ -73,14 +73,15 @@ class Base
     std::vector <char> player_input_buf;
     std::vector <char> chunk_request_buf;
 #ifdef _TGL_CLIENT
-    GLFWwindow* window;
+    // Currently using global_window in GLOBALS.h for this
+    // GLFWwindow* window;
 #else
     std::map <udp_address, TGLClientStatus> clients;
 #endif
     double heartbeat_period;
     double tick_rate;
     double client_input_update_rate;
-    bool server_processing;
+    // bool server_processing;
     std::chrono::steady_clock::time_point time_of_last_send;
     std::chrono::steady_clock::time_point time_of_last_input_send;
 
@@ -97,6 +98,11 @@ class Base
     float chunk_despawn_distance;
     int max_loaded_chunks;
     tgl::PhysicsEngine physics_engine;
+#ifdef USER_INTERACTION_MANAGER_CLASS
+    USER_INTERACTION_MANAGER_CLASS interaction_manager;
+#else
+    tgl::InteractionManager interaction_manager;
+#endif
     bool gravity_enabled;
     float water_speed_multiplier;
 
@@ -194,6 +200,11 @@ class Base
     void set_world_actor(tgl::Actor * in_actor);
     void get_game_state();
     void update_sun(double time_delta);
+    
+    // OpenGL call functions
+    void draw_actor_to_shadow_map(Actor * actor);
+    void draw_actor(Actor * actor);
+    void draw_hud_element(HudElement * element);
 };
 
 }  // namespace tgl

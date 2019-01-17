@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <vector>
 
-#include "tmc/block_generator.h"
-#include "tmc/chunk_spawn.h"
 #include "tmc/mc_items.h"
 
 namespace tgl

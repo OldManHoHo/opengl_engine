@@ -67,7 +67,8 @@ class Actor
     // flags
     bool static_physics;
     bool is_chunk;
-
+    bool delete_flag;
+    
     Actor();
     ~Actor() = default;
     Actor(const Actor& rhs) = default;
@@ -83,6 +84,7 @@ class Actor
     void set_scale(glm::vec3 in_scale);
     void add_component(tgl::Component * in_component);
     std::vector <std::shared_ptr<tgl::Component>> get_components();
+    void flag_for_deletion(bool do_delete);
     virtual void tick(double time_delta);
     void translate(glm::vec3 in_translation);
     void rotate(float angle, glm::vec3 axis);

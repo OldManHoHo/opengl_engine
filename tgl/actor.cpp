@@ -9,7 +9,8 @@ int Actor::_id_counter = 0;
 
 Actor::Actor():
     id(_id_counter),
-    is_chunk(false)
+    is_chunk(false),
+    delete_flag(false)
 {
     transform = glm::mat4(1.0);
     scale = glm::vec3(1.0, 1.0, 1.0);
@@ -88,6 +89,11 @@ void Actor::add_component(tgl::Component * in_component)
 std::vector <std::shared_ptr<tgl::Component>> Actor::get_components()
 {
     return components;
+}
+
+void Actor::flag_for_deletion(bool do_delete)
+{
+    delete_flag = do_delete;
 }
 
 void Actor::tick(double time_delta)

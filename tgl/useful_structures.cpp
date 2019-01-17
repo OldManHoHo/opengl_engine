@@ -1,4 +1,5 @@
 #include "tgl/useful_structures.h"
+#include "tgl/tgl_gl.h"
 
 namespace tgl
 {

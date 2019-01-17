@@ -1,8 +1,5 @@
-#include "tgl/base.h"
-#include "tgl/game_state.h"
+#include "tgl/globals.h"
 #include "tgl/input_handler.h"
-
-extern tgl::Base gl_base;
 
 namespace tgl
 {
@@ -21,14 +18,15 @@ InputHandler::InputHandler()
     key_states['1'+2] = false;
     key_states['1'+3] = false;
     key_states['1'+4] = false;
+    set_cursor_enabled(false);
 }
 
 void InputHandler::tick(double time_delta)
 {
 #ifdef _TGL_SERVER
 #elif defined(_TGL_CLIENT)
-    glfwGetCursorPos(gl_base.get_window(), &mouse_x, &mouse_y);
-    if (glfwGetKey(gl_base.get_window(), GLFW_KEY_W) == GLFW_PRESS)
+    glfwGetCursorPos(global::window, &mouse_x, &mouse_y);
+    if (glfwGetKey(global::window, GLFW_KEY_W) == GLFW_PRESS)
     {
         key_states['w'] = true;
     }
@@ -36,7 +34,7 @@ void InputHandler::tick(double time_delta)
     {
         key_states['w'] = false;
     }
-    if (glfwGetKey(gl_base.get_window(), GLFW_KEY_S) == GLFW_PRESS)
+    if (glfwGetKey(global::window, GLFW_KEY_S) == GLFW_PRESS)
     {
         key_states['s'] = true;
     }
@@ -44,7 +42,7 @@ void InputHandler::tick(double time_delta)
     {
         key_states['s'] = false;
     }
-    if (glfwGetKey(gl_base.get_window(), GLFW_KEY_A) == GLFW_PRESS)
+    if (glfwGetKey(global::window, GLFW_KEY_A) == GLFW_PRESS)
     {
         key_states['a'] = true;
     }
@@ -52,7 +50,7 @@ void InputHandler::tick(double time_delta)
     {
         key_states['a'] = false;
     }
-    if (glfwGetKey(gl_base.get_window(), GLFW_KEY_D) == GLFW_PRESS)
+    if (glfwGetKey(global::window, GLFW_KEY_D) == GLFW_PRESS)
     {
         key_states['d'] = true;
     }
@@ -60,7 +58,7 @@ void InputHandler::tick(double time_delta)
     {
         key_states['d'] = false;
     }
-    if (glfwGetKey(gl_base.get_window(), GLFW_KEY_SPACE) == GLFW_PRESS)
+    if (glfwGetKey(global::window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
         key_states[' '] = true;
     }
@@ -68,7 +66,7 @@ void InputHandler::tick(double time_delta)
     {
         key_states[' '] = false;
     }
-    if (glfwGetMouseButton(gl_base.get_window(), GLFW_MOUSE_BUTTON_1) ==
+    if (glfwGetMouseButton(global::window, GLFW_MOUSE_BUTTON_1) ==
             GLFW_PRESS)
     {
         key_states[1] = true;
@@ -77,7 +75,7 @@ void InputHandler::tick(double time_delta)
     {
         key_states[1] = false;
     }
-    if (glfwGetMouseButton(gl_base.get_window(), GLFW_MOUSE_BUTTON_2) ==
+    if (glfwGetMouseButton(global::window, GLFW_MOUSE_BUTTON_2) ==
             GLFW_PRESS)
     {
         key_states[2] = true;
@@ -88,7 +86,7 @@ void InputHandler::tick(double time_delta)
     }
     for (int i = 0; i < 9; ++i)
     {
-        if (glfwGetKey(gl_base.get_window(), GLFW_KEY_1 + i) == GLFW_PRESS)
+        if (glfwGetKey(global::window, GLFW_KEY_1 + i) == GLFW_PRESS)
         {
             key_states['1' + i] = true;
         }
@@ -103,6 +101,27 @@ void InputHandler::tick(double time_delta)
 void InputHandler::generate_input()
 {
     // std::vector <unsigned char> message_buf(1024);
+}
+
+void InputHandler::set_cursor_enabled(bool cursor_enabled)
+{
+#ifdef _TGL_CLIENT
+    if (cursor_enabled)
+    {
+        glfwSetInputMode(global::window, GLFW_CURSOR, GLFW_CURSOR_ENABLED);
+    }
+    else
+    {
+        glfwSetInputMode(global::window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+#endif  // _TGL_CLIENT
+}
+
+void InputHandler::set_cursor_pos(int in_x, int in_y)
+{
+#ifdef _TGL_CLIENT
+    glfwSetCursorPos(global::window, in_x, in_y);
+#endif  // _TGL_CLIENT
 }
 
 }  // namespace tgl

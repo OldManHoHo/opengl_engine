@@ -12,8 +12,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "tgl/inventory.h"
+#include "tgl/mesh.h"
+#include "tmc/mc_items.h"
 
+// TODO(Teddy Walsh): Should this be in tmc?
 namespace tgl
 {
 

@@ -16,6 +16,8 @@ class InputHandler
     InputHandler();
     void tick(double time_delta);
     void generate_input();
+    void set_cursor_enabled(bool cursor_enabled);
+    void set_cursor_pos(int in_x, int in_y);
 };
 
 }  // namespace tgl

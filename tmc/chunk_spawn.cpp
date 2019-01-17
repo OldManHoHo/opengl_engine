@@ -8,11 +8,11 @@
 #endif
 
 #include "tgl/base.h"
+#include "tgl/net_messages.h"
+#include "tgl/useful_structures.h"
 #ifndef _EXCLUDE_TMC_DROPPED_ITEM
 #include "tmc/dropped_item.h"
 #endif
-#include "tgl/useful_structures.h"
-
 
 #define PI 3.1415926
 

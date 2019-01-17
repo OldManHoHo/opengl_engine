@@ -11,7 +11,6 @@
 #include "tgl/mesh_vertices.h"
 #include "tgl/shader.h"
 #include "tgl/texture.h"
-#include "tmc/block_generator.h"
 
 namespace tgl
 {

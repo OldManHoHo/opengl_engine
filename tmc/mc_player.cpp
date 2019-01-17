@@ -1,11 +1,5 @@
-#include "tgl/base.h"
-#ifndef _EXCLUDE_TMC_DROPPED_ITEM
-#include "tmc/dropped_item.h"
-#endif
 #include "tmc/mc_player.h"
 #include "tgl/useful_structures.h"
-
-extern tgl::Base gl_base;
 
 namespace tmc
 {
@@ -62,17 +56,6 @@ void Player::tick(double time_delta)
     static double time_since_last_right = 10;
     time_since_last_left += time_delta;
     time_since_last_right += time_delta;
-#ifndef _EXCLUDE_TMC_DROPPED_ITEM
-    std::vector <tgl::Actor*> collected_items =
-        chunk_spawn->collect_nearby_dropped_items(get_pos(),
-                                                  item_collect_radius);
-    for (auto item : collected_items)
-    {
-        inventory.change_quantity(((tmc::DroppedItem*)item)->item_type, 1);
-        gl_base.remove_actor(item);
-        delete item;
-    }
-#endif
     if (input_handler.key_states[1])
     {
         std::cout << "MOUSE 1" << "\n";
@@ -83,14 +66,15 @@ void Player::tick(double time_delta)
             forward_vector = glm::mat3(get_rot())*forward_vector;
             // forward_vector += pos;
             // forward_vector += glm::vec3(0.0, 0.5, 0);
-
+            
+            // TODO(Teddy Walsh): hit should include direction and pos info
             set_hitting(forward_vector);
             tgl::InventoryItem& check = get_equipped();
             if (check.type != tgl::ItemId::none)
             {
-#ifdef _TGL_SERVER
+// #ifdef _TGL_SERVER
                 hits.push_back(forward_vector);
-#endif
+// #endif  // _TGL_SERVER
             }
             time_since_last_left = 0;
         }
@@ -190,7 +174,16 @@ void Player::add_quick_slot()
 
 std::vector<glm::vec3> Player::fetch_hits()
 {
-    return hits;
+    std::vector<glm::vec3> out_hits = hits;
+    hits.clear();
+    return out_hits;
+}
+
+std::vector<std::pair<glm::vec3, e_block_type>> Player::fetch_placements()
+{
+    std::vector<std::pair<glm::vec3, e_block_type>> out_placements = placements;
+    placements.clear();
+    return out_placements;
 }
 
 }  // namespace tmc

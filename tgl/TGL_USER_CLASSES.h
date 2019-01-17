@@ -1,16 +1,16 @@
 #ifndef TGL_USER_CLASSES_H_
 #define TGL_USER_CLASSES_H_
 
-#define USER_PLAYER_CLASS tmc::Player
 #include "tmc/mc_player.h"
+#define USER_PLAYER_CLASS tmc::Player
 
-#define USER_WORLD_CLASS tmc::ChunkSpawn
 #include "tmc/chunk_spawn.h"
+#define USER_WORLD_CLASS tmc::ChunkSpawn
 
-#define USER_PHYSICS_CLASS tgl::PhysicsEngine
 #include "tgl/physics_engine.h"
+#define USER_PHYSICS_CLASS tgl::PhysicsEngine
 
-#define USER_INTERACTION_MANAGER_CLASS tmc::InteractionManager
 #include "tmc/mc_interaction_manager.h"
+#define USER_INTERACTION_MANAGER_CLASS tmc::InteractionManager
 
 #endif

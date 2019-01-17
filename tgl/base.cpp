@@ -16,7 +16,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "tgl/globals.h"
 #include "tgl/material.h"
+#include "tgl/net_messages.h"
 #include "tgl/shader.h"
 
 namespace tgl
@@ -52,6 +54,46 @@ bool Base::gl_init()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    
+    global::window = gl_create_window(window_width, window_height);
+    if (global::window == nullptr)
+    {
+        return false;
+    }
+
+    glad_init();
+    glViewport(0, 0, window_width, window_height);
+
+    glfwSetFramebufferSizeCallback(global::window, framebuffer_size_callback);
+
+    glEnable(GL_DEPTH_TEST);
+    // glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+    glFrontFace(GL_CCW);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // glDepthRange(0.0f, 1.0f);
+    tgl::Material * default_material = new tgl::Material;
+    tgl::Shader v_shader("content/shaders/vertex_shader_default.glsl",
+                         GL_VERTEX_SHADER);
+    tgl::Shader f_shader("content/shaders/fragment_shader_default.glsl",
+                         GL_FRAGMENT_SHADER);
+
+    GLenum err;
+    while ((err = glGetError()) != GL_NO_ERROR)
+    {
+        printf("GL ERROR: %d\n", err);
+        return false;
+    }
+
+    default_material->add_shader(&v_shader);
+    default_material->add_shader(&f_shader);
+    default_material->link_shader();
+    default_shader_program = default_material->get_shader_program();
+    
     return true;
 }
 
@@ -59,7 +101,8 @@ GLFWwindow * Base::gl_create_window(int in_width, int in_height)
 {
     window_height = in_height;
     window_width = in_width;
-    window = glfwCreateWindow(in_width, in_height, "LearnOpenGL", NULL, NULL);
+    GLFWwindow * window = glfwCreateWindow(in_width, in_height, 
+                                           "LearnOpenGL", NULL, NULL);
     if (window == nullptr)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -82,13 +125,13 @@ bool Base::glad_init()
 
 void Base::processInput(GLFWwindow *window)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(global::window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
 
 GLFWwindow * Base::get_window()
 {
-    return window;
+    return global::window;
 }
 
 void Base::add_camera(tgl::Camera * in_camera)
@@ -391,12 +434,6 @@ void Base::generate_game_state(bool full)
             offset += sizeof(short);
             *(short*)&game_state_buf[offset] = (short)actor->type;
             offset += sizeof(short);
-            auto trans_p = glm::value_ptr(actor->get_transform());
-
-            // actor->transform[0][0] = 50;
-            // std::copy(trans_p,
-            //           trans_p + sizeof(GLfloat)*16,
-            //           &game_state_buf[offset]);
             auto pos_p = glm::value_ptr(actor->pos);
             memcpy(&game_state_buf[offset], pos_p, 3*sizeof(GLfloat));
             offset += 3*sizeof(GLfloat);
@@ -406,9 +443,6 @@ void Base::generate_game_state(bool full)
             auto scale_p = glm::value_ptr(actor->scale);
             memcpy(&game_state_buf[offset], scale_p, 3*sizeof(GLfloat));
             offset += 3*sizeof(GLfloat);
-            // *(float*)&game_state_buf[offset] = 10;
-            // *(float*)&game_state_buf[offset+4] = 20;
-            // offset += sizeof(GLfloat)*16;
             // # int props
             *(short*)&game_state_buf[offset] = 0;
             offset += sizeof(short);
@@ -418,14 +452,6 @@ void Base::generate_game_state(bool full)
             // # vec3 props
             *(short*)&game_state_buf[offset] = 0;
             offset += sizeof(short);
-
-            // const float * at = glm::value_ptr(actor->get_transform());
-            // game_state::GameState::ActorState * as =
-            //      last_generated_game_state.add_actors();
-            // as->set_id(actor->id);
-            // as->set_type(actor->type);
-            // *(as->mutable_transform()->mutable_val()) = {at, at + 15};
-            // //as->transform().add_val();
         }
     }
     std::vector <block_def>& changes =
@@ -636,46 +662,7 @@ int Base::init()
     read_conf();
 #ifdef _TGL_CLIENT
     gl_init();
-    // window_width = 3000;
-    // window_height = 2000;
-    GLFWwindow * window = gl_create_window(window_width, window_height);
-    if (window == nullptr)
-    {
-        return -1;
-    }
-
-    glad_init();
-    glViewport(0, 0, window_width, window_height);
-
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    glEnable(GL_DEPTH_TEST);
-    // glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LEQUAL);
-    glFrontFace(GL_CCW);
-    glCullFace(GL_BACK);
-    glEnable(GL_CULL_FACE);
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    // glDepthRange(0.0f, 1.0f);
-    tgl::Material * default_material = new tgl::Material;
-    tgl::Shader v_shader("content/shaders/vertex_shader_default.glsl",
-                         GL_VERTEX_SHADER);
-    tgl::Shader f_shader("content/shaders/fragment_shader_default.glsl",
-                         GL_FRAGMENT_SHADER);
-
-    GLenum err;
-    while ((err = glGetError()) != GL_NO_ERROR)
-    {
-        printf("GL ERROR: %d\n", err);
-    }
-
-    default_material->add_shader(&v_shader);
-    default_material->add_shader(&f_shader);
-    default_material->link_shader();
-    default_shader_program = default_material->get_shader_program();
-    if (server_processing)
+    if (!global::server_processing)
     {
         udp_interface.s_bind(client_ip_address,
                              client_udp_receive_port,
@@ -708,7 +695,6 @@ int Base::init()
         printf("Connected");
     }
     ray_bounce.init();
-
 #else
     udp_interface.s_bind(server_ip_address,
                          server_udp_receive_port,
@@ -865,7 +851,7 @@ void Base::read_conf()
     conf_float_values["water_speed_multiplier"] = &water_speed_multiplier;
     conf_bool_values["debug_console_enabled"] = &debug_console_enabled;
     conf_double_values["client_input_update_rate"] = &client_input_update_rate;
-    conf_bool_values["server_processing"] = &server_processing;
+    conf_bool_values["server_processing"] = &global::server_processing;
 
     *conf_double_values["heartbeat_period"] = 1.0;
     *conf_double_values["tick_rate"] = 30;
@@ -1052,7 +1038,7 @@ void Base::update()
         }
 
         // input
-        processInput(window);
+        processInput(global::window);
 
         // rendering commands here
         // glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
@@ -1112,111 +1098,7 @@ void Base::update()
             for (int i = 0; i < actors.size(); ++i)
             // for (int i = actors.size()-1; i >=0; --i)
             {
-                // FIXME: needs to be moved out of Base and into TMC class
-                if (actors[i]->is_chunk)
-                {
-                    tmc::Chunk * act_chunk = (tmc::Chunk*)actors[i];
-                    int chunk_x, chunk_y;
-                    ((tmc::ChunkSpawn*)chunks_spawner)->get_chunk_of_point(
-                                act_chunk->get_pos() + glm::vec3(1, 0, 1),
-                                chunk_x,
-                                chunk_y);
-                    if (!((tmc::ChunkSpawn*)chunks_spawner)->chunk_in_fov(
-                                chunk_x,
-                                chunk_y,
-                                active_camera->get_pos(),
-                                ((tgl::Player*)active_camera)->forward_vec))
-                    {
-                        continue;
-                    }
-                }
-                std::vector <std::shared_ptr<tgl::Component>> components =
-                        actors[i]->get_components();
-
-                //for (auto mesh_it = components.end() - 1;
-                //     mesh_it != components.begin() - 1;
-                //     --mesh_it)
-                for (auto mesh_it = components.begin();
-                     mesh_it != components.end();
-                     ++mesh_it)
-                {
-                    int err;
-                    if ((*mesh_it)->get_draw_flag())
-                    {
-                        std::shared_ptr<tgl::Mesh> mesh_comp = 
-                            std::dynamic_pointer_cast<tgl::Mesh>(*mesh_it);
-                        glBindVertexArray(mesh_comp->get_VAO());
-
-                        // Compute the MVP matrix from the light's point of view
-
-                        if (shadow_maps_enabled)
-                        {
-                            shadow_pos1 = active_camera->get_pos();
-                            sun_pos_buf1 = sun_pos;
-                            glm::vec3 side_vec =
-                                glm::cross(shadow_pos1 - sun_pos_buf1,
-                                           glm::vec3(1, 0, 0));
-                            double light_dist =
-                                glm::length(shadow_pos1 - sun_pos_buf1);
-
-                            glm::mat4 depthProjectionMatrix =
-                                glm::ortho<float>(-shadow_map_box_width/2.0,
-                                              shadow_map_box_width/2.0,
-                                              -shadow_map_box_height/2.0,
-                                              shadow_map_box_height/2.0,
-                                              light_dist -
-                                                shadow_map_box_start_distance,
-                                              light_dist +
-                                                shadow_map_box_end_distance);
-
-                            glm::mat4 depthViewMatrix =
-                                glm::lookAt(sun_pos_buf1,
-                                            shadow_pos1,
-                                            glm::cross(
-                                                side_vec,
-                                                shadow_pos1 - sun_pos_buf1));
-                            // glm::mat4 depthModelMatrix = glm::mat4(1.0);
-                            depthMVP1 = depthProjectionMatrix *
-                                        depthViewMatrix *
-                                        actors[i]->get_transform() *
-                                        mesh_comp->get_transform();
-                            // TODO(Teddy Walsh): put as much into separate
-                            //      function as possible
-                            GLuint depthMatrixID = glGetUniformLocation(
-                                ray_bounce.mat->get_shader_program(),
-                                "depthMVP");
-                            // Send our transformation to the currently bound
-                            // shader in the "MVP" uniform
-                            glUniformMatrix4fv(
-                                depthMatrixID,
-                                1,
-                                GL_FALSE,
-                                &depthMVP1[0][0]);
-
-                            if (mesh_comp->get_instanced_flag())
-                            {
-                                glDrawArraysInstanced(GL_TRIANGLES,
-                                    0,
-                                    mesh_comp->get_length(),
-                                    mesh_comp->get_instance_count());
-                                while ((err = glGetError()) != GL_NO_ERROR)
-                                {
-                                    printf("GL ERROR: %d\n", err);
-                                }
-                            }
-                            else
-                            {
-                                glDrawArrays(GL_TRIANGLES,
-                                             0,
-                                             mesh_comp->get_length());
-                                while ((err = glGetError()) != GL_NO_ERROR)
-                                {
-                                    printf("GL ERROR: %d\n", err);
-                                }
-                            }
-                        }
-                    }
-                }
+                draw_actor_to_shadow_map(actors[i]);
             }
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1224,187 +1106,10 @@ void Base::update()
 #endif
 
 ///////////////////////////////////////////
-// ACTOR DRAWING AND TICKING
+// ACTOR DRAWING
         for (int i = 0; i < actors.size(); ++i)
         {
-#ifdef _TGL_CLIENT
-            // Don't draw chunks that aren't in player's field of view
-            if (actors[i]->is_chunk)
-            {
-                tmc::Chunk * act_chunk = (tmc::Chunk*)actors[i];
-                int chunk_x, chunk_y;
-                ((tmc::ChunkSpawn*)chunks_spawner)->get_chunk_of_point(
-                    act_chunk->get_pos() + glm::vec3(1, 0, 1),
-                    chunk_x,
-                    chunk_y);
-                if (!((tmc::ChunkSpawn*)chunks_spawner)->chunk_in_fov(
-                    chunk_x,
-                    chunk_y,
-                    active_camera->get_pos(),
-                    ((tgl::Player*)active_camera)->forward_vec))
-                {
-                    continue;
-                }
-            }
-#endif
-            std::vector <std::shared_ptr<tgl::Component>> components =
-                    actors[i]->get_components();
-            // std::vector <tgl::Component*> components =
-            //      (*actor_it)->get_components();
-            //for (auto mesh_it = components.end() - 1;
-            //     mesh_it != components.begin() - 1;
-            //     --mesh_it)
-            for (auto mesh_it = components.begin();
-                 mesh_it != components.end();
-                 ++mesh_it)
-            {
-#ifdef _TGL_CLIENT
-                // If component is to be drawn
-                if ((*mesh_it)->get_draw_flag())
-                {
-                    std::shared_ptr<tgl::Mesh> mesh_comp = 
-                        std::dynamic_pointer_cast<tgl::Mesh>(*mesh_it);
-                    glBindVertexArray(mesh_comp->get_VAO());
-                    // glBindBuffer(GL_ARRAY_BUFFER,(*mesh_it)->get_VBO());
-                    // std::vector <GLuint> attribs = mesh_comp->get_attribs();
-                    // for (auto attrib_it = attribs.begin();
-                    //     attrib_it != attribs.end();
-                    //     ++attrib_it)
-                    // {
-                    //      glEnableVertexAttribArray((*attrib_it));
-                    // }
-                    GLuint shader_id = 0;
-                    if (!mesh_comp->get_material()->default_program)
-                    {
-                        shader_id = mesh_comp->get_shader_program();
-                        glUseProgram(mesh_comp->get_shader_program());
-                    }
-                    else
-                    {
-                        shader_id = default_shader_program;
-                        glUseProgram(default_shader_program);
-                    }
-
-                    GLuint mesh_loc = glGetUniformLocation(shader_id, "mesh");
-                    glUniformMatrix4fv(mesh_loc,
-                                       1,
-                                       GL_FALSE,
-                                       glm::value_ptr(
-                                           mesh_comp->get_transform()));
-
-                    GLuint model_loc = glGetUniformLocation(shader_id, "model");
-                    glUniformMatrix4fv(model_loc,
-                                       1,
-                                       GL_FALSE,
-                                       glm::value_ptr(
-                                           actors[i]->get_transform()));
-
-                    active_camera->set_projection(
-                        glm::perspective(glm::radians(player_fov),
-                        (1.0f*window_width / window_height),
-                        0.1f,
-                        1000.0f));
-                    GLuint projection =
-                        glGetUniformLocation(shader_id, "projection");
-                    glUniformMatrix4fv(projection,
-                                       1,
-                                       GL_FALSE,
-                                       glm::value_ptr(
-                                           active_camera->get_projection()));
-
-                    GLuint view = glGetUniformLocation(shader_id, "view");
-                    glUniformMatrix4fv(view,
-                                       1,
-                                       GL_FALSE,
-                                       glm::value_ptr(
-                                           active_camera->get_view()));
-
-                    GLuint light_dir_loc =
-                        glGetUniformLocation(shader_id, "in_light_pos");
-                    glUniform3fv(light_dir_loc,
-                                 1,
-                                 glm::value_ptr(
-                                     sun_pos - active_camera->get_pos()));
-
-                    GLuint light_color_loc =
-                        glGetUniformLocation(shader_id, "in_light_color");
-                    glUniform3fv(light_color_loc,
-                                 1,
-                                 glm::value_ptr(sun_intensity));
-
-                    std::vector <tgl::Texture*> textures =
-                        mesh_comp->get_textures();
-                    int count = 0;
-                    for (auto tex_it = textures.begin();
-                         tex_it != textures.end();
-                         ++tex_it)
-                    {
-                        glActiveTexture(GL_TEXTURE0 + count);
-                        glBindTexture(GL_TEXTURE_2D, (*tex_it)->get_name());
-                        count += 1;
-                    }
-
-                    // SHADOW MAPS
-
-                    if (shadow_maps_enabled)
-                    {
-                        glm::vec3 side_vec =
-                            glm::cross(shadow_pos2 - sun_pos_buf2,
-                                       glm::vec3(1, 0, 0));
-                        double light_dist =
-                            glm::length(shadow_pos2 - sun_pos_buf2);
-
-                        glm::mat4 depthProjectionMatrix =
-                            glm::ortho<float>(-shadow_map_box_width/2.0,
-                                              shadow_map_box_width/2.0,
-                                              -shadow_map_box_height/2.0,
-                                              shadow_map_box_height/2.0,
-                                              light_dist -
-                                                shadow_map_box_start_distance,
-                                              light_dist +
-                                                shadow_map_box_end_distance);
-                        glm::mat4 depthViewMatrix =
-                            glm::lookAt(sun_pos_buf2,
-                                        shadow_pos2,
-                                        glm::cross(side_vec,
-                                            shadow_pos1 - sun_pos_buf1));
-                        depthMVP2 = depthProjectionMatrix *
-                                    depthViewMatrix *
-                                    actors[i]->get_transform() *
-                                    mesh_comp->get_transform();
-                        glm::mat4 depthBiasMVP;
-                        // glUseProgram(shader_id);
-                        glm::mat4 biasMatrix(
-                            0.5, 0.0, 0.0, 0.0,
-                            0.0, 0.5, 0.0, 0.0,
-                            0.0, 0.0, 0.5, 0.0,
-                            0.5, 0.5, 0.5, 1.0);
-                        depthBiasMVP = biasMatrix * depthMVP2;
-                        GLuint dbmvp =
-                            glGetUniformLocation(shader_id, "DepthBiasMVP");
-                        glUniformMatrix4fv(dbmvp,
-                                           1,
-                                           GL_FALSE,
-                                           glm::value_ptr(depthBiasMVP));
-                        glActiveTexture(GL_TEXTURE0 + 20);
-                        glBindTexture(GL_TEXTURE_2D, ray_bounce.get_texture());
-                    }
-                    if (mesh_comp->get_instanced_flag())
-                    {
-                        glDrawArraysInstanced(GL_TRIANGLES,
-                                              0,
-                                              mesh_comp->get_length(),
-                                              mesh_comp->get_instance_count());
-                    }
-                    else
-                    {
-                        glDrawArrays(GL_TRIANGLES, 0, mesh_comp->get_length());
-                    }
-                }
-#endif
-            }
-            // FIXME: Should ticking be outside of the drawing loop?
-            actors[i]->tick(time_delta);
+            draw_actor(actors[i]);
         }
 
 ///////////////////////////////////////////
@@ -1412,97 +1117,53 @@ void Base::update()
 #ifdef _TGL_CLIENT
         for (int i = 0; i < HUD_elements.size(); ++i)
         {
-            GLuint shader_id = HUD_elements[i]->mat.get_shader_program();
-            glUseProgram(shader_id);
-
-            GLfloat * params = HUD_elements[i]->get_params();
-            params[0] /= window_width;
-            params[1] /= window_height;
-            params[2] /= window_width;
-            params[3] /= window_height;
-            GLuint params_loc = glGetUniformLocation(shader_id, "params");
-            glUniform4fv(params_loc, 1, params);
-
-            GLuint color_loc = glGetUniformLocation(shader_id, "color");
-            glUniform3fv(color_loc, 1, glm::value_ptr(HUD_elements[i]->color));
-
-            if (HUD_elements[i]->texture_active)
-            {
-                GLuint offset_loc_1 =
-                    glGetUniformLocation(shader_id, "tex_offset_1");
-                glUniform2fv(
-                    offset_loc_1,
-                    1,
-                    glm::value_ptr(HUD_elements[i]->top_left_tex_offset));
-                GLuint offset_loc_2 =
-                    glGetUniformLocation(shader_id, "tex_offset_2");
-                glUniform2fv(
-                    offset_loc_2,
-                    1,
-                    glm::value_ptr(HUD_elements[i]->bottom_right_tex_offset));
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, HUD_elements[i]->tex->get_name());
-            }
-
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-            for (int j = 0; j < HUD_elements[i]->sub_elements.size(); ++j)
-            {
-                tgl::HudElement * sub_el = HUD_elements[i]->sub_elements[j];
-                shader_id = sub_el->mat.get_shader_program();
-                glUseProgram(shader_id);
-
-                GLfloat * params_sub = sub_el->get_params();
-                params_sub[0] /= window_width;
-                params_sub[1] /= window_height;
-                params_sub[2] /= window_width;
-                params_sub[3] /= window_height;
-                params_sub[2] += params[2];
-                params_sub[3] += params[3];
-                params_loc = glGetUniformLocation(shader_id, "params");
-                glUniform4fv(params_loc, 1, params_sub);
-
-                color_loc = glGetUniformLocation(shader_id, "color");
-                glUniform3fv(color_loc, 1, glm::value_ptr(sub_el->color));
-
-                if (sub_el->texture_active)
-                {
-                    GLuint offset_loc_1 = glGetUniformLocation(shader_id,
-                                                               "tex_offset_1");
-                    glUniform2fv(
-                        offset_loc_1,
-                        1,
-                        glm::value_ptr(sub_el->top_left_tex_offset));
-                    GLuint offset_loc_2 = glGetUniformLocation(shader_id,
-                                                               "tex_offset_2");
-                    glUniform2fv(
-                        offset_loc_2,
-                        1,
-                        glm::value_ptr(sub_el->bottom_right_tex_offset));
-                    glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, sub_el->tex->get_name());
-                }
-
-                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-            }
+            draw_hud_element(HUD_elements[i]);
         }
 #endif
 
 ///////////////////////////////////////////
 // PHYSICS UPDATE
 // #ifdef _TGL_SERVER
-        if (server_processing)
+        if (global::server_processing)
         {
             physics_engine.tick(time_delta,
-                                actors,
-                                (tmc::ChunkSpawn*)chunks_spawner, gravity_enabled);
+                            actors,
+                            (tmc::ChunkSpawn*)chunks_spawner, gravity_enabled);
         }
 // #endif
+        if (global::server_processing)
+        {
+            interaction_manager.tick(time_delta, actors);
+        }
+
+///////////////////////////////////////////
+// ACTOR TICKING
+        for (int i = 0; i < actors.size(); ++i)
+        {
+            actors[i]->tick(time_delta);
+        }
+
+///////////////////////////////////////////
+// DELETE ACTORS FLAGGED FOR DELETION
+        int i = 0;
+        while (i < actors.size())
+        {
+            if (actors[i]->delete_flag)
+            {
+                Actor * to_delete = actors[i];
+                remove_actor(to_delete);
+                delete to_delete;
+            }
+            else
+            {
+                i += 1;
+            }
+        }
 
 // check and call events and swap the buffers
 #ifdef _TGL_CLIENT
         glfwPollEvents();
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(global::window);
 
 ///////////////////////////////////////////
 // SHADOW MAP BUFFER SWAPPING
@@ -1544,13 +1205,6 @@ void Base::update()
     }
 #endif
     end = std::chrono::steady_clock::now();
-    /*
-    {
-        using namespace std::chrono_literals;
-        std::this_thread::sleep_for(5us);
-        end = std::chrono::steady_clock::now();
-    }
-    */
 }
 
 void Base::add_mesh(tgl::Mesh * in_mesh)
@@ -1675,4 +1329,374 @@ void Base::update_sun(double time_delta)
     return;
 }
 
+void Base::draw_actor_to_shadow_map(Actor * actor)
+{
+#ifdef _TGL_CLIENT
+    if (actor->is_chunk)
+    {
+        tmc::Chunk * act_chunk = (tmc::Chunk*)actor;
+        int chunk_x, chunk_y;
+        ((tmc::ChunkSpawn*)chunks_spawner)->get_chunk_of_point(
+                    act_chunk->get_pos() + glm::vec3(1, 0, 1),
+                    chunk_x,
+                    chunk_y);
+        if (!((tmc::ChunkSpawn*)chunks_spawner)->chunk_in_fov(
+                    chunk_x,
+                    chunk_y,
+                    active_camera->get_pos(),
+                    ((tgl::Player*)active_camera)->forward_vec))
+        {
+            return;
+        }
+    }
+    std::vector <std::shared_ptr<tgl::Component>> components =
+            actor->get_components();
+
+    //for (auto mesh_it = components.end() - 1;
+    //     mesh_it != components.begin() - 1;
+    //     --mesh_it)
+    for (auto mesh_it = components.begin();
+         mesh_it != components.end();
+         ++mesh_it)
+    {
+        int err;
+        if ((*mesh_it)->get_draw_flag())
+        {
+            std::shared_ptr<tgl::Mesh> mesh_comp = 
+                std::dynamic_pointer_cast<tgl::Mesh>(*mesh_it);
+            glBindVertexArray(mesh_comp->get_VAO());
+
+            // Compute the MVP matrix from the light's point of view
+
+            if (shadow_maps_enabled)
+            {
+                shadow_pos1 = active_camera->get_pos();
+                sun_pos_buf1 = sun_pos;
+                glm::vec3 side_vec =
+                    glm::cross(shadow_pos1 - sun_pos_buf1,
+                               glm::vec3(1, 0, 0));
+                double light_dist =
+                    glm::length(shadow_pos1 - sun_pos_buf1);
+
+                glm::mat4 depthProjectionMatrix =
+                    glm::ortho<float>(-shadow_map_box_width/2.0,
+                                  shadow_map_box_width/2.0,
+                                  -shadow_map_box_height/2.0,
+                                  shadow_map_box_height/2.0,
+                                  light_dist -
+                                    shadow_map_box_start_distance,
+                                  light_dist +
+                                    shadow_map_box_end_distance);
+
+                glm::mat4 depthViewMatrix =
+                    glm::lookAt(sun_pos_buf1,
+                                shadow_pos1,
+                                glm::cross(
+                                    side_vec,
+                                    shadow_pos1 - sun_pos_buf1));
+                // glm::mat4 depthModelMatrix = glm::mat4(1.0);
+                depthMVP1 = depthProjectionMatrix *
+                            depthViewMatrix *
+                            actor->get_transform() *
+                            mesh_comp->get_transform();
+                // TODO(Teddy Walsh): put as much into separate
+                //      function as possible
+                GLuint depthMatrixID = glGetUniformLocation(
+                    ray_bounce.mat->get_shader_program(),
+                    "depthMVP");
+                // Send our transformation to the currently bound
+                // shader in the "MVP" uniform
+                glUniformMatrix4fv(
+                    depthMatrixID,
+                    1,
+                    GL_FALSE,
+                    &depthMVP1[0][0]);
+
+                if (mesh_comp->get_instanced_flag())
+                {
+                    glDrawArraysInstanced(GL_TRIANGLES,
+                        0,
+                        mesh_comp->get_length(),
+                        mesh_comp->get_instance_count());
+                    while ((err = glGetError()) != GL_NO_ERROR)
+                    {
+                        printf("GL ERROR: %d\n", err);
+                    }
+                }
+                else
+                {
+                    glDrawArrays(GL_TRIANGLES,
+                                 0,
+                                 mesh_comp->get_length());
+                    while ((err = glGetError()) != GL_NO_ERROR)
+                    {
+                        printf("GL ERROR: %d\n", err);
+                    }
+                }
+            }
+        }
+    }
+#endif
+}
+
+void Base::draw_actor(Actor * actor)
+{
+#ifdef _TGL_CLIENT
+    // Don't draw chunks that aren't in player's field of view
+    if (actor->is_chunk)
+    {
+        tmc::Chunk * act_chunk = (tmc::Chunk*)actor;
+        int chunk_x, chunk_y;
+        ((tmc::ChunkSpawn*)chunks_spawner)->get_chunk_of_point(
+            act_chunk->get_pos() + glm::vec3(1, 0, 1),
+            chunk_x,
+            chunk_y);
+        if (!((tmc::ChunkSpawn*)chunks_spawner)->chunk_in_fov(
+            chunk_x,
+            chunk_y,
+            active_camera->get_pos(),
+            ((tgl::Player*)active_camera)->forward_vec))
+        {
+            continue;
+        }
+    }
+#endif
+    std::vector <std::shared_ptr<tgl::Component>> components =
+            actor->get_components();
+    // std::vector <tgl::Component*> components =
+    //      (*actor_it)->get_components();
+    //for (auto mesh_it = components.end() - 1;
+    //     mesh_it != components.begin() - 1;
+    //     --mesh_it)
+    for (auto mesh_it = components.begin();
+         mesh_it != components.end();
+         ++mesh_it)
+    {
+#ifdef _TGL_CLIENT
+        // If component is to be drawn
+        if ((*mesh_it)->get_draw_flag())
+        {
+            std::shared_ptr<tgl::Mesh> mesh_comp = 
+                std::dynamic_pointer_cast<tgl::Mesh>(*mesh_it);
+            glBindVertexArray(mesh_comp->get_VAO());
+            // glBindBuffer(GL_ARRAY_BUFFER,(*mesh_it)->get_VBO());
+            // std::vector <GLuint> attribs = mesh_comp->get_attribs();
+            // for (auto attrib_it = attribs.begin();
+            //     attrib_it != attribs.end();
+            //     ++attrib_it)
+            // {
+            //      glEnableVertexAttribArray((*attrib_it));
+            // }
+            GLuint shader_id = 0;
+            if (!mesh_comp->get_material()->default_program)
+            {
+                shader_id = mesh_comp->get_shader_program();
+                glUseProgram(mesh_comp->get_shader_program());
+            }
+            else
+            {
+                shader_id = default_shader_program;
+                glUseProgram(default_shader_program);
+            }
+
+            GLuint mesh_loc = glGetUniformLocation(shader_id, "mesh");
+            glUniformMatrix4fv(mesh_loc,
+                               1,
+                               GL_FALSE,
+                               glm::value_ptr(
+                                   mesh_comp->get_transform()));
+
+            GLuint model_loc = glGetUniformLocation(shader_id, "model");
+            glUniformMatrix4fv(model_loc,
+                               1,
+                               GL_FALSE,
+                               glm::value_ptr(
+                                   actor->get_transform()));
+
+            active_camera->set_projection(
+                glm::perspective(glm::radians(player_fov),
+                (1.0f*window_width / window_height),
+                0.1f,
+                1000.0f));
+            GLuint projection =
+                glGetUniformLocation(shader_id, "projection");
+            glUniformMatrix4fv(projection,
+                               1,
+                               GL_FALSE,
+                               glm::value_ptr(
+                                   active_camera->get_projection()));
+
+            GLuint view = glGetUniformLocation(shader_id, "view");
+            glUniformMatrix4fv(view,
+                               1,
+                               GL_FALSE,
+                               glm::value_ptr(
+                                   active_camera->get_view()));
+
+            GLuint light_dir_loc =
+                glGetUniformLocation(shader_id, "in_light_pos");
+            glUniform3fv(light_dir_loc,
+                         1,
+                         glm::value_ptr(
+                             sun_pos - active_camera->get_pos()));
+
+            GLuint light_color_loc =
+                glGetUniformLocation(shader_id, "in_light_color");
+            glUniform3fv(light_color_loc,
+                         1,
+                         glm::value_ptr(sun_intensity));
+
+            std::vector <tgl::Texture*> textures =
+                mesh_comp->get_textures();
+            int count = 0;
+            for (auto tex_it = textures.begin();
+                 tex_it != textures.end();
+                 ++tex_it)
+            {
+                glActiveTexture(GL_TEXTURE0 + count);
+                glBindTexture(GL_TEXTURE_2D, (*tex_it)->get_name());
+                count += 1;
+            }
+
+            // SHADOW MAPS
+
+            if (shadow_maps_enabled)
+            {
+                glm::vec3 side_vec =
+                    glm::cross(shadow_pos2 - sun_pos_buf2,
+                               glm::vec3(1, 0, 0));
+                double light_dist =
+                    glm::length(shadow_pos2 - sun_pos_buf2);
+
+                glm::mat4 depthProjectionMatrix =
+                    glm::ortho<float>(-shadow_map_box_width/2.0,
+                                      shadow_map_box_width/2.0,
+                                      -shadow_map_box_height/2.0,
+                                      shadow_map_box_height/2.0,
+                                      light_dist -
+                                        shadow_map_box_start_distance,
+                                      light_dist +
+                                        shadow_map_box_end_distance);
+                glm::mat4 depthViewMatrix =
+                    glm::lookAt(sun_pos_buf2,
+                                shadow_pos2,
+                                glm::cross(side_vec,
+                                    shadow_pos1 - sun_pos_buf1));
+                depthMVP2 = depthProjectionMatrix *
+                            depthViewMatrix *
+                            actor->get_transform() *
+                            mesh_comp->get_transform();
+                glm::mat4 depthBiasMVP;
+                // glUseProgram(shader_id);
+                glm::mat4 biasMatrix(
+                    0.5, 0.0, 0.0, 0.0,
+                    0.0, 0.5, 0.0, 0.0,
+                    0.0, 0.0, 0.5, 0.0,
+                    0.5, 0.5, 0.5, 1.0);
+                depthBiasMVP = biasMatrix * depthMVP2;
+                GLuint dbmvp =
+                    glGetUniformLocation(shader_id, "DepthBiasMVP");
+                glUniformMatrix4fv(dbmvp,
+                                   1,
+                                   GL_FALSE,
+                                   glm::value_ptr(depthBiasMVP));
+                glActiveTexture(GL_TEXTURE0 + 20);
+                glBindTexture(GL_TEXTURE_2D, ray_bounce.get_texture());
+            }
+            if (mesh_comp->get_instanced_flag())
+            {
+                glDrawArraysInstanced(GL_TRIANGLES,
+                                      0,
+                                      mesh_comp->get_length(),
+                                      mesh_comp->get_instance_count());
+            }
+            else
+            {
+                glDrawArrays(GL_TRIANGLES, 0, mesh_comp->get_length());
+            }
+        }
+#endif  // _TGL_CLIENT
+    }
+}
+
+void Base::draw_hud_element(HudElement * element)
+{
+#ifdef _TGL_CLIENT
+    GLuint shader_id = element->mat.get_shader_program();
+    glUseProgram(shader_id);
+
+    GLfloat * params = element->get_params();
+    params[0] /= window_width;
+    params[1] /= window_height;
+    params[2] /= window_width;
+    params[3] /= window_height;
+    GLuint params_loc = glGetUniformLocation(shader_id, "params");
+    glUniform4fv(params_loc, 1, params);
+
+    GLuint color_loc = glGetUniformLocation(shader_id, "color");
+    glUniform3fv(color_loc, 1, glm::value_ptr(element->color));
+
+    if (element->texture_active)
+    {
+        GLuint offset_loc_1 =
+            glGetUniformLocation(shader_id, "tex_offset_1");
+        glUniform2fv(
+            offset_loc_1,
+            1,
+            glm::value_ptr(element->top_left_tex_offset));
+        GLuint offset_loc_2 =
+            glGetUniformLocation(shader_id, "tex_offset_2");
+        glUniform2fv(
+            offset_loc_2,
+            1,
+            glm::value_ptr(element->bottom_right_tex_offset));
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, element->tex->get_name());
+    }
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    for (int j = 0; j < element->sub_elements.size(); ++j)
+    {
+        tgl::HudElement * sub_el = element->sub_elements[j];
+        shader_id = sub_el->mat.get_shader_program();
+        glUseProgram(shader_id);
+
+        GLfloat * params_sub = sub_el->get_params();
+        params_sub[0] /= window_width;
+        params_sub[1] /= window_height;
+        params_sub[2] /= window_width;
+        params_sub[3] /= window_height;
+        params_sub[2] += params[2];
+        params_sub[3] += params[3];
+        params_loc = glGetUniformLocation(shader_id, "params");
+        glUniform4fv(params_loc, 1, params_sub);
+
+        color_loc = glGetUniformLocation(shader_id, "color");
+        glUniform3fv(color_loc, 1, glm::value_ptr(sub_el->color));
+
+        if (sub_el->texture_active)
+        {
+            GLuint offset_loc_1 = glGetUniformLocation(shader_id,
+                                                       "tex_offset_1");
+            glUniform2fv(
+                offset_loc_1,
+                1,
+                glm::value_ptr(sub_el->top_left_tex_offset));
+            GLuint offset_loc_2 = glGetUniformLocation(shader_id,
+                                                       "tex_offset_2");
+            glUniform2fv(
+                offset_loc_2,
+                1,
+                glm::value_ptr(sub_el->bottom_right_tex_offset));
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, sub_el->tex->get_name());
+        }
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+#endif  // _TGL_CLIENT
+}
+
 }  // namespace tgl
+

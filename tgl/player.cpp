@@ -3,11 +3,9 @@
 #include <stdio.h>
 
 #include "glm/gtx/matrix_decompose.hpp"
+#include "tgl/net_messages.h"
 #include "tgl/tgl_gl.h"
-#include "tgl/base.h"
 #include "tgl/useful_structures.h"
-
-extern tgl::Base gl_base;  // TODO(Teddy Walsh): Get rid of this global
 
 namespace tgl
 {
@@ -18,9 +16,6 @@ Player::Player() :
     blank_item(tgl::ItemId::none, 0),
     equipped_index(0)
 {
-#ifdef _TGL_CLIENT
-    glfwSetInputMode(gl_base.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-#endif
     x_angle = 0;
     y_angle = 0;
 
@@ -36,8 +31,6 @@ Player::Player() :
 Player::~Player()
 {
 }
-
-extern tgl::Actor debug_actor;
 
 void Player::tick(double time_delta)
 {
@@ -111,7 +104,7 @@ void Player::tick(double time_delta)
     //      debug_block->pos.z <<
     //      "\n";
 #ifdef _TGL_CLIENT
-    glfwSetCursorPos(gl_base.get_window(), 0, 0);
+    input_handler.set_cursor_pos(0,0);
 #endif
 
     glm::vec3 forward_vector_crosshair(1.0, 0.0, 0.0);

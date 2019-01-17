@@ -3,7 +3,6 @@
 
 #include <vector>
 
-#include "tgl/base.h"
 #include "tmc/chunk_spawn.h"
 #include "tgl/player.h"
 
@@ -16,6 +15,7 @@ class Player : public tgl::Player
     glm::vec3 equipped_border_color;
     glm::vec3 unequipped_border_color;
     std::vector<glm::vec3> hits;
+    std::vector<std::pair<glm::vec3, e_block_type>> placements;
 
  public:
     static const int max_hit_distance = 5;
@@ -33,6 +33,7 @@ class Player : public tgl::Player
     void set_chunk_spawn(tmc::ChunkSpawn * in_chunk_spawn);
     void add_quick_slot();
     std::vector<glm::vec3> fetch_hits();
+    std::vector<std::pair<glm::vec3, e_block_type>> fetch_placements();
 };
 
 } // namespace tmc

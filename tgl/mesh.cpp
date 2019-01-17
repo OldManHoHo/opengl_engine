@@ -105,7 +105,7 @@ Mesh::Mesh(MeshVertices const* in_vertices)
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR mesh init 1: %d\n", err);
     }
     length = in_vertices->count;
     glGenVertexArrays(1, &VAO);
@@ -134,7 +134,7 @@ Mesh::Mesh(MeshVertices const* in_vertices)
 
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR mesh init 2: %d\n", err);
     }
 }
 
@@ -317,7 +317,7 @@ void Mesh::enable_instancing(GLfloat * instance_locations,
 
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR buffering instancing data: %d\n", err);
     }
 
     instance_attrib = new_attrib();
@@ -416,7 +416,7 @@ void Mesh::remove_instance(int index)
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR removing instance: %d\n", err);
     }
 }
 
@@ -433,7 +433,7 @@ int Mesh::add_instance(glm::vec3 loc)
                         data);
         while ((err = glGetError()) != GL_NO_ERROR)
         {
-            printf("GL ERROR: %d\n", err);
+            printf("GL ERROR adding instance buffer: %d\n", err);
         }
         instance_count += 1;
         refresh_instances();
@@ -443,7 +443,7 @@ int Mesh::add_instance(glm::vec3 loc)
             glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
             while ((err = glGetError()) != GL_NO_ERROR)
             {
-                printf("GL ERROR: %d\n", err);
+                printf("GL ERROR adding light data instance: %d\n", err);
             }
             glBufferSubData(GL_ARRAY_BUFFER,
                             instance_count*sizeof(GLbyte),
@@ -453,7 +453,7 @@ int Mesh::add_instance(glm::vec3 loc)
 
         while ((err = glGetError()) != GL_NO_ERROR)
         {
-            printf("GL ERROR: %d\n", err);
+            printf("GL ERROR add instance end: %d\n", err);
         }
         return instance_count - 1;
     }
@@ -586,7 +586,7 @@ void Mesh::refresh_light_data(std::vector <unsigned char>& in_data)
                      GL_DYNAMIC_DRAW);
         while ((err = glGetError()) != GL_NO_ERROR)
         {
-            printf("GL ERROR: %d\n", err);
+            printf("GL ERROR refresh light data: %d\n", err);
         }
         refresh_instances();
         refreshes += 1;
@@ -619,7 +619,7 @@ void Mesh::refresh_light_data_vec(std::vector <GLfloat>& in_data)
                      GL_DYNAMIC_DRAW);
         while ((err = glGetError()) != GL_NO_ERROR)
         {
-            printf("GL ERROR: %d\n", err);
+            printf("GL ERROR refresh light data: %d\n", err);
         }
         refresh_instances();
         refreshes += 1;

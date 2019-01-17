@@ -8,7 +8,7 @@ MeshVertices::MeshVertices(std::vector<GLfloat> const &vertices)
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR mesh vertices init: %d\n", err);
     }
     glGenBuffers(1, &vertex_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_VBO);
@@ -73,21 +73,21 @@ void MeshVertices::calculate_normals(std::vector<GLfloat> const &vertices)
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR mesh_vertices calculate normals begin: %d\n", err);
     }
 
     glGenBuffers(1, &normal_VBO);
 
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR calculate normals gen buffers: %d\n", err);
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, normal_VBO);
 
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR calculate normals bind buffer: %d\n", err);
     }
 
     glBufferData(GL_ARRAY_BUFFER,
@@ -97,7 +97,7 @@ void MeshVertices::calculate_normals(std::vector<GLfloat> const &vertices)
 
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR calculate normals buffer data: %d\n", err);
     }
 }
 

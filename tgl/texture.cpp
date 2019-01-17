@@ -15,7 +15,7 @@ Texture::Texture(const char * filename)
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR Texture init: %d\n", err);
     }
     glGenTextures(1, &texture);
 

@@ -245,7 +245,7 @@ ChunkSpawn::ChunkSpawn():
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR chunk_spawn init 1: %d\n", err);
     }
 
     // tgl::Shader v_shader("vertex_shader_light.glsl", GL_VERTEX_SHADER);
@@ -269,7 +269,7 @@ ChunkSpawn::ChunkSpawn():
 
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR chunk_spawn init 2: %d\n", err);
     }
 #endif
     return;

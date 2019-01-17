@@ -117,7 +117,7 @@ namespace useful_structures
         GLenum err;
         while ((err = glGetError()) != GL_NO_ERROR)
         {
-            printf("GL ERROR: %d\n", err);
+            printf("GL ERROR create cube mesh: %d\n", err);
         }
 
         temp_mat->add_shader(&v_shader);

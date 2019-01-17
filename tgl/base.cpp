@@ -85,7 +85,7 @@ bool Base::gl_init()
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR)
     {
-        printf("GL ERROR: %d\n", err);
+        printf("GL ERROR creating default shaders: %d\n", err);
         return false;
     }
 
@@ -102,7 +102,7 @@ GLFWwindow * Base::gl_create_window(int in_width, int in_height)
     window_height = in_height;
     window_width = in_width;
     GLFWwindow * window = glfwCreateWindow(in_width, in_height, 
-                                           "LearnOpenGL", NULL, NULL);
+                                           "tmc", NULL, NULL);
     if (window == nullptr)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -1422,7 +1422,7 @@ void Base::draw_actor_to_shadow_map(Actor * actor)
                         mesh_comp->get_instance_count());
                     while ((err = glGetError()) != GL_NO_ERROR)
                     {
-                        printf("GL ERROR: %d\n", err);
+                        printf("GL ERROR drawing instanced shadow maps: %d\n", err);
                     }
                 }
                 else
@@ -1432,7 +1432,7 @@ void Base::draw_actor_to_shadow_map(Actor * actor)
                                  mesh_comp->get_length());
                     while ((err = glGetError()) != GL_NO_ERROR)
                     {
-                        printf("GL ERROR: %d\n", err);
+                        printf("GL ERROR drawing shadow maps: %d\n", err);
                     }
                 }
             }

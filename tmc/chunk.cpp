@@ -27,11 +27,9 @@ Chunk::Chunk(tgl::MeshVertices * mesh_vertices,
     }
 }
 
-
 Chunk::~Chunk()
 {
 }
-
 
 bool Chunk::remove_instance(int block_type, glm::vec3 loc)
 {

@@ -17,7 +17,8 @@ HudElement::HudElement(
 	    texture_active(false),
 	    top_left_tex_offset(top_left_tex_offset_x, top_left_tex_offset_y),
 	    bottom_right_tex_offset(bottom_right_tex_offset_x,
-		                        bottom_right_tex_offset_y)
+		                        bottom_right_tex_offset_y),
+        visible(true)
 {
 	if (texture_file != nullptr)
 	{

@@ -47,7 +47,7 @@ class Inventory  //: public ::Component
 
  public:
     // class constants
-    static const unsigned int default_quick_use_size = 5;
+    static const unsigned int default_quick_use_size = 6;
     static InventoryItem no_item;
 
     Inventory(int in_x_size, int in_y_size);

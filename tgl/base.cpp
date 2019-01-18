@@ -1655,8 +1655,14 @@ void Base::draw_hud_element(HudElement * element)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, element->tex->get_name());
     }
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    if (element->visible)
+    {
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+    else
+    {
+        return;
+    }
 
     for (int j = 0; j < element->sub_elements.size(); ++j)
     {
@@ -1694,8 +1700,10 @@ void Base::draw_hud_element(HudElement * element)
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, sub_el->tex->get_name());
         }
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        if (sub_el->visible)
+        {
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        }
     }
 #endif  // _TGL_CLIENT
 }

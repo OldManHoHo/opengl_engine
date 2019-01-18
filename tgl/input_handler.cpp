@@ -10,6 +10,7 @@ InputHandler::InputHandler()
     key_states['s'] = false;
     key_states['d'] = false;
     key_states['a'] = false;
+    key_states['e'] = false;
     key_states[' '] = false;
     key_states[1] = false;
     key_states[2] = false;
@@ -57,6 +58,14 @@ void InputHandler::tick(double time_delta)
     else
     {
         key_states['d'] = false;
+    }
+    if (glfwGetKey(global::window, GLFW_KEY_E) == GLFW_PRESS)
+    {
+        key_states['e'] = true;
+    }
+    else
+    {
+        key_states['e'] = false;
     }
     if (glfwGetKey(global::window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {

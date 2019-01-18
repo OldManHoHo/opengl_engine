@@ -10,11 +10,12 @@
 namespace tgl
 {
 
-Player::Player() :
-    inventory(10, 10),
+Player::Player(int inventory_items) :
+    inventory(int(sqrt(inventory_items)), int(inventory_items/int(sqrt(inventory_items)))),
     multi_press_threshold(0.25),
     blank_item(tgl::ItemId::none, 0),
-    equipped_index(0)
+    equipped_index(0),
+    cursor_on(false)
 {
     x_angle = 0;
     y_angle = 0;
@@ -42,39 +43,46 @@ void Player::tick(double time_delta)
     static float debug_rot = 0.0;
     static float time_passed = 0.0;
     time_passed += time_delta;
-    debug_rot +=  5;
+    debug_rot += 5;
     glm::vec3 up_vector(0.0, 1.0, 0.0);
     up_vector = glm::mat3(get_rot())*up_vector;
     glm::vec3 x_vector(1.0, 0.0, 0.0);
     // glfwGetCursorPos(gl_base.get_window(), &xpos, &ypos);
-    double xpos, ypos;
-    xpos = input_handler.mouse_x;
-    ypos = input_handler.mouse_y;
-    x_angle += ypos*3.14159 / 5000;
-    while (x_angle > 3.14159)
+    if (!cursor_on)
     {
-        x_angle -= 2 * 3.14159;
-    }
-    while (x_angle < -3.14159)
-    {
-        x_angle += 2 * 3.14159;
-    }
-    y_angle += xpos*3.14159 / 5000;
-    while (y_angle > 3.14159)
-    {
-        y_angle -= 2 * 3.14159;
-    }
-    while (y_angle < -3.14159)
-    {
-        y_angle += 2 * 3.14159;
-    }
-#ifdef _TGL_CLIENT
-    set_rot(glm::mat4(1.0));
-#endif
-    // set_rot(glm::quat());
+        double xpos, ypos;
+        xpos = input_handler.mouse_x;
+        ypos = input_handler.mouse_y;
+        x_angle += ypos * 3.14159 / 5000;
+        while (x_angle > 3.14159)
+        {
+            x_angle -= 2 * 3.14159;
+        }
+        while (x_angle < -3.14159)
+        {
+            x_angle += 2 * 3.14159;
+        }
+        y_angle += xpos * 3.14159 / 5000;
+        while (y_angle > 3.14159)
+        {
+            y_angle -= 2 * 3.14159;
+        }
+        while (y_angle < -3.14159)
+        {
+            y_angle += 2 * 3.14159;
+        }
+    #ifdef _TGL_CLIENT
+        set_rot(glm::mat4(1.0));
+    #endif
+        // set_rot(glm::quat());
 
-    rotate(-y_angle, glm::vec3(0, 1.0, 0));
-    rotate(-x_angle, glm::vec3(0.0, 0.0, 1.0));
+        rotate(-y_angle, glm::vec3(0, 1.0, 0));
+        rotate(-x_angle, glm::vec3(0.0, 0.0, 1.0));
+        
+#ifdef _TGL_CLIENT
+        input_handler.set_cursor_pos(0, 0);
+#endif
+    }
 
     x_vector = glm::mat3(get_rot())*x_vector;
 
@@ -103,9 +111,7 @@ void Player::tick(double time_delta)
     //      "Z POS" <<
     //      debug_block->pos.z <<
     //      "\n";
-#ifdef _TGL_CLIENT
-    input_handler.set_cursor_pos(0,0);
-#endif
+
 
     glm::vec3 forward_vector_crosshair(1.0, 0.0, 0.0);
     forward_vector_crosshair = glm::mat3(get_rot())*forward_vector_crosshair;
@@ -125,8 +131,8 @@ void Player::tick(double time_delta)
         forward_vector = glm::mat3(get_rot())*forward_vector;
         forward_vector.y = 0;
         // translate(forward_vector);
-        vel.x = forward_vector.x;
-        vel.z = forward_vector.z;
+        vel.x += forward_vector.x;
+        vel.z += forward_vector.z;
         // debug_block->set_pos(glm::vec3(0, 0, 2.0));
     }
     else
@@ -136,9 +142,38 @@ void Player::tick(double time_delta)
     }
     if (input_handler.key_states['s'])
     {
-        glm::vec3 forward_vector(0.0, 0.0, time_delta*-30);
-        forward_vector = forward_vector*glm::mat3(get_rot());
+        glm::vec3 forward_vector(-10.0, 0.0, 0.0);
+        forward_vector = glm::mat3(get_rot())*forward_vector;
+        forward_vector.y = 0;
+        // translate(forward_vector);
+        vel.x += forward_vector.x;
+        vel.z += forward_vector.z;
     }
+    if (input_handler.key_states['a'])
+    {
+        glm::vec3 forward_vector(0.0, 0.0, -10.0);
+        forward_vector = glm::mat3(get_rot())*forward_vector;
+        forward_vector.y = 0;
+        // translate(forward_vector);
+        vel.x += forward_vector.x;
+        vel.z += forward_vector.z;
+    }
+    if (input_handler.key_states['d'])
+    {
+        glm::vec3 forward_vector(0.0, 0.0, 10.0);
+        forward_vector = glm::mat3(get_rot())*forward_vector;
+        forward_vector.y = 0;
+        // translate(forward_vector);
+        vel.x += forward_vector.x;
+        vel.z += forward_vector.z;
+    }
+    float y_vel = vel.y;
+    vel.y = 0;
+    if (glm::length(vel) > 9.9)
+    {
+        vel = glm::normalize(vel)*10.0f;
+    }
+    vel.y = y_vel;
     if (input_handler.key_states[' '])
     {
         if (get_on_ground())
@@ -251,6 +286,12 @@ void Player::apply_input_msg(std::vector <char> & input_msg)
 glm::vec3 Player::get_eye_loc()
 {
     return eye_loc;
+}
+
+void Player::enable_mouse_cursor(bool in_cursor_on)
+{
+    input_handler.set_cursor_enabled(in_cursor_on);
+    cursor_on = in_cursor_on;
 }
 
 }  // namespace tgl

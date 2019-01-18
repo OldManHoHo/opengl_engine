@@ -29,6 +29,7 @@ class Player : public tgl::Camera
     tgl::Inventory inventory;
     tgl::InventoryItem * equipped_item;
     tgl::HudElement * inventory_hud;
+    tgl::HudElement * full_inventory_hud;
     char equipped_index;
 
     float y_angle;
@@ -36,10 +37,11 @@ class Player : public tgl::Camera
 
     glm::vec3 crosshair;
 
+    bool cursor_on;
     bool hitting_bool;
     glm::vec3 hitting;
 
-    Player();
+    Player(int inventory_items);
     ~Player();
     void tick(double time_delta);
     void set_hitting(glm::vec3 in_hitting);
@@ -50,6 +52,7 @@ class Player : public tgl::Camera
     bool change_inventory_amount(tgl::ItemId item_type, int in_amount);
     void generate_input_msg(std::vector <char> & input_msg);
     void apply_input_msg(std::vector <char> & input_msg);
+    void enable_mouse_cursor(bool in_cursor_on);
     glm::vec3 get_eye_loc();
 };
 

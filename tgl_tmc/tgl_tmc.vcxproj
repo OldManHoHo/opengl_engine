@@ -138,7 +138,6 @@
     <ClCompile Include="..\tgl\base.cpp" />
     <ClCompile Include="..\tgl\bounds.cpp" />
     <ClCompile Include="..\tgl\camera.cpp" />
-    <ClCompile Include="..\tgl\chunk.cpp" />
     <ClCompile Include="..\tgl\component.cpp" />
     <ClCompile Include="..\tgl\game_state.cpp" />
     <ClCompile Include="..\tgl\globals.cpp" />
@@ -158,6 +157,7 @@
     <ClCompile Include="..\tgl\useful_structures.cpp" />
     <ClCompile Include="..\tmc\block_generator.cpp" />
     <ClCompile Include="..\tmc\cellular.cpp" />
+    <ClCompile Include="..\tmc\chunk.cpp" />
     <ClCompile Include="..\tmc\chunk_database.cpp" />
     <ClCompile Include="..\tmc\chunk_spawn.cpp" />
     <ClCompile Include="..\tmc\dropped_item.cpp" />
@@ -176,7 +176,6 @@
     <ClInclude Include="..\tgl\base.h" />
     <ClInclude Include="..\tgl\bounds.h" />
     <ClInclude Include="..\tgl\camera.h" />
-    <ClInclude Include="..\tgl\chunk.h" />
     <ClInclude Include="..\tgl\component.h" />
     <ClInclude Include="..\tgl\game_state.h" />
     <ClInclude Include="..\tgl\globals.h" />
@@ -201,6 +200,7 @@
     <ClInclude Include="..\tgl\useful_structures.h" />
     <ClInclude Include="..\tmc\block_generator.h" />
     <ClInclude Include="..\tmc\cellular.h" />
+    <ClInclude Include="..\tmc\chunk.h" />
     <ClInclude Include="..\tmc\chunk_database.h" />
     <ClInclude Include="..\tmc\chunk_spawn.h" />
     <ClInclude Include="..\tmc\coord_types.h" />

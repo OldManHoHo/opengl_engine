@@ -11,8 +11,8 @@
 
 #include "tgl/tgl_gl.h"
 #include "tgl/actor.h"
-#include "tgl/chunk.h"
 #include "tgl/mesh.h"
+#include "tmc/chunk.h"
 #include "tmc/mc_items.h"
 #include "tmc/block_generator.h"
 // #include "TMCDroppedItem.h"

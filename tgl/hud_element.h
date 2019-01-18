@@ -18,6 +18,7 @@ class HudElement
 {
  public:
     bool texture_active;
+    bool visible;
     ::GLfloat height;
     ::GLfloat width;
     ::glm::vec3 color;

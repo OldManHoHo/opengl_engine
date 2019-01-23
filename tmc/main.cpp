@@ -6,16 +6,15 @@
 #include "tgl/base.h"
 #include "tgl/camera.h"
 #include "tgl/globals.h"
+#include "tgl/text_hud_element.h"
+#include "tgl/useful_structures.h"
 #include "tmc/mc_player.h"
 #include "tmc/chunk_spawn.h"
 #include "tmc/mc_interaction_manager.h"
-#include "tgl/useful_structures.h"
 
 #ifdef _UNIT_TEST
 #include "tmc/Simplex.h"
 #endif
-
-
 
 tgl::Base gl_base; // TODO: Either make tgl::Base object accessible to classes
 				 //
@@ -46,7 +45,8 @@ int main()
 #endif
 	
 	gl_base.init();
-
+    int texture_units = 0;
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &texture_units);
 #ifdef _TGL_CLIENT
 	tgl::HudElement inventory(600, 120, glm::vec2(100,100), glm::vec3(0.2, 0.2, 0.2));
 	int offset = 10;
@@ -106,6 +106,20 @@ int main()
     {
         gl_base.add_actor(&main_cam);
     }
+    tgl::HudElement * the;
+    tgl::HudElement * the2;
+    
+    //the = new tgl::HudElement(
+    //    375,
+    //    75,
+    //    glm::vec2(1000, 1000),
+    //    glm::vec3(0, 0, 0),
+    //    std::string("TEst TextTTT"),
+    //    0,
+    //    0,
+    //    0,
+    //    0);
+    //main_cam.add_hud(the);
 #endif
 	// gl_base.add_actor(&p1);
 	// gl_base.add_actor(&p2);

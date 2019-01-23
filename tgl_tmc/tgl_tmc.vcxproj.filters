@@ -19,6 +19,12 @@
     <Filter Include="tmc">
       <UniqueIdentifier>{16c5fdf8-c52b-4987-8f71-2122c66d0e85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libdrawtext">
+      <UniqueIdentifier>{0d0c3243-e752-49be-80cb-8c300db9ef2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{530be63a-0ec9-40e4-80db-56af8b0b7683}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tgl\actor.cpp">
@@ -147,6 +153,9 @@
     <ClCompile Include="..\tmc\chunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\tgl\text_hud_element.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\tgl\actor.h">
@@ -272,5 +281,58 @@
     <ClInclude Include="..\tmc\chunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\tgl\text_hud_element.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\tgl\content\shaders\fragment_shader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\fragment_shader_default.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\fragment_shader_glyph.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\fragment_shader_HUD.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\fragment_shader_HUD_tex.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\fragment_shader_light.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\ray_bounce_fragment.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\ray_bounce_vertex.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\vertex_shader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\vertex_shader_default.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\vertex_shader_glyph.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\vertex_shader_HUD.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\vertex_shader_HUD_tex.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\vertex_shader_light.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\fragment_shader_HUD_text.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\tgl\content\shaders\vertex_shader_HUD_text.glsl">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

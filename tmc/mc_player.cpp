@@ -45,9 +45,22 @@ void Player::init_inventory(int num_slots)
                     glm::vec2(i*inventory_slot_width + inventory_slot_border,
                     inventory_slot_border), glm::vec3(0.5, 0.5, 0.5),
                     "content/textures/mc.png");
+        tgl::HudElement * the;
+        the = new tgl::HudElement(
+            30,
+            30,
+            glm::vec2(i*inventory_slot_width + inventory_slot_border,
+                inventory_slot_border),
+            glm::vec3(0, 0, 0),
+            std::string("AB"),
+            0,
+            0,
+            0,
+            0);
 
         inventory_hud->sub_elements.push_back(inventory_itemb);
         inventory_hud->sub_elements.push_back(inventory_item);
+        inventory_hud->sub_elements.push_back(the);
     }
     add_hud(inventory_hud);
 
@@ -75,9 +88,22 @@ void Player::init_inventory(int num_slots)
                         i*inventory_slot_height + inventory_slot_border), 
                     glm::vec3(0.5, 0.5, 0.5),
                     "content/textures/mc.png");
+            tgl::HudElement * the;
+            the = new tgl::HudElement(
+                30,
+                30,
+                glm::vec2(j*inventory_slot_width + inventory_slot_border,
+                    i*inventory_slot_height + inventory_slot_border),
+                glm::vec3(0, 0, 0),
+                std::string("AB"),
+                0,
+                0,
+                0,
+                0);
 
             full_inventory_hud->sub_elements.push_back(inventory_itemb);
             full_inventory_hud->sub_elements.push_back(inventory_item);
+            full_inventory_hud->sub_elements.push_back(the);
         }
     }
     add_hud(full_inventory_hud);
@@ -190,15 +216,15 @@ void Player::tick(double time_delta)
     {
         if (i == equipped_index)
         {
-            inventory_hud->sub_elements[2*i]->color = equipped_border_color;
+            inventory_hud->sub_elements[3*i]->color = equipped_border_color;
             // hud[0]->sub_elements[2*i]->color = equipped_border_color;
         }
         else
         {
-            inventory_hud->sub_elements[2 * i]->color = unequipped_border_color;
+            inventory_hud->sub_elements[3 * i]->color = unequipped_border_color;
         }
         tgl::InventoryItem * next_item = inventory.get_item(i, 0);
-        int index = i*2 + 1;
+        int index = i*3 + 1;
         if (next_item != nullptr)
         {
             inventory_hud->sub_elements[index]->set_offsets(
@@ -207,22 +233,24 @@ void Player::tick(double time_delta)
                 tgl::useful_structures::
                     item_id_to_texture_coords[next_item->type] +
                     glm::vec2(16, 16));
+            inventory_hud->sub_elements[index + 1]->set_text(std::to_string(next_item->quantity));
         }
         else
         {
             inventory_hud->sub_elements[index]->set_offsets(
                 glm::vec2(16, 8 * 16),
                 glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
+            inventory_hud->sub_elements[index + 1]->set_text("");
         }
     }
     for (int i = 0; i < inventory_slots - tgl::Inventory::default_quick_use_size; ++i)
     {
-        full_inventory_hud->sub_elements[2 * i]->color = unequipped_border_color;
+        full_inventory_hud->sub_elements[3 * i]->color = unequipped_border_color;
         int inventory_index = i + tgl::Inventory::default_quick_use_size;
         tgl::InventoryItem * next_item = 
             inventory.get_item(inventory_index % full_inventory_slot_width, 
                                floor(inventory_index/full_inventory_slot_width));
-        int index = i * 2 + 1;
+        int index = i * 3 + 1;
         if (next_item != nullptr)
         {
             full_inventory_hud->sub_elements[index]->set_offsets(
@@ -231,12 +259,14 @@ void Player::tick(double time_delta)
                 tgl::useful_structures::
                 item_id_to_texture_coords[next_item->type] +
                 glm::vec2(16, 16));
+            full_inventory_hud->sub_elements[index + 1]->set_text(std::to_string(next_item->quantity));
         }
         else
         {
             full_inventory_hud->sub_elements[index]->set_offsets(
                 glm::vec2(16, 8 * 16),
                 glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
+            full_inventory_hud->sub_elements[index + 1]->set_text("");
         }
     }
 #else

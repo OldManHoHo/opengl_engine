@@ -2,8 +2,11 @@
 #ifndef TGL_HUD_ELEMENT_H_
 #define TGL_HUD_ELEMENT_H_
 
+#include <map>
 #include <vector>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -31,6 +34,31 @@ class HudElement
     tgl::Material mat;
     tgl::Shader * hud_shader_f;
     tgl::Shader * hud_shader_v;
+    std::string text;
+
+    static FT_Library library;
+    static FT_Face face;
+    static std::map<char, Texture*> char_textures;
+    static float font_size;
+
+    static void init_ft_library();
+
+    HudElement(
+        ::GLfloat in_width,
+        ::GLfloat in_height,
+        glm::vec3 in_color,
+        ::glm::vec2 in_pos);
+
+    HudElement(
+        ::GLfloat in_width,
+        ::GLfloat in_height,
+        ::glm::vec2 in_pos,
+        ::glm::vec3 in_color,
+        std::string in_text,
+        int top_left_tex_offset_x,
+        int top_left_tex_offset_y,
+        int bottom_right_tex_offset_x,
+        int bottom_right_tex_offset_y);
 
     HudElement(::GLfloat in_width,
                ::GLfloat in_height,
@@ -44,6 +72,7 @@ class HudElement
 
     ::GLfloat * get_params();
     void set_offsets(::glm::vec2 top_left, ::glm::vec2 bottom_right);
+    void set_text(std::string in_text);
 };
 
 }  // namespace tgl

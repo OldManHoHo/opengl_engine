@@ -23,6 +23,7 @@
 #ifdef _TGL_CLIENT
 #include "tgl/ray_bounce.h"
 #endif
+#include "tgl/text_hud_element.h"
 #include "tgl/udp_interface.h"
 
 namespace tgl
@@ -88,6 +89,7 @@ class Base
     std::vector <tgl::Mesh*> meshes;
     std::vector <tgl::Actor*> actors;
     std::vector <tgl::HudElement*> HUD_elements;
+    HudElement * the;
     tgl::Player * active_camera;
     float player_fov;
     float player_start_pos_x;
@@ -204,7 +206,7 @@ class Base
     // OpenGL call functions
     void draw_actor_to_shadow_map(Actor * actor);
     void draw_actor(Actor * actor);
-    void draw_hud_element(HudElement * element);
+    void draw_hud_element(HudElement * element, float offset_x = 0, float offset_y = 0);
 };
 
 }  // namespace tgl

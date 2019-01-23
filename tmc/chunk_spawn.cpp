@@ -820,7 +820,15 @@ void ChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
     {
         instances.push_back(std::vector<GLfloat>(0));
     }
-
+    for (int i = 0; i < block_type_count; ++i)
+    {
+        if (instances[i].size() == 0)
+        {
+            instances[i].push_back(0);
+            instances[i].push_back(-1);
+            instances[i].push_back(0);
+        }
+    }
     block_generator->get_points((chunk_x * 16 - 1), (chunk_y * 16 - 1), 0, 18);
 
     for (int i = 1; i < 17; ++i)

@@ -110,18 +110,18 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\glm-0.9.9-a2;..\;..\glfw-3.2.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_TGL_CLIENT;GLM_ENABLE_EXPERIMENTAL;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\glm-0.9.9-a2;..\;..\glfw-3.2.1\include;..\libdrawtext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_TGL_CLIENT;GLM_ENABLE_EXPERIMENTAL;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib64;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -153,6 +153,7 @@
     <ClCompile Include="..\tgl\ray_bounce.cpp" />
     <ClCompile Include="..\tgl\shader.cpp" />
     <ClCompile Include="..\tgl\texture.cpp" />
+    <ClCompile Include="..\tgl\text_hud_element.cpp" />
     <ClCompile Include="..\tgl\udp_interface.cpp" />
     <ClCompile Include="..\tgl\useful_structures.cpp" />
     <ClCompile Include="..\tmc\block_generator.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="..\tgl\shader.h" />
     <ClInclude Include="..\tgl\stb_image.h" />
     <ClInclude Include="..\tgl\texture.h" />
+    <ClInclude Include="..\tgl\text_hud_element.h" />
     <ClInclude Include="..\tgl\tgl_gl.h" />
     <ClInclude Include="..\tgl\TGL_USER_CLASSES.h" />
     <ClInclude Include="..\tgl\udp_interface.h" />
@@ -211,6 +213,24 @@
     <ClInclude Include="..\tmc\mc_player.h" />
     <ClInclude Include="..\tmc\simplex.h" />
     <ClInclude Include="..\tmc\white_noise.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\tgl\content\shaders\fragment_shader.glsl" />
+    <None Include="..\tgl\content\shaders\fragment_shader_default.glsl" />
+    <None Include="..\tgl\content\shaders\fragment_shader_glyph.glsl" />
+    <None Include="..\tgl\content\shaders\fragment_shader_HUD.glsl" />
+    <None Include="..\tgl\content\shaders\fragment_shader_HUD_tex.glsl" />
+    <None Include="..\tgl\content\shaders\fragment_shader_HUD_text.glsl" />
+    <None Include="..\tgl\content\shaders\fragment_shader_light.glsl" />
+    <None Include="..\tgl\content\shaders\ray_bounce_fragment.glsl" />
+    <None Include="..\tgl\content\shaders\ray_bounce_vertex.glsl" />
+    <None Include="..\tgl\content\shaders\vertex_shader.glsl" />
+    <None Include="..\tgl\content\shaders\vertex_shader_default.glsl" />
+    <None Include="..\tgl\content\shaders\vertex_shader_glyph.glsl" />
+    <None Include="..\tgl\content\shaders\vertex_shader_HUD.glsl" />
+    <None Include="..\tgl\content\shaders\vertex_shader_HUD_tex.glsl" />
+    <None Include="..\tgl\content\shaders\vertex_shader_HUD_text.glsl" />
+    <None Include="..\tgl\content\shaders\vertex_shader_light.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

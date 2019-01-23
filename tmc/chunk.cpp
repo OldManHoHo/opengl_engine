@@ -10,7 +10,6 @@ Chunk::Chunk(tgl::MeshVertices * mesh_vertices,
              std::vector <std::vector <GLfloat>> instances)
 {
     is_chunk = true;
-    block_instances = instances;
     static_physics = true;
     for (int i = 0; i < type_count; ++i)
     {
@@ -23,8 +22,13 @@ Chunk::Chunk(tgl::MeshVertices * mesh_vertices,
                                      (instances[i].size() / 3) - 50,
                                      50);
         }
+        else
+        {
+            printf("empty\n");
+        }
         add_component(temp_mesh);
     }
+    block_instances = instances;
 }
 
 Chunk::~Chunk()

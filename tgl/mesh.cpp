@@ -425,7 +425,7 @@ int Mesh::add_instance(glm::vec3 loc)
     GLenum err;
     GLfloat data[3] = { loc.x, loc.y, loc.z };
     glBindBuffer(GL_ARRAY_BUFFER, instance_VBO);
-    if (instance_count < buffer_size - 1)
+    if (instance_count < buffer_size)
     {
         glBufferSubData(GL_ARRAY_BUFFER,
                         instance_count * 3 * sizeof(GLfloat),

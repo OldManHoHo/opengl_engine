@@ -662,6 +662,7 @@ int Base::init()
     read_conf();
 #ifdef _TGL_CLIENT
     gl_init();
+    tgl::HudElement::init_ft_library();
     if (!global::server_processing)
     {
         udp_interface.s_bind(client_ip_address,
@@ -1621,7 +1622,7 @@ void Base::draw_actor(Actor * actor)
     }
 }
 
-void Base::draw_hud_element(HudElement * element)
+void Base::draw_hud_element(HudElement * element, float offset_x, float offset_y)
 {
 #ifdef _TGL_CLIENT
     GLuint shader_id = element->mat.get_shader_program();
@@ -1632,6 +1633,10 @@ void Base::draw_hud_element(HudElement * element)
     params[1] /= window_height;
     params[2] /= window_width;
     params[3] /= window_height;
+
+    params[2] += offset_x;
+    params[3] += offset_y;
+
     GLuint params_loc = glGetUniformLocation(shader_id, "params");
     glUniform4fv(params_loc, 1, params);
 
@@ -1666,19 +1671,24 @@ void Base::draw_hud_element(HudElement * element)
 
     for (int j = 0; j < element->sub_elements.size(); ++j)
     {
+        draw_hud_element(element->sub_elements[j], 
+                         params[2], 
+                         params[3]);
+        continue;
         tgl::HudElement * sub_el = element->sub_elements[j];
         shader_id = sub_el->mat.get_shader_program();
         glUseProgram(shader_id);
 
+        GLfloat params_sub_new[4];
         GLfloat * params_sub = sub_el->get_params();
-        params_sub[0] /= window_width;
-        params_sub[1] /= window_height;
-        params_sub[2] /= window_width;
-        params_sub[3] /= window_height;
-        params_sub[2] += params[2];
-        params_sub[3] += params[3];
+        params_sub_new[0] = params_sub[0] / window_width;
+        params_sub_new[1] = params_sub[1] / window_height;
+        params_sub_new[2] = params_sub[2] / window_width;
+        params_sub_new[3] = params_sub[3] / window_height;
+        params_sub_new[2] += params[2];
+        params_sub_new[3] += params[3];
         params_loc = glGetUniformLocation(shader_id, "params");
-        glUniform4fv(params_loc, 1, params_sub);
+        glUniform4fv(params_loc, 1, params_sub_new);
 
         color_loc = glGetUniformLocation(shader_id, "color");
         glUniform3fv(color_loc, 1, glm::value_ptr(sub_el->color));

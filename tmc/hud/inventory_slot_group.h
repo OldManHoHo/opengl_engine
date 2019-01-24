@@ -1,5 +1,5 @@
-#ifndef TMC_HUD_MAIN_INVENTORY_H_
-#define TMC_HUD_MAIN_INVENTORY_H_
+#ifndef TMC_HUD_INVENTORY_SLOT_GROUP_H_
+#define TMC_HUD_INVENTORY_SLOT_GROUP_H_
 
 #include "tgl/hud_element.h"
 
@@ -8,7 +8,7 @@ namespace tmc
 namespace hud
 {
     
-class MainInventory : public tgl::HudElement
+class InventorySlotGroup : public tgl::HudElement
 {
     // Number of total items
     int num_items;
@@ -20,7 +20,7 @@ class MainInventory : public tgl::HudElement
     int inventory_slot_height;
     int inventory_slot_width;
     
-    MainInventory(int in_pos_x, int in_pos_y,
+    InventorySlotGroup(int in_pos_x, int in_pos_y,
                   int in_num_items, int in_num_columns,
                   int in_inventory_slot_width,
                   int in_inventory_slot_height,

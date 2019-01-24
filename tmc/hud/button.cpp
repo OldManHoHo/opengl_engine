@@ -12,14 +12,28 @@ Button::Button(const int (&)[1] in_on_press,
                   glm::vec3 in_color):
     button_text(in_button_text),
     on_press(in_on_press),
-    tgl::HudElement()
+    tgl::HudElement(in_width,
+            in_height,
+            glm::vec2(in_pos_x, in_pos_y),
+            in_color);
 {
-  
+    tgl::HudElement * button_text_element;
+    button_text_element = new tgl::HudElement(
+                30,
+                30,
+                glm::vec2(5, 5),
+                glm::vec3(0, 0, 0),
+                std::string(button_text),
+                0,
+                0,
+                0,
+                0);
+    sub_elements.push_back(button_text_element);
 }
 
 void Button::on_click()
 {
-    
+    on_press();
 }
     
 }  // namespace hud

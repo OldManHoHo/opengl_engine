@@ -7,7 +7,7 @@
 
 namespace tgl
 {
-
+#ifdef _TGL_CLIENT
 GLuint Texture::texture_count = 0;
 
 Texture::Texture(const char * filename)
@@ -125,5 +125,6 @@ GLuint Texture::get_name()
 {
     return texture;
 }
+#endif  // _TGL_CLIENT
 
 }  // namespace tgl

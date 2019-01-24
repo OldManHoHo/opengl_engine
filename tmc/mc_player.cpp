@@ -115,7 +115,6 @@ extern tgl::Actor debug_actor;
 void Player::tick(double time_delta)
 {
     tgl::Player::tick(time_delta);
-
     static double time_since_last_left = 10;
     static double time_since_last_right = 10;
     static double time_since_last_e = 10;
@@ -165,7 +164,6 @@ void Player::tick(double time_delta)
                                                   hit_type,
                                                   block_to_add,
                                                   intersect_point);
-
             if (chunk_spawn != nullptr)
             {
                 tgl::InventoryItem& check = get_equipped();
@@ -208,7 +206,7 @@ void Player::tick(double time_delta)
     {
         if (input_handler.key_states['1' + i])
         {
-            equipped_item = inventory.get_item(i, 0);
+            equipped_item = inventory.get_item(i);
             equipped_index = i;
         }
     }
@@ -223,7 +221,7 @@ void Player::tick(double time_delta)
         {
             inventory_hud->sub_elements[3 * i]->color = unequipped_border_color;
         }
-        tgl::InventoryItem * next_item = inventory.get_item(i, 0);
+        tgl::InventoryItem * next_item = inventory.get_item(i);
         int index = i*3 + 1;
         if (next_item != nullptr)
         {
@@ -248,8 +246,7 @@ void Player::tick(double time_delta)
         full_inventory_hud->sub_elements[3 * i]->color = unequipped_border_color;
         int inventory_index = i + tgl::Inventory::default_quick_use_size;
         tgl::InventoryItem * next_item = 
-            inventory.get_item(inventory_index % full_inventory_slot_width, 
-                               floor(inventory_index/full_inventory_slot_width));
+            inventory.get_item(i);
         int index = i * 3 + 1;
         if (next_item != nullptr)
         {
@@ -270,7 +267,7 @@ void Player::tick(double time_delta)
         }
     }
 #else
-    equipped_item = inventory.get_item(equipped_index, 0);
+    equipped_item = inventory.get_item(equipped_index);
 #endif
 }
 

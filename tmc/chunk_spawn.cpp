@@ -1648,7 +1648,6 @@ void ChunkSpawn::generate_chunk_request(std::vector <char> & chunk_mod_msg)
     chunks_to_request.clear();
 }
 
-
 std::unordered_map<block_coord, block_def>& ChunkSpawn::get_mods(
 						chunk_coord to_send)
 {

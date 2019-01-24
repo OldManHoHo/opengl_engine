@@ -16,14 +16,15 @@
 #include "tgl/TGL_USER_CLASSES.h"
 #include "tgl/camera.h"
 #include "tgl/globals.h"
+#ifdef _TGL_CLIENT
 #include "tgl/hud_element.h"
+#endif  // _TGL_CLIENT
 #include "tgl/mesh.h"
 #include "tgl/physics_engine.h"
 #include "tgl/player.h"
 #ifdef _TGL_CLIENT
 #include "tgl/ray_bounce.h"
 #endif
-#include "tgl/text_hud_element.h"
 #include "tgl/udp_interface.h"
 
 namespace tgl

@@ -20,6 +20,7 @@
 #include "tgl/material.h"
 #include "tgl/net_messages.h"
 #include "tgl/shader.h"
+#include "tmc/net_msg_structures.h"
 
 namespace tgl
 {

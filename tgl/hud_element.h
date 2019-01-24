@@ -5,8 +5,10 @@
 #include <map>
 #include <vector>
 
+#ifdef _TGL_CLIENT
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#endif  // _TGL_CLIENT
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -36,12 +38,14 @@ class HudElement
     tgl::Shader * hud_shader_v;
     std::string text;
 
+#ifdef _TGL_CLIENT
     static FT_Library library;
     static FT_Face face;
     static std::map<char, Texture*> char_textures;
     static float font_size;
 
     static void init_ft_library();
+#endif  // _TGL_CLIENT
 
     HudElement(
         ::GLfloat in_width,
@@ -73,6 +77,10 @@ class HudElement
     ::GLfloat * get_params();
     void set_offsets(::glm::vec2 top_left, ::glm::vec2 bottom_right);
     void set_text(std::string in_text);
+    
+    virtual void on_click();
+    virtual void on_click_release();
+    virtual void on_drag();
 };
 
 }  // namespace tgl

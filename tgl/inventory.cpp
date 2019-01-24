@@ -22,13 +22,12 @@ bool InventoryItem::operator!= (const InventoryItem& item_b)
 
 InventoryItem Inventory::no_item(none);
 
-Inventory::Inventory(int in_x_size, int in_y_size) :
-    items(in_x_size*in_y_size, nullptr),
-    x_size(in_x_size),
-    y_size(in_y_size)
+Inventory::Inventory(int in_size) :
+    items(in_size, nullptr),
+    size(in_size)
 {
-    set_item(0, 0, pickaxe, 1);
-    set_item(1, 0, iid_dirt_block, 10);
+    set_item(0, pickaxe, 1);
+    set_item(1, iid_dirt_block, 10);
 }
 
 std::vector <InventoryItem*>& Inventory::get_items()
@@ -36,29 +35,26 @@ std::vector <InventoryItem*>& Inventory::get_items()
     return items;
 }
 
-void Inventory::set_item(unsigned int in_x,
-                         unsigned int in_y,
+void Inventory::set_item(unsigned int in_index,
                          ItemId in_type,
                          unsigned int in_quantity)
 {
-    items[in_y*x_size + in_x] = new InventoryItem(in_type, in_quantity);
+    items[in_index] = new InventoryItem(in_type, in_quantity);
 }
 
-InventoryItem * Inventory::get_item(unsigned int in_x, unsigned int in_y)
+InventoryItem * Inventory::get_item(unsigned int in_index)
 {
-    return items[in_y*x_size + in_x];
+    return items[in_index];
 }
 
-// Move an item from on x,y position to another in the inventory.
+// Move an item from one position to another in the inventory.
 // If the destination space is occupied, the move will fail and return false.
-bool Inventory::move_item(unsigned int src_x,
-                          unsigned int src_y,
-                          unsigned int dest_x,
-                          unsigned int dest_y)
+bool Inventory::move_item(unsigned int src_index,
+                          unsigned int dest_index)
 {
     bool retval = false;
-    InventoryItem * dest = get_item(dest_x, dest_y);
-    InventoryItem * src = get_item(src_x, src_y);
+    InventoryItem * dest = get_item(dest_index);
+    InventoryItem * src = get_item(src_index);
     if (dest == nullptr)
     {
         dest = src;
@@ -74,14 +70,14 @@ bool Inventory::move_item(unsigned int src_x,
 
 // Delete an item from the inventory. If the space to delete is empty,
 // the delete will fail and return false.
-bool Inventory::delete_item(unsigned int in_x, unsigned int in_y)
+bool Inventory::delete_item(unsigned int in_index)
 {
     bool retval = false;
-    InventoryItem * to_delete = get_item(in_x, in_y);
+    InventoryItem * to_delete = get_item(in_index);
     if (to_delete != nullptr)
     {
-        delete items[in_y*x_size + in_x];
-        items[in_y*x_size + in_x] = nullptr;
+        delete items[in_index];
+        items[in_index] = nullptr;
         retval = true;
     }
     else
@@ -133,39 +129,36 @@ bool Inventory::change_quantity(ItemId in_type, int in_quantity)
 
 void Inventory::print_inventory()
 {
-    for (unsigned int i = 0; i < y_size; ++i)
+    for (unsigned int i = 0; i < size; ++i)
     {
-        for (unsigned int j = 0; j < x_size; ++j)
-        {
-            if (get_item(j, i) != nullptr)
+            if (get_item(i) != nullptr)
             {
                 std::cout <<
-                    get_item(j, i)->type <<
+                    get_item(i)->type <<
                     ", " <<
-                    get_item(j, i)->quantity <<
-                    ";\t";
+                    get_item(i)->quantity <<
+                    ";\n";
             }
             else
             {
-                std::cout << "NULL" << ";\t";
+                std::cout << "NULL" << ";\n";
             }
-        }
-        std::cout << "\n";
+
     }
     printf("\nDONE\n");
 }
 
 int main_inventory()
 {
-    Inventory test_inventory(10, 5);
+    Inventory test_inventory(50);
 
     std::vector <InventoryItem*>& item_refs = test_inventory.get_items();
     test_inventory.print_inventory();
-    test_inventory.set_item(9, 4, iid_sand_block, 100);
+    test_inventory.set_item(36, iid_sand_block, 100);
     test_inventory.print_inventory();
     test_inventory.change_quantity(iid_sand_block, -100);
     test_inventory.print_inventory();
-    test_inventory.delete_item(0, 0);
+    test_inventory.delete_item(0);
     test_inventory.print_inventory();
     test_inventory.change_quantity(iid_stone_block, 1);
     test_inventory.print_inventory();

@@ -6,9 +6,9 @@
 
 #include "tgl/camera.h"
 #include "tgl/hud_element.h"
+#include "tgl/mesh.h"
 #include "tgl/input_handler.h"
 #include "tgl/inventory.h"
-#include "tgl/mesh.h"
 
 namespace tgl
 {

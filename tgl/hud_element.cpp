@@ -330,4 +330,16 @@ void HudElement::set_text(std::string in_text)
     }
 }
 
+void HudElement::on_click()
+{
+}
+
+void HudElement::on_click_release()
+{
+}
+
+void HudElement::on_drag()
+{
+}
+
 }  // namespace tgl

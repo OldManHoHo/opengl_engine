@@ -41,8 +41,7 @@ class InventoryItem
 class Inventory  //: public ::Component
 {
     // object data
-    unsigned int x_size;
-    unsigned int y_size;
+    unsigned int size;
     std::vector <InventoryItem*> items;
 
  public:
@@ -50,23 +49,20 @@ class Inventory  //: public ::Component
     static const unsigned int default_quick_use_size = 6;
     static InventoryItem no_item;
 
-    Inventory(int in_x_size, int in_y_size);
+    Inventory(int in_size);
 
     // Item retrieval
     std::vector <InventoryItem*>& get_items();
-    InventoryItem * get_item(unsigned int in_x, unsigned int in_y);
+    InventoryItem * get_item(unsigned int in_index);
     InventoryItem * get_quick_use(unsigned int index);
 
     // Item Manipulation
-    void set_item(unsigned int in_x,
-                  unsigned int in_y,
+    void set_item(unsigned int in_index,
                   ItemId in_type,
                   unsigned int in_quantity);
-    bool move_item(unsigned int src_x,
-                   unsigned int src_y,
-                   unsigned int dest_x,
-                   unsigned int dest_y);
-    bool delete_item(unsigned int in_x, unsigned int in_y);
+    bool move_item(unsigned int src_index,
+                   unsigned int dest_index);
+    bool delete_item(unsigned int in_index);
     bool change_quantity(ItemId in_type, int in_quantity);
     void print_inventory();
 

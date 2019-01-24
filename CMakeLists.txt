@@ -40,6 +40,7 @@ set (SRC ${tmc}/main.cpp
 	${tmc}/mc_items.cpp
 	${tmc}/mc_interaction_manager.cpp
 	${tgl}/globals.cpp
+	${tmc}/hud/inventory_slot.cpp
 	)
 
 #	${tgl}/FastNoiseSIMD/FastNoiseSIMD_avx2.cpp

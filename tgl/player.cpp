@@ -11,7 +11,7 @@ namespace tgl
 {
 
 Player::Player(int inventory_items) :
-    inventory(int(sqrt(inventory_items)), int(inventory_items/int(sqrt(inventory_items)))),
+    inventory(inventory_items),
     multi_press_threshold(0.25),
     blank_item(tgl::ItemId::none, 0),
     equipped_index(0),

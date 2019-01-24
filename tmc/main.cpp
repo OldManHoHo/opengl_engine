@@ -6,7 +6,6 @@
 #include "tgl/base.h"
 #include "tgl/camera.h"
 #include "tgl/globals.h"
-#include "tgl/text_hud_element.h"
 #include "tgl/useful_structures.h"
 #include "tmc/mc_player.h"
 #include "tmc/chunk_spawn.h"
@@ -45,8 +44,6 @@ int main()
 #endif
 	
 	gl_base.init();
-    int texture_units = 0;
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &texture_units);
 #ifdef _TGL_CLIENT
 	tgl::HudElement inventory(600, 120, glm::vec2(100,100), glm::vec3(0.2, 0.2, 0.2));
 	int offset = 10;

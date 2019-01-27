@@ -37,6 +37,8 @@ BlockGenerator::~BlockGenerator()
 // in_x, in_y, in_z. No get_points call is required before this.
 e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
 {
+
+
     // Non-random generation used for testing
     if (test_gen)
     {
@@ -55,6 +57,19 @@ e_block_type BlockGenerator::get_point(int in_x, int in_y, int in_z)
     if (new_type != bt_invalid)
     {
         return new_type;
+    }
+
+    if (0)
+    {
+        int test_count = 0;
+        if (in_z == 170 || in_z == 175)
+        {
+            return bt_dirt_with_grass;
+        }
+        else
+        {
+            return bt_air;
+        }
     }
 
     float * noises = height->get_points_2d(in_x, in_y, 1);
@@ -171,11 +186,43 @@ e_block_type * BlockGenerator::get_points(int in_x,
                                           int in_z,
                                           int division)
 {
+    
     if (blocks != nullptr)
     {
         delete[] blocks;
     }
     blocks = new e_block_type[division * division * 256]{bt_air};
+
+    if (0)
+    {
+        int test_count = 0;
+        for (int j = 0; j < division; j++)
+            // for (int j = division-1; j >= 0; --j)
+        {
+            for (int k = 0; k < division; k++)
+                // for (int k = division-1; k >= 0; --k)
+            {
+                for (int i = 0; i < 256; i++)
+                {
+                    e_block_type mod = check_for_mod(in_x + j, in_y + k, in_z + i);
+                    if (mod == bt_invalid)
+                    {
+                        if (i == 170 || i == 175)
+                        {
+                            blocks[test_count] = bt_dirt_with_grass;
+                        }
+                    }
+                    else
+                    {
+                        blocks[test_count] = mod;
+                    }
+                    test_count += 1;
+                }
+            }
+        }
+		return blocks;
+    }
+    
     float * noises = height->get_points_2d(in_x, in_y, division);
     float * noises2 = height2->get_points_2d(in_x, in_y, division);
     float * noises3 = height3->get_points_2d(in_x, in_y, division);
@@ -358,7 +405,7 @@ void BlockGenerator::set_point(e_block_type in_block_type,
         if ((mod_flags[chunk_loc][byte_pos] & (1 << bit_pos)))
         {
             //(*ind).type = in_block_type;
-            world_mods[chunk_loc][block_coord(0, 0, 0)].type = in_block_type;
+            world_mods[chunk_loc][def.loc].type = in_block_type;
         }
         else
         {

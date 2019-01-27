@@ -11,20 +11,17 @@ Chunk::Chunk(tgl::MeshVertices * mesh_vertices,
 {
     is_chunk = true;
     static_physics = true;
+	int unused_count = 50;
     for (int i = 0; i < type_count; ++i)
     {
         tgl::Mesh * temp_mesh = new tgl::Mesh(mesh_vertices);
         temp_mesh->set_material(block_material, i);
-        if (instances[i].size())
+        //if (instances[i].size())
         {
-        instances[i].resize(instances[i].size() + 50*3, -0.5);
-        temp_mesh->enable_instancing(&(instances[i][0]),
-                                     (instances[i].size() / 3) - 50,
-                                     50);
-        }
-        else
-        {
-            printf("empty\n");
+            instances[i].resize(instances[i].size() + unused_count *3, -0.5);
+            temp_mesh->enable_instancing(&(instances[i][0]),
+                                         (instances[i].size() / 3) - unused_count,
+										 unused_count);
         }
         add_component(temp_mesh);
     }

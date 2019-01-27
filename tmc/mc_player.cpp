@@ -1,6 +1,10 @@
 #include "tmc/mc_player.h"
-#include "tgl/useful_structures.h"
+
+#include "tgl/globals.h"
 #include "tgl/inventory.h"
+#include "tgl/useful_structures.h"
+#include "tmc/hud/inventory_slot.h"
+
 
 namespace tmc
 {
@@ -28,85 +32,31 @@ void Player::init_inventory(int num_slots)
                             glm::vec2(inventory_screen_pos_x,
                                       inventory_screen_pos_y),
                             glm::vec3(0.0, 0.0, 0.0));
-#endif
-    int offset = inventory_slot_border;
-    int shift = inventory_slot_width;
-#ifdef _TGL_CLIENT
-    for (int i = 0; i < num_slots; ++i)
-    {
-        tgl::HudElement * inventory_itemb =
-            new tgl::HudElement(inventory_slot_width,
-                    inventory_slot_height,
-                    glm::vec2(i*inventory_slot_width, 0),
-                    glm::vec3(0.5, 0.5, 0.5));
-        tgl::HudElement * inventory_item =
-            new tgl::HudElement(inventory_slot_width - 2*inventory_slot_border,
-                    inventory_slot_height - 2*inventory_slot_border,
-                    glm::vec2(i*inventory_slot_width + inventory_slot_border,
-                    inventory_slot_border), glm::vec3(0.5, 0.5, 0.5),
-                    "content/textures/mc.png");
-        tgl::HudElement * the;
-        the = new tgl::HudElement(
-            30,
-            30,
-            glm::vec2(i*inventory_slot_width + inventory_slot_border,
-                inventory_slot_border),
-            glm::vec3(0, 0, 0),
-            std::string("AB"),
-            0,
-            0,
-            0,
-            0);
+    tmc::hud::InventorySlotGroup * inventory_hud_slot_group = 
+        new tmc::hud::InventorySlotGroup(inventory_screen_pos_x,
+            inventory_screen_pos_y + 
+                inventory_slot_height + 
+                space_between_quick_full,
+            full_inventory_slot_height*full_inventory_slot_width, 
+            full_inventory_slot_width,
+            inventory_slot_width,
+            inventory_slot_height,
+            inventory_slot_border);
+    full_inventory_hud = static_cast<tgl::HudElement*>(inventory_hud_slot_group);
 
-        inventory_hud->sub_elements.push_back(inventory_itemb);
-        inventory_hud->sub_elements.push_back(inventory_item);
-        inventory_hud->sub_elements.push_back(the);
-    }
+    tmc::hud::InventorySlotGroup * quick_use_hud_slot_group =
+        new tmc::hud::InventorySlotGroup(inventory_screen_pos_x,
+            inventory_screen_pos_y,
+            quick_use_slots,
+            quick_use_slots,
+            inventory_slot_width,
+            inventory_slot_height,
+            inventory_slot_border);
+    inventory_hud = static_cast<tgl::HudElement*>(quick_use_hud_slot_group);
     add_hud(inventory_hud);
-
-    full_inventory_hud =
-        new tgl::HudElement(full_inventory_slot_width*inventory_slot_width,
-            full_inventory_slot_height*inventory_slot_height,
-            glm::vec2(inventory_screen_pos_x,
-                inventory_screen_pos_y + inventory_slot_height +
-                space_between_quick_full),
-            glm::vec3(0.0, 0.0, 0.0));
-
-    for (int i = 0; i < full_inventory_slot_height; ++i)
-    {
-        for (int j = 0; j < full_inventory_slot_width; ++j)
-        {
-            tgl::HudElement * inventory_itemb =
-                new tgl::HudElement(inventory_slot_width,
-                    inventory_slot_height,
-                    glm::vec2(j*inventory_slot_width, i*inventory_slot_height),
-                    glm::vec3(0.5, 0.5, 0.5));
-            tgl::HudElement * inventory_item =
-                new tgl::HudElement(inventory_slot_width - 2 * inventory_slot_border,
-                    inventory_slot_height - 2 * inventory_slot_border,
-                    glm::vec2(j*inventory_slot_width + inventory_slot_border,
-                        i*inventory_slot_height + inventory_slot_border), 
-                    glm::vec3(0.5, 0.5, 0.5),
-                    "content/textures/mc.png");
-            tgl::HudElement * the;
-            the = new tgl::HudElement(
-                30,
-                30,
-                glm::vec2(j*inventory_slot_width + inventory_slot_border,
-                    i*inventory_slot_height + inventory_slot_border),
-                glm::vec3(0, 0, 0),
-                std::string("AB"),
-                0,
-                0,
-                0,
-                0);
-
-            full_inventory_hud->sub_elements.push_back(inventory_itemb);
-            full_inventory_hud->sub_elements.push_back(inventory_item);
-            full_inventory_hud->sub_elements.push_back(the);
-        }
-    }
     add_hud(full_inventory_hud);
+    return;
+    //add_hud();
 #endif
 }
 
@@ -121,6 +71,53 @@ void Player::tick(double time_delta)
     time_since_last_left += time_delta;
     time_since_last_right += time_delta;
     time_since_last_e += time_delta;
+	glm::vec2 mouse_pos = glm::vec2(input_handler.mouse_x, input_handler.mouse_y);
+	mouse_pos.y = tgl::global::window_height - mouse_pos.y;
+	if (hud_dragging != nullptr && input_handler.key_held[1])
+	{
+		hud_dragging->pos += mouse_pos - drag_mouse_diff;
+		drag_mouse_diff = mouse_pos;
+	}
+	if (input_handler.key_press[1] && hud_dragging == nullptr)
+	{
+		tgl::HudElement * out_he = nullptr;
+		screen_pos_to_inventory_index(mouse_pos.x, mouse_pos.y,
+			dragged_inventory_index, out_he);
+		if (dragged_inventory_index >= 0)
+		{
+			hud_dragging = new tmc::hud::InventorySlot(
+				*dynamic_cast<tmc::hud::InventorySlot*>(out_he));
+			if (dragged_inventory_index < quick_use_slots)
+			{
+				hud_dragging->pos += inventory_hud->pos;
+			}
+			else
+			{
+				hud_dragging->pos += full_inventory_hud->pos;
+			}
+			orig_drag_pos = hud_dragging->pos;
+			drag_mouse_diff = mouse_pos;
+			hud.push_back(hud_dragging);
+		}
+	}
+	if (input_handler.key_states[1] == false)
+	{
+		if (hud_dragging != nullptr)
+		{
+			tgl::HudElement * out_he = nullptr;
+			int swap_item_index = -1;
+			screen_pos_to_inventory_index(mouse_pos.x, mouse_pos.y,
+				swap_item_index, out_he);
+			if (swap_item_index != -1)
+			{
+				inventory.swap_items(swap_item_index, dragged_inventory_index);
+			}
+			delete hud_dragging;
+			hud_dragging = nullptr;
+			hud.resize(hud.size() - 1);
+		}
+		hud_dragging = nullptr;
+	}
     if (input_handler.key_states[1])
     {
         std::cout << "MOUSE 1" << "\n";
@@ -214,56 +211,67 @@ void Player::tick(double time_delta)
     {
         if (i == equipped_index)
         {
-            inventory_hud->sub_elements[3*i]->color = equipped_border_color;
+            inventory_hud->sub_elements[i]->color = equipped_border_color;
             // hud[0]->sub_elements[2*i]->color = equipped_border_color;
         }
         else
         {
-            inventory_hud->sub_elements[3 * i]->color = unequipped_border_color;
+            inventory_hud->sub_elements[i]->color = unequipped_border_color;
         }
         tgl::InventoryItem * next_item = inventory.get_item(i);
-        int index = i*3 + 1;
+        auto picture_element =
+            static_cast<tmc::hud::InventorySlot*>(
+                inventory_hud->sub_elements[i])->picture_element;
+        auto text_element =
+            static_cast<tmc::hud::InventorySlot*>(
+                inventory_hud->sub_elements[i])->text_element;
         if (next_item != nullptr)
         {
-            inventory_hud->sub_elements[index]->set_offsets(
+            picture_element->set_offsets(
                 tgl::useful_structures::
                     item_id_to_texture_coords[next_item->type],
                 tgl::useful_structures::
                     item_id_to_texture_coords[next_item->type] +
                     glm::vec2(16, 16));
-            inventory_hud->sub_elements[index + 1]->set_text(std::to_string(next_item->quantity));
+            text_element->set_text(std::to_string(next_item->quantity));
         }
         else
         {
-            inventory_hud->sub_elements[index]->set_offsets(
+            picture_element->set_offsets(
                 glm::vec2(16, 8 * 16),
                 glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
-            inventory_hud->sub_elements[index + 1]->set_text("");
+            text_element->set_text("");
         }
     }
     for (int i = 0; i < inventory_slots - tgl::Inventory::default_quick_use_size; ++i)
     {
-        full_inventory_hud->sub_elements[3 * i]->color = unequipped_border_color;
+        full_inventory_hud->sub_elements[i]->color = unequipped_border_color;
         int inventory_index = i + tgl::Inventory::default_quick_use_size;
         tgl::InventoryItem * next_item = 
-            inventory.get_item(i);
-        int index = i * 3 + 1;
+            inventory.get_item(inventory_index);
+        auto picture_element = 
+            static_cast<tmc::hud::InventorySlot*>(
+                full_inventory_hud->sub_elements[i])->picture_element;
+        auto text_element = 
+            static_cast<tmc::hud::InventorySlot*>(
+                full_inventory_hud->sub_elements[i])->text_element;
         if (next_item != nullptr)
         {
-            full_inventory_hud->sub_elements[index]->set_offsets(
+            picture_element->set_offsets(
                 tgl::useful_structures::
                 item_id_to_texture_coords[next_item->type],
                 tgl::useful_structures::
                 item_id_to_texture_coords[next_item->type] +
                 glm::vec2(16, 16));
-            full_inventory_hud->sub_elements[index + 1]->set_text(std::to_string(next_item->quantity));
+            text_element->set_text(
+                std::to_string(next_item->quantity));
         }
         else
         {
-            full_inventory_hud->sub_elements[index]->set_offsets(
+            picture_element->set_offsets(
                 glm::vec2(16, 8 * 16),
                 glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
-            full_inventory_hud->sub_elements[index + 1]->set_text("");
+            text_element->set_text("");
         }
     }
 #else
@@ -292,6 +300,50 @@ std::vector<std::pair<glm::vec3, e_block_type>> Player::fetch_placements()
     std::vector<std::pair<glm::vec3, e_block_type>> out_placements = placements;
     placements.clear();
     return out_placements;
+}
+
+int Player::screen_pos_to_inventory_index(int in_pos_x, int in_pos_y, 
+	int &inventory_index, tgl::HudElement *& out_hud_element)
+{
+	int inventory_count = 0;
+	for (auto he : inventory_hud->sub_elements)
+	{
+		if (in_pos_x < inventory_hud->pos.x + he->pos.x + he->width &&
+			in_pos_y < inventory_hud->pos.y + he->pos.y + he->height &&
+			in_pos_x > inventory_hud->pos.x + he->pos.x &&
+			in_pos_y > inventory_hud->pos.y + he->pos.y)
+		{
+			if (dynamic_cast<tmc::hud::InventorySlot*>(he) != nullptr)
+			{
+				out_hud_element = he;
+				inventory_index = inventory_count;
+				return inventory_count;
+			}
+		}
+		inventory_count += 1;
+	}
+	for (auto he : full_inventory_hud->sub_elements)
+	{
+		if (in_pos_x < full_inventory_hud->pos.x + he->pos.x + he->width &&
+			in_pos_y < full_inventory_hud->pos.y + he->pos.y + he->height &&
+			in_pos_x > full_inventory_hud->pos.x + he->pos.x &&
+			in_pos_y > full_inventory_hud->pos.y + he->pos.y)
+		{
+			if (dynamic_cast<tmc::hud::InventorySlot*>(he) != nullptr)
+			{
+				out_hud_element = he;
+				inventory_index = inventory_count;
+				if (he == nullptr)
+				{
+					printf("TEST\n");
+				}
+				return inventory_count;
+			}
+		}
+		inventory_count += 1;
+	}
+	inventory_index = -1;
+	return -1;
 }
 
 }  // namespace tmc

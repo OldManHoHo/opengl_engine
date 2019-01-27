@@ -148,6 +148,13 @@ void Inventory::print_inventory()
     printf("\nDONE\n");
 }
 
+void Inventory::swap_items(int index_1, int index_2)
+{
+	InventoryItem * swapper = items[index_1];
+	items[index_1] = items[index_2];
+	items[index_2] = swapper;
+}
+
 int main_inventory()
 {
     Inventory test_inventory(50);

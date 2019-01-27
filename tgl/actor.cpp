@@ -5,7 +5,7 @@
 namespace tgl
 {
 
-int Actor::_id_counter = 0;
+int tgl::Actor::_id_counter = 0;
 
 Actor::Actor():
     id(_id_counter),

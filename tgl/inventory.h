@@ -65,6 +65,7 @@ class Inventory  //: public ::Component
     bool delete_item(unsigned int in_index);
     bool change_quantity(ItemId in_type, int in_quantity);
     void print_inventory();
+	void swap_items(int index_1, int index_2);
 
     // Management
     void repair_garbage();

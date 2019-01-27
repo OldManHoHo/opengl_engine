@@ -163,6 +163,9 @@
     <ClCompile Include="..\tmc\chunk_spawn.cpp" />
     <ClCompile Include="..\tmc\dropped_item.cpp" />
     <ClCompile Include="..\tmc\generator.cpp" />
+    <ClCompile Include="..\tmc\hud\button.cpp" />
+    <ClCompile Include="..\tmc\hud\inventory_slot.cpp" />
+    <ClCompile Include="..\tmc\hud\inventory_slot_group.cpp" />
     <ClCompile Include="..\tmc\main.cpp" />
     <ClCompile Include="..\tmc\mc_interaction_manager.cpp" />
     <ClCompile Include="..\tmc\mc_items.cpp" />
@@ -208,6 +211,10 @@
     <ClInclude Include="..\tmc\coord_types.h" />
     <ClInclude Include="..\tmc\dropped_item.h" />
     <ClInclude Include="..\tmc\generator.h" />
+    <ClInclude Include="..\tmc\hud\button.h" />
+    <ClInclude Include="..\tmc\hud\crafting_table_hud.h" />
+    <ClInclude Include="..\tmc\hud\inventory_slot.h" />
+    <ClInclude Include="..\tmc\hud\inventory_slot_group.h" />
     <ClInclude Include="..\tmc\mc_interaction_manager.h" />
     <ClInclude Include="..\tmc\mc_items.h" />
     <ClInclude Include="..\tmc\mc_player.h" />
@@ -231,6 +238,7 @@
     <None Include="..\tgl\content\shaders\vertex_shader_HUD_tex.glsl" />
     <None Include="..\tgl\content\shaders\vertex_shader_HUD_text.glsl" />
     <None Include="..\tgl\content\shaders\vertex_shader_light.glsl" />
+    <None Include="..\tgl\global.conf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

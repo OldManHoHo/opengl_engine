@@ -54,6 +54,7 @@ class Player : public tgl::Camera
     void apply_input_msg(std::vector <char> & input_msg);
     void enable_mouse_cursor(bool in_cursor_on);
     glm::vec3 get_eye_loc();
+	void process_clicks();
 };
 
 }  // namespace tgl

@@ -331,7 +331,7 @@ void Mesh::enable_instancing(GLfloat * instance_locations,
     glVertexAttribDivisor(instance_attrib, 1);
     refresh_instances();
 
-    enable_light_data(in_unused_count);
+    //enable_light_data(in_unused_count);
 }
 
 bool Mesh::get_instanced_flag()
@@ -425,16 +425,20 @@ int Mesh::add_instance(glm::vec3 loc)
     GLenum err;
     GLfloat data[3] = { loc.x, loc.y, loc.z };
     glBindBuffer(GL_ARRAY_BUFFER, instance_VBO);
+	GLfloat * instance_buffer_map = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
     if (instance_count < buffer_size)
     {
-        glBufferSubData(GL_ARRAY_BUFFER,
-                        instance_count * 3 * sizeof(GLfloat),
-                        3 * sizeof(GLfloat),
-                        data);
+        //glBufferSubData(GL_ARRAY_BUFFER,
+        //                0,//instance_count * 3 * sizeof(GLfloat),
+        //                3 * sizeof(GLfloat),
+        //                data);
+		memcpy((void*)(instance_buffer_map + instance_count * 3),
+			   (void*)data, sizeof(GLfloat) * 3);
         while ((err = glGetError()) != GL_NO_ERROR)
         {
             printf("GL ERROR adding instance buffer: %d\n", err);
         }
+		glUnmapBuffer(GL_ARRAY_BUFFER);
         instance_count += 1;
         refresh_instances();
         unsigned char c_data[1] = { 128 };

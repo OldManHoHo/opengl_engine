@@ -56,14 +56,14 @@ bool Base::gl_init()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
-    global::window = gl_create_window(window_width, window_height);
+    global::window = gl_create_window(global::window_width, global::window_height);
     if (global::window == nullptr)
     {
         return false;
     }
 
     glad_init();
-    glViewport(0, 0, window_width, window_height);
+    glViewport(0, 0, global::window_width, global::window_height);
 
     glfwSetFramebufferSizeCallback(global::window, framebuffer_size_callback);
 
@@ -100,8 +100,8 @@ bool Base::gl_init()
 
 GLFWwindow * Base::gl_create_window(int in_width, int in_height)
 {
-    window_height = in_height;
-    window_width = in_width;
+	global::window_height = in_height;
+	global::window_width = in_width;
     GLFWwindow * window = glfwCreateWindow(in_width, in_height, 
                                            "tmc", NULL, NULL);
     if (window == nullptr)
@@ -819,8 +819,8 @@ void Base::read_conf()
     conf_int_values["server_udp_send_port"] = &server_udp_send_port;
     conf_string_values["client_ip_address"] = &client_ip_address;
     conf_string_values["server_ip_address"] = &server_ip_address;
-    conf_int_values["window_height"] = &window_height;
-    conf_int_values["window_width"] = &window_width;
+    conf_int_values["window_height"] = &global::window_height;
+    conf_int_values["window_width"] = &global::window_width;
     conf_float_values["constant_time_delta"] = &constant_time_delta;
     conf_bool_values["max_framerate_enabled"] = &max_framerate_enabled;
     conf_float_values["max_framerate"] = &max_framerate;
@@ -1099,21 +1099,30 @@ void Base::update()
             glViewport(0, 0, shadow_map_size, shadow_map_size);
             glUseProgram(ray_bounce.mat->get_shader_program());
 
+            
             for (int i = 0; i < actors.size(); ++i)
             // for (int i = actors.size()-1; i >=0; --i)
             {
-                draw_actor_to_shadow_map(actors[i]);
+                //if (glm::length(glm::vec2(actors[i]->pos.x, actors[i]->pos.z) - glm::vec2(active_camera->pos.x, active_camera->pos.z)) < 50)
+                {
+                    draw_actor_to_shadow_map(actors[i]);
+                }
             }
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(0, 0, window_width, window_height);
+        glViewport(0, 0, global::window_width, global::window_height);
 #endif
 
 ///////////////////////////////////////////
 // ACTOR DRAWING
+        actor_count = 0;
         for (int i = 0; i < actors.size(); ++i)
         {
-            draw_actor(actors[i]);
+            //if (glm::length(glm::vec2(actors[i]->pos.x, actors[i]->pos.z) - glm::vec2(active_camera->pos.x, active_camera->pos.z)) < 50)
+            {
+                draw_actor(actors[i]);
+                actor_count += 1;
+            }
         }
 
 ///////////////////////////////////////////
@@ -1359,10 +1368,12 @@ void Base::draw_actor_to_shadow_map(Actor * actor)
     //for (auto mesh_it = components.end() - 1;
     //     mesh_it != components.begin() - 1;
     //     --mesh_it)
+    int mesh_count = -1;
     for (auto mesh_it = components.begin();
          mesh_it != components.end();
          ++mesh_it)
     {
+        mesh_count += 1;
         int err;
         if ((*mesh_it)->get_draw_flag())
         {
@@ -1418,20 +1429,20 @@ void Base::draw_actor_to_shadow_map(Actor * actor)
 
                 if (mesh_comp->get_instanced_flag())
                 {
-                    glDrawArraysInstanced(GL_TRIANGLES,
-                        0,
-                        mesh_comp->get_length(),
-                        mesh_comp->get_instance_count());
-                    while ((err = glGetError()) != GL_NO_ERROR)
-                    {
-                        printf("GL ERROR drawing instanced shadow maps: %d\n", err);
-                    }
+                        glDrawArraysInstanced(GL_TRIANGLES,
+                            0,
+                            mesh_comp->get_length(),
+                            mesh_comp->get_instance_count());
+                        while ((err = glGetError()) != GL_NO_ERROR)
+                        {
+                            printf("GL ERROR drawing instanced shadow maps: %d\n", err);
+                        }
                 }
                 else
                 {
-                    glDrawArrays(GL_TRIANGLES,
-                                 0,
-                                 mesh_comp->get_length());
+                    //glDrawArrays(GL_TRIANGLES,
+                    //             0,
+                    //             mesh_comp->get_length());
                     while ((err = glGetError()) != GL_NO_ERROR)
                     {
                         printf("GL ERROR drawing shadow maps: %d\n", err);
@@ -1519,7 +1530,7 @@ void Base::draw_actor(Actor * actor)
 
             active_camera->set_projection(
                 glm::perspective(glm::radians(player_fov),
-                (1.0f*window_width / window_height),
+                (1.0f*global::window_width / global::window_height),
                 0.1f,
                 1000.0f));
             GLuint projection =
@@ -1546,9 +1557,9 @@ void Base::draw_actor(Actor * actor)
 
             GLuint light_color_loc =
                 glGetUniformLocation(shader_id, "in_light_color");
-            glUniform3fv(light_color_loc,
-                         1,
-                         glm::value_ptr(sun_intensity));
+                glUniform3fv(light_color_loc,
+                    1,
+                    glm::value_ptr(sun_intensity));
 
             std::vector <tgl::Texture*> textures =
                 mesh_comp->get_textures();
@@ -1630,10 +1641,10 @@ void Base::draw_hud_element(HudElement * element, float offset_x, float offset_y
     glUseProgram(shader_id);
 
     GLfloat * params = element->get_params();
-    params[0] /= window_width;
-    params[1] /= window_height;
-    params[2] /= window_width;
-    params[3] /= window_height;
+    params[0] /= global::window_width;
+    params[1] /= global::window_height;
+    params[2] /= global::window_width;
+    params[3] /= global::window_height;
 
     params[2] += offset_x;
     params[3] += offset_y;
@@ -1682,10 +1693,10 @@ void Base::draw_hud_element(HudElement * element, float offset_x, float offset_y
 
         GLfloat params_sub_new[4];
         GLfloat * params_sub = sub_el->get_params();
-        params_sub_new[0] = params_sub[0] / window_width;
-        params_sub_new[1] = params_sub[1] / window_height;
-        params_sub_new[2] = params_sub[2] / window_width;
-        params_sub_new[3] = params_sub[3] / window_height;
+        params_sub_new[0] = params_sub[0] / global::window_width;
+        params_sub_new[1] = params_sub[1] / global::window_height;
+        params_sub_new[2] = params_sub[2] / global::window_width;
+        params_sub_new[3] = params_sub[3] / global::window_height;
         params_sub_new[2] += params[2];
         params_sub_new[3] += params[3];
         params_loc = glGetUniformLocation(shader_id, "params");

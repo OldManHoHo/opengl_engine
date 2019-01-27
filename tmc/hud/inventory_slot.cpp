@@ -16,14 +16,13 @@ InventorySlot::InventorySlot(int in_x, int in_y,
                 glm::vec2(in_x, in_y),
                 glm::vec3(0.5, 0.5, 0.5))
 {
-    tgl::HudElement * item_picture =
+    picture_element =
         new tgl::HudElement(inventory_slot_width - 2*inventory_slot_border,
             inventory_slot_height - 2*inventory_slot_border,
             glm::vec2(inventory_slot_border,
                 inventory_slot_border), glm::vec3(0.5, 0.5, 0.5),
             "content/textures/mc.png");
-    tgl::HudElement * item_count;
-    item_count = new tgl::HudElement(
+    text_element = new tgl::HudElement(
         30,
         30,
         glm::vec2(0,0),
@@ -33,8 +32,8 @@ InventorySlot::InventorySlot(int in_x, int in_y,
         0,
         0,
         0);
-    item_picture->sub_elements.push_back(item_count);
-    sub_elements.push_back(item_picture);
+    picture_element->sub_elements.push_back(text_element);
+    sub_elements.push_back(picture_element);
     
 }
 

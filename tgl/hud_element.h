@@ -3,6 +3,7 @@
 #define TGL_HUD_ELEMENT_H_
 
 #include <map>
+#include <string>
 #include <vector>
 
 #ifdef _TGL_CLIENT

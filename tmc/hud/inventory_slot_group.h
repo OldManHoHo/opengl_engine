@@ -2,6 +2,7 @@
 #define TMC_HUD_INVENTORY_SLOT_GROUP_H_
 
 #include "tgl/hud_element.h"
+#include "tmc/hud/inventory_slot.h"
 
 namespace tmc
 {
@@ -10,6 +11,7 @@ namespace hud
     
 class InventorySlotGroup : public tgl::HudElement
 {
+ public:
     // Number of total items
     int num_items;
     // Number of items in each row
@@ -29,3 +31,5 @@ class InventorySlotGroup : public tgl::HudElement
     
 }  // namespace hud
 }  // namespace tmc
+
+#endif  // TMC_HUD_INVENTORY_SLOT_GROUP_H_

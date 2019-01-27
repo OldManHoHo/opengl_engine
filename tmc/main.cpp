@@ -73,13 +73,6 @@ int main()
 	inventory.sub_elements.push_back(&inventory_item5b);
 	inventory.sub_elements.push_back(&inventory_item5);
 
-
-	tgl::HudElement depth_buffer_display(500, 500, glm::vec2(100, 500), glm::vec3(0, 0, 0), "content/textures/mc.png");
-	depth_buffer_display.tex->texture = gl_base.ray_bounce.depthTexture;
-
-	tgl::HudElement depth_buffer_display2(500, 500, glm::vec2(100, 1050), glm::vec3(0, 0, 0), "content/textures/mc.png");
-	depth_buffer_display2.tex->texture = gl_base.ray_bounce.depthTexture2;
-
 	debug_actor.add_component(tgl::useful_structures::create_cube_mesh());
 #endif
 	debug_actor.set_scale(glm::vec3(0.1,0.1,0.1));
@@ -97,6 +90,14 @@ int main()
 	// TMCPlayer p6;
 	
 	main_cam.set_chunk_spawn(&chunk_spawn);
+
+    tgl::HudElement * depth_buffer_display = new tgl::HudElement(500, 500, glm::vec2(100, 500), glm::vec3(0, 0, 0), "content/textures/mc.png");
+    depth_buffer_display->tex->texture = gl_base.ray_bounce.depthTexture;
+    main_cam.add_hud(depth_buffer_display);
+
+    tgl::HudElement * depth_buffer_display2 = new tgl::HudElement(500, 500, glm::vec2(100, 1050), glm::vec3(0, 0, 0), "content/textures/mc.png");
+    depth_buffer_display2->tex->texture = gl_base.ray_bounce.depthTexture2;
+    main_cam.add_hud(depth_buffer_display2);
 
 #ifdef _TGL_CLIENT
     if (tgl::global::server_processing)

@@ -5,17 +5,16 @@ namespace tmc
 namespace hud
 {
 
-Button::Button(const int (&)[1] in_on_press,
+Button::Button(
                   std::string in_button_text,
                   int in_pos_x, int in_pos_y,
-                  int in_width, int in_height
+                  int in_width, int in_height,
                   glm::vec3 in_color):
     button_text(in_button_text),
-    on_press(in_on_press),
     tgl::HudElement(in_width,
             in_height,
             glm::vec2(in_pos_x, in_pos_y),
-            in_color);
+            in_color)
 {
     tgl::HudElement * button_text_element;
     button_text_element = new tgl::HudElement(
@@ -33,7 +32,10 @@ Button::Button(const int (&)[1] in_on_press,
 
 void Button::on_click()
 {
-    on_press();
+}
+
+void Button::on_click_release()
+{
 }
     
 }  // namespace hud

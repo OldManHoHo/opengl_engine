@@ -3,8 +3,9 @@
 
 #include <vector>
 
-#include "tmc/chunk_spawn.h"
 #include "tgl/player.h"
+#include "tmc/chunk_spawn.h"
+#include "tmc/hud/inventory_slot_group.h"
 
 namespace tmc
 {
@@ -19,6 +20,10 @@ class Player : public tgl::Player
     bool inventory_on;
     int inventory_slots;
     int quick_use_slots;
+	tgl::HudElement * hud_dragging;
+	glm::vec2 orig_drag_pos;
+	glm::vec2 drag_mouse_diff;
+	int dragged_inventory_index;
 
  public:
     static const int max_hit_distance = 5;
@@ -40,6 +45,8 @@ class Player : public tgl::Player
     void add_quick_slot();
     std::vector<glm::vec3> fetch_hits();
     std::vector<std::pair<glm::vec3, e_block_type>> fetch_placements();
+	int screen_pos_to_inventory_index(int in_pos_x, int in_pos_y, 
+									  int &inventory_index, tgl::HudElement *& out_hud_element);
 };
 
 } // namespace tmc

@@ -46,8 +46,11 @@ class chunk_searcher
 class ChunkSpawn : public tgl::Actor
 {
     std::map <chunk_coord, tmc::Chunk*> chunks;
+	//std::map <block_coord, BlockState> block_states;
 
-    tgl::MeshVertices * block_mesh_vertices;
+	const int block_buffer_count = 20;
+	int block_buffer_pointer;
+    std::vector <tgl::MeshVertices *> block_mesh_vertices;
     tgl::Texture * block_texture;
     tgl::Material * block_material;
 

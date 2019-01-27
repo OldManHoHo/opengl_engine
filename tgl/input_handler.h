@@ -12,6 +12,12 @@ class InputHandler
 {
  public:
     std::map <char, bool> key_states;
+	std::map <char, bool> key_held;
+	std::map <char, double> held_time;
+	std::map <char, bool> key_press;
+	std::map <char, int> key_glfw_enum;
+	double hold_threshold;
+
     double mouse_x, mouse_y;
     InputHandler();
     void tick(double time_delta);

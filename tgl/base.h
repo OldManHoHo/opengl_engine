@@ -162,6 +162,8 @@ class Base
 
     std::map <chunk_coord, std::map<block_coord, char>> light_calcs;
 
+    int actor_count;
+
  public:
     Base();
     ~Base();

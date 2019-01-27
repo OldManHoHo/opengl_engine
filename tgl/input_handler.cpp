@@ -4,21 +4,30 @@
 namespace tgl
 {
 
-InputHandler::InputHandler()
+InputHandler::InputHandler():
+	hold_threshold(0.2)
 {
-    key_states['w'] = false;
-    key_states['s'] = false;
-    key_states['d'] = false;
-    key_states['a'] = false;
-    key_states['e'] = false;
-    key_states[' '] = false;
-    key_states[1] = false;
-    key_states[2] = false;
-    key_states['1'] = false;
-    key_states['1'+1] = false;
-    key_states['1'+2] = false;
-    key_states['1'+3] = false;
-    key_states['1'+4] = false;
+	key_glfw_enum['w'] = GLFW_KEY_W;
+	key_glfw_enum['s'] = GLFW_KEY_S;
+	key_glfw_enum['d'] = GLFW_KEY_D;
+	key_glfw_enum['a'] = GLFW_KEY_A;
+	key_glfw_enum['e'] = GLFW_KEY_E;
+	key_glfw_enum[' '] = GLFW_KEY_SPACE;
+	key_glfw_enum[1] = GLFW_MOUSE_BUTTON_LEFT;
+	key_glfw_enum[2] = GLFW_MOUSE_BUTTON_RIGHT;
+	key_glfw_enum['1'] = GLFW_KEY_1;
+	key_glfw_enum['1' + 1] = GLFW_KEY_2;
+	key_glfw_enum['1' + 2] = GLFW_KEY_3;
+	key_glfw_enum['1' + 3] = GLFW_KEY_4;
+	key_glfw_enum['1' + 4] = GLFW_KEY_5;
+
+	for (auto key : key_states)
+	{
+		key_held[key.first] = false;
+		key_states[key.first] = false;
+		held_time[key.first] = -1;
+	}
+
     set_cursor_enabled(false);
 }
 
@@ -26,84 +35,79 @@ void InputHandler::tick(double time_delta)
 {
 #ifdef _TGL_SERVER
 #elif defined(_TGL_CLIENT)
-    glfwGetCursorPos(global::window, &mouse_x, &mouse_y);
-    if (glfwGetKey(global::window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        key_states['w'] = true;
-    }
-    else
-    {
-        key_states['w'] = false;
-    }
-    if (glfwGetKey(global::window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        key_states['s'] = true;
-    }
-    else
-    {
-        key_states['s'] = false;
-    }
-    if (glfwGetKey(global::window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        key_states['a'] = true;
-    }
-    else
-    {
-        key_states['a'] = false;
-    }
-    if (glfwGetKey(global::window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        key_states['d'] = true;
-    }
-    else
-    {
-        key_states['d'] = false;
-    }
-    if (glfwGetKey(global::window, GLFW_KEY_E) == GLFW_PRESS)
-    {
-        key_states['e'] = true;
-    }
-    else
-    {
-        key_states['e'] = false;
-    }
-    if (glfwGetKey(global::window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    {
-        key_states[' '] = true;
-    }
-    else
-    {
-        key_states[' '] = false;
-    }
-    if (glfwGetMouseButton(global::window, GLFW_MOUSE_BUTTON_1) ==
-            GLFW_PRESS)
-    {
-        key_states[1] = true;
-    }
-    else
-    {
-        key_states[1] = false;
-    }
-    if (glfwGetMouseButton(global::window, GLFW_MOUSE_BUTTON_2) ==
-            GLFW_PRESS)
-    {
-        key_states[2] = true;
-    }
-    else
-    {
-        key_states[2] = false;
-    }
-    for (int i = 0; i < 9; ++i)
-    {
-        if (glfwGetKey(global::window, GLFW_KEY_1 + i) == GLFW_PRESS)
-        {
-            key_states['1' + i] = true;
-        }
-        else
-        {
-            key_states['1' + i] = false;
-        }
-    }
+	glfwGetCursorPos(global::window, &mouse_x, &mouse_y);
+	for (auto key : key_states)
+	{
+		if (glfwGetKey(global::window, key_glfw_enum[key.first]) == GLFW_PRESS)
+		{
+			if (key_press[key.first] == false)
+			{
+				key_press[key.first] = true;
+			}
+			else
+			{
+				key_press[key.first] = false;
+			}
+			held_time[key.first] += time_delta;
+			key_states[key.first] = true;
+			if (held_time[key.first] > hold_threshold)
+			{
+				key_held[key.first] = true;
+			}
+		}
+		else
+		{
+			key_press[key.first] = false;
+			key_states[key.first] = false;
+			key_held[key.first] = false;
+		}
+	}
+	if (glfwGetMouseButton(global::window, key_glfw_enum[1]) == GLFW_PRESS)
+	{
+		if (key_press[1] == false)
+		{
+			key_press[1] = true;
+		}
+		else
+		{
+			key_press[1] = false;
+		}
+		held_time[1] += time_delta;
+		key_states[1] = true;
+		if (held_time[1] > hold_threshold)
+		{
+			key_held[1] = true;
+		}
+	}
+	else
+	{
+		key_press[1] = false;
+		key_states[1] = false;
+		key_held[1] = false;
+	}
+	if (glfwGetMouseButton(global::window, key_glfw_enum[2]) == GLFW_PRESS)
+	{
+		if (key_press[2] == false)
+		{
+			key_press[2] = true;
+		}
+		else
+		{
+			key_press[2] = false;
+		}
+		held_time[2] += time_delta;
+		key_states[2] = true;
+		if (held_time[2] > hold_threshold)
+		{
+			key_held[2] = true;
+		}
+	}
+	else
+	{
+		key_press[2] = false;
+		key_states[2] = false;
+		key_held[2] = false;
+	}
 #endif
 }
 

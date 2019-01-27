@@ -1,13 +1,11 @@
-#include "tmc/hud/main_inventory.h"
-
-#include "tmc/hud/inventory_slot.h"
+#include "tmc/hud/inventory_slot_group.h"
 
 namespace tmc
 {
 namespace hud
 {
     
-MainInventory::MainInventory(int in_pos_x, int in_pos_y,
+InventorySlotGroup::InventorySlotGroup(int in_pos_x, int in_pos_y,
                       int in_num_items, int in_num_columns,
                       int in_inventory_slot_width,
                       int in_inventory_slot_height,
@@ -20,7 +18,7 @@ MainInventory::MainInventory(int in_pos_x, int in_pos_y,
     tgl::HudElement(in_num_columns*inventory_slot_width,
             ceil(in_num_items*1.0/in_num_columns)*inventory_slot_height,
             glm::vec2(in_pos_x, in_pos_y),
-            glm::vec3(0.0, 0.0, 0.0));
+            glm::vec3(0.0, 0.0, 0.0))
 {
     for (int i = 0; i < num_items; ++i)
     {

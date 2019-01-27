@@ -239,10 +239,14 @@ ChunkSpawn::ChunkSpawn():
     block_texture = new tgl::Texture("content/textures/mc.png");
     block_material = new tgl::Material;
 
-    block_mesh_vertices =
-        new tgl::MeshVertices(tgl::useful_structures::vertex_data_block_small);
+	for (int i = 0; i < block_buffer_count; ++i)
+	{
+		block_mesh_vertices.push_back(
+			new tgl::MeshVertices(tgl::useful_structures::vertex_data_block_small));
+		block_buffer_pointer = 0;
+	}
 
-    GLenum err;
+    GLenum err; 
     while ((err = glGetError()) != GL_NO_ERROR)
     {
         printf("GL ERROR chunk_spawn init 1: %d\n", err);
@@ -316,7 +320,6 @@ glm::vec3 ray_cast_block_finder(glm::vec3 in_position,
         y_intersected_block,
         z_intersected_block,
         intersected_block;
-
 
     if (in_ray.x != 0)
     {
@@ -824,9 +827,9 @@ void ChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
     {
         if (instances[i].size() == 0)
         {
-            instances[i].push_back(0);
-            instances[i].push_back(-1);
-            instances[i].push_back(0);
+			instances[i].push_back(0);
+			instances[i].push_back(0);
+			instances[i].push_back(0);
         }
     }
     block_generator->get_points((chunk_x * 16 - 1), (chunk_y * 16 - 1), 0, 18);
@@ -904,8 +907,13 @@ void ChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
         }
     }
 #ifdef _TGL_CLIENT
+	tgl::MeshVertices * block_mesh_vertices_temp =
+		block_mesh_vertices[block_buffer_pointer];
+	block_buffer_pointer = (block_buffer_pointer + 1) % block_mesh_vertices.size();
+	//	new tgl::MeshVertices(tgl::useful_structures::vertex_data_block_small);
+
     chunks[chunk_coord(chunk_x, chunk_y)] =
-        new tmc::Chunk(block_mesh_vertices,
+        new tmc::Chunk(block_mesh_vertices_temp,
                        block_material,
                        block_type_count,
                        instances);

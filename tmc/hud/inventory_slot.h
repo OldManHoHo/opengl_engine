@@ -11,6 +11,9 @@ namespace hud
 class InventorySlot : public tgl::HudElement
 {
  public:
+    tgl::HudElement * picture_element;
+    tgl::HudElement * text_element;
+
     InventorySlot(int in_x, int in_y,
                      int inventory_slot_width,
                      int inventory_slot_height,

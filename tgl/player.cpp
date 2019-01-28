@@ -12,7 +12,7 @@ namespace tgl
 
 Player::Player(int inventory_items) :
     inventory(inventory_items),
-    multi_press_threshold(0.25),
+    multi_press_threshold(0.05),
     blank_item(tgl::ItemId::none, 0),
     equipped_index(0),
     cursor_on(false)

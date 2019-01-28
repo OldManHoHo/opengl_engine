@@ -157,10 +157,12 @@
     <ClCompile Include="..\tgl\udp_interface.cpp" />
     <ClCompile Include="..\tgl\useful_structures.cpp" />
     <ClCompile Include="..\tmc\block_generator.cpp" />
+    <ClCompile Include="..\tmc\block_state.cpp" />
     <ClCompile Include="..\tmc\cellular.cpp" />
     <ClCompile Include="..\tmc\chunk.cpp" />
     <ClCompile Include="..\tmc\chunk_database.cpp" />
     <ClCompile Include="..\tmc\chunk_spawn.cpp" />
+    <ClCompile Include="..\tmc\crafting_table_hud.cpp" />
     <ClCompile Include="..\tmc\dropped_item.cpp" />
     <ClCompile Include="..\tmc\generator.cpp" />
     <ClCompile Include="..\tmc\hud\button.cpp" />
@@ -204,6 +206,7 @@
     <ClInclude Include="..\tgl\udp_interface.h" />
     <ClInclude Include="..\tgl\useful_structures.h" />
     <ClInclude Include="..\tmc\block_generator.h" />
+    <ClInclude Include="..\tmc\block_state.h" />
     <ClInclude Include="..\tmc\cellular.h" />
     <ClInclude Include="..\tmc\chunk.h" />
     <ClInclude Include="..\tmc\chunk_database.h" />
@@ -211,6 +214,7 @@
     <ClInclude Include="..\tmc\coord_types.h" />
     <ClInclude Include="..\tmc\dropped_item.h" />
     <ClInclude Include="..\tmc\generator.h" />
+    <ClInclude Include="..\tmc\Header.h" />
     <ClInclude Include="..\tmc\hud\button.h" />
     <ClInclude Include="..\tmc\hud\crafting_table_hud.h" />
     <ClInclude Include="..\tmc\hud\inventory_slot.h" />

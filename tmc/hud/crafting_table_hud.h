@@ -9,13 +9,19 @@ namespace tmc
 namespace hud
 {
     
-class CraftingTableHud : tgl::HudElement
+class CraftingTableHud : public tgl::HudElement
 {
     int size_x;
     int size_y;
+	int inventory_slot_width;
+	int inventory_slot_height;
+	int inventory_slot_border;
     
  public:
-    CraftingTableHud(int size_x, int size_y, int pos_x, int pos_y);
+    CraftingTableHud(int size_x, int size_y, int pos_x, int pos_y,
+		int in_inventory_slot_width,
+		int in_inventory_slot_height,
+		int in_inventory_slot_border);
 };
     
 }  // namespace hud   

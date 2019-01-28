@@ -38,6 +38,10 @@ void InputHandler::tick(double time_delta)
 	glfwGetCursorPos(global::window, &mouse_x, &mouse_y);
 	for (auto key : key_states)
 	{
+		if (key.first == 1 || key.first == 2)
+		{
+			continue;
+		}
 		if (glfwGetKey(global::window, key_glfw_enum[key.first]) == GLFW_PRESS)
 		{
 			if (key_press[key.first] == false)

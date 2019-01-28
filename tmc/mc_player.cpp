@@ -18,7 +18,9 @@ Player::Player():
             + tgl::Inventory::default_quick_use_size),
     quick_use_slots(tgl::Inventory::default_quick_use_size),
     tgl::Player(full_inventory_slot_width*full_inventory_slot_height
-                + tgl::Inventory::default_quick_use_size)
+                + tgl::Inventory::default_quick_use_size),
+	crafting_table_hud(nullptr),
+	crafting_table_on(false)
 {
     init_inventory(quick_use_slots);
 }
@@ -53,8 +55,16 @@ void Player::init_inventory(int num_slots)
             inventory_slot_height,
             inventory_slot_border);
     inventory_hud = static_cast<tgl::HudElement*>(quick_use_hud_slot_group);
+	crafting_table_hud =
+		new tmc::hud::CraftingTableHud(100, 100, 
+			inventory_slot_width*quick_use_slots + inventory_screen_pos_x + 100,
+			inventory_screen_pos_y,
+			inventory_slot_width,
+			inventory_slot_height,
+			inventory_slot_border);
     add_hud(inventory_hud);
     add_hud(full_inventory_hud);
+	add_hud(static_cast<tgl::HudElement*>(crafting_table_hud));
     return;
     //add_hud();
 #endif
@@ -73,12 +83,17 @@ void Player::tick(double time_delta)
     time_since_last_e += time_delta;
 	glm::vec2 mouse_pos = glm::vec2(input_handler.mouse_x, input_handler.mouse_y);
 	mouse_pos.y = tgl::global::window_height - mouse_pos.y;
-	if (hud_dragging != nullptr && input_handler.key_held[1])
+
+	if (crafting_table_on)
 	{
-		hud_dragging->pos += mouse_pos - drag_mouse_diff;
-		drag_mouse_diff = mouse_pos;
+		crafting_table_hud->visible = true;
 	}
-	if (input_handler.key_press[1] && hud_dragging == nullptr)
+	else
+	{
+		crafting_table_hud->visible = false;
+	}
+	if (input_handler.key_press[1] && hud_dragging == nullptr && 
+		time_since_last_left >= multi_press_threshold)
 	{
 		tgl::HudElement * out_he = nullptr;
 		screen_pos_to_inventory_index(mouse_pos.x, mouse_pos.y,
@@ -100,7 +115,8 @@ void Player::tick(double time_delta)
 			hud.push_back(hud_dragging);
 		}
 	}
-	if (input_handler.key_states[1] == false)
+	else if (input_handler.key_press[1] &&
+		     time_since_last_left >= multi_press_threshold)
 	{
 		if (hud_dragging != nullptr)
 		{
@@ -115,8 +131,14 @@ void Player::tick(double time_delta)
 			delete hud_dragging;
 			hud_dragging = nullptr;
 			hud.resize(hud.size() - 1);
+			hud_dragging = nullptr;
 		}
-		hud_dragging = nullptr;
+
+	}
+	if (hud_dragging != nullptr)
+	{
+		hud_dragging->pos += mouse_pos - drag_mouse_diff;
+		drag_mouse_diff = mouse_pos;
 	}
     if (input_handler.key_states[1])
     {

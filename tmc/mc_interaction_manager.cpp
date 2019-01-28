@@ -70,18 +70,27 @@ void InteractionManager::tick(double time_delta, std::vector<tgl::Actor*>& actor
                                                       intersect_point);
                 if (chunk_spawn != nullptr)
                 {
-                    tgl::InventoryItem& check = player->get_equipped();
-                    if (check.type != tgl::ItemId::none)
-                    {
-                        block_def block_to_place;
-                        block_to_place.loc = block_coord(block_to_add_loc);
-                        block_to_place.type = 
-                            item_id_to_block_type(check.type);
-                        if (tgl::global::server_processing)
-                        {
-                            chunk_spawn->post_placement(block_to_place);
-                        }
-                    }
+					BlockState * block_state = nullptr;
+					block_state = chunk_spawn->get_block_state(hit_block);
+					if (block_state != nullptr)
+					{
+
+					}
+					else
+					{
+						tgl::InventoryItem& check = player->get_equipped();
+						if (check.type != tgl::ItemId::none)
+						{
+							block_def block_to_place;
+							block_to_place.loc = block_coord(block_to_add_loc);
+							block_to_place.type =
+								item_id_to_block_type(check.type);
+							if (tgl::global::server_processing)
+							{
+								chunk_spawn->post_placement(block_to_place);
+							}
+						}
+					}
                 }
             }
             

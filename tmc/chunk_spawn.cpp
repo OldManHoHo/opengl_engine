@@ -657,13 +657,13 @@ void ChunkSpawn::tick(double time_delta)
                                 (unsigned int)(placement.loc.y),
                                 (unsigned int)(placement.loc.z - chunk_y * 16));
 #ifdef _TGL_CLIENT
-            chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(placement.type,
-                                                                to_create);
+            //chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(placement.type,
+            //                                                    to_create);
 #endif
-            block_generator->set_point(placement.type,
-                                       placement.loc.x,
-                                       placement.loc.z,
-                                       placement.loc.y);
+            set_point(placement.loc.x,
+					  placement.loc.y,
+					  placement.loc.z,
+					  placement.type);
 #ifdef _TGL_SERVER
             new_block_changes.push_back(block_def(placement.loc.x,
                                                   placement.loc.y,
@@ -1213,7 +1213,6 @@ void ChunkSpawn::set_point(int x, int y, int z, e_block_type b_type)
         chunks[chunk_coord(chunk_x, chunk_y)]->add_instance(b_type, to_remove);
     }
 #endif
-    //block_generator->set_point(b_type, x, z, y);
 
     e_block_type type_to_remove = get_point(x, y, z);
     if (type_to_remove != bt_air)
@@ -1282,6 +1281,15 @@ void ChunkSpawn::set_point(int x, int y, int z, e_block_type b_type)
         }
 #endif 
     }
+	else
+	{
+		block_generator->set_point(b_type, x, z, y);
+	}
+	if (block_type_enum_to_state_proto.find(b_type) != 
+		block_type_enum_to_state_proto.end())
+	{
+		block_states[block_coord(x, y, z)] = block_type_enum_to_state_proto[b_type];
+	}
 }
 
 e_block_type * ChunkSpawn::get_points(int x, int y, int division)
@@ -1660,6 +1668,15 @@ std::unordered_map<block_coord, block_def>& ChunkSpawn::get_mods(
 						chunk_coord to_send)
 {
 	return block_generator->world_mods[to_send];
+}
+
+BlockState * ChunkSpawn::get_block_state(glm::vec3 in_block_loc)
+{
+	if (block_states.find(block_coord(in_block_loc)) != block_states.end())
+	{
+		return &block_states[block_coord(in_block_loc)];
+	}
+	return nullptr;
 }
 
 }  // namespace tmc

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{7B01A013-98A5-4F7F-953D-FDA939CDFE7F}</ProjectGuid>
+    <RootNamespace>tmcclient</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD.cpp" />
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_avx2.cpp" />
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_avx512.cpp" />
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_internal.cpp" />
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_neon.cpp" />
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_sse2.cpp" />
+    <ClCompile Include="FastNoiseSIMD\FastNoiseSIMD_sse41.cpp" />
+    <ClCompile Include="glad\glad.c" />
+    <ClCompile Include="tgl\actor.cpp" />
+    <ClCompile Include="tgl\base.cpp" />
+    <ClCompile Include="tgl\bounds.cpp" />
+    <ClCompile Include="tgl\camera.cpp" />
+    <ClCompile Include="tgl\component.cpp" />
+    <ClCompile Include="tgl\game_state.cpp" />
+    <ClCompile Include="tgl\globals.cpp" />
+    <ClCompile Include="tgl\hud_element.cpp" />
+    <ClCompile Include="tgl\input_handler.cpp" />
+    <ClCompile Include="tgl\inventory.cpp" />
+    <ClCompile Include="tgl\library_queue.cpp" />
+    <ClCompile Include="tgl\material.cpp" />
+    <ClCompile Include="tgl\mesh.cpp" />
+    <ClCompile Include="tgl\mesh_vertices.cpp" />
+    <ClCompile Include="tgl\physics_engine.cpp" />
+    <ClCompile Include="tgl\player.cpp" />
+    <ClCompile Include="tgl\ray_bounce.cpp" />
+    <ClCompile Include="tgl\shader.cpp" />
+    <ClCompile Include="tgl\texture.cpp" />
+    <ClCompile Include="tgl\udp_interface.cpp" />
+    <ClCompile Include="tgl\useful_structures.cpp" />
+    <ClCompile Include="tmc\block_generator.cpp" />
+    <ClCompile Include="tmc\cellular.cpp" />
+    <ClCompile Include="tmc\chunk.cpp" />
+    <ClCompile Include="tmc\chunk_database.cpp" />
+    <ClCompile Include="tmc\chunk_spawn.cpp" />
+    <ClCompile Include="tmc\dropped_item.cpp" />
+    <ClCompile Include="tmc\generator.cpp" />
+    <ClCompile Include="tmc\hud\button.cpp" />
+    <ClCompile Include="tmc\hud\inventory_slot.cpp" />
+    <ClCompile Include="tmc\hud\inventory_slot_group.cpp" />
+    <ClCompile Include="tmc\main.cpp" />
+    <ClCompile Include="tmc\mc_interaction_manager.cpp" />
+    <ClCompile Include="tmc\mc_items.cpp" />
+    <ClCompile Include="tmc\mc_player.cpp" />
+    <ClCompile Include="tmc\simplex.cpp" />
+    <ClCompile Include="tmc\white_noise.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tgl\global.conf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FastNoiseSIMD\FastNoiseSIMD.h" />
+    <ClInclude Include="FastNoiseSIMD\FastNoiseSIMD_internal.h" />
+    <ClInclude Include="glad\glad.h" />
+    <ClInclude Include="tgl\actor.h" />
+    <ClInclude Include="tgl\base.h" />
+    <ClInclude Include="tgl\bounds.h" />
+    <ClInclude Include="tgl\camera.h" />
+    <ClInclude Include="tgl\component.h" />
+    <ClInclude Include="tgl\game_state.h" />
+    <ClInclude Include="tgl\globals.h" />
+    <ClInclude Include="tgl\hud_element.h" />
+    <ClInclude Include="tgl\input_handler.h" />
+    <ClInclude Include="tgl\interaction_manager.h" />
+    <ClInclude Include="tgl\inventory.h" />
+    <ClInclude Include="tgl\library_queue.h" />
+    <ClInclude Include="tgl\material.h" />
+    <ClInclude Include="tgl\mesh.h" />
+    <ClInclude Include="tgl\mesh_vertices.h" />
+    <ClInclude Include="tgl\net_messages.h" />
+    <ClInclude Include="tgl\physics_engine.h" />
+    <ClInclude Include="tgl\player.h" />
+    <ClInclude Include="tgl\ray_bounce.h" />
+    <ClInclude Include="tgl\shader.h" />
+    <ClInclude Include="tgl\stb_image.h" />
+    <ClInclude Include="tgl\texture.h" />
+    <ClInclude Include="tgl\tgl_gl.h" />
+    <ClInclude Include="tgl\TGL_USER_CLASSES.h" />
+    <ClInclude Include="tgl\udp_interface.h" />
+    <ClInclude Include="tgl\useful_structures.h" />
+    <ClInclude Include="tmc\block_generator.h" />
+    <ClInclude Include="tmc\cellular.h" />
+    <ClInclude Include="tmc\chunk.h" />
+    <ClInclude Include="tmc\chunk_database.h" />
+    <ClInclude Include="tmc\chunk_spawn.h" />
+    <ClInclude Include="tmc\coord_types.h" />
+    <ClInclude Include="tmc\dropped_item.h" />
+    <ClInclude Include="tmc\generator.h" />
+    <ClInclude Include="tmc\hud\button.h" />
+    <ClInclude Include="tmc\hud\crafting_table_hud.h" />
+    <ClInclude Include="tmc\hud\inventory_slot.h" />
+    <ClInclude Include="tmc\hud\inventory_slot_group.h" />
+    <ClInclude Include="tmc\mc_interaction_manager.h" />
+    <ClInclude Include="tmc\mc_items.h" />
+    <ClInclude Include="tmc\mc_player.h" />
+    <ClInclude Include="tmc\net_msg_structures.h" />
+    <ClInclude Include="tmc\simplex.h" />
+    <ClInclude Include="tmc\white_noise.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

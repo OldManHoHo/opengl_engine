@@ -115,7 +115,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\glm-0.9.9-a2;..\;..\glfw-3.2.1\include;..\libdrawtext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\glm-0.9.9-a2;..\;..\glfw-3.2.1\include;..\freetype;C:\Users\teddy\Source\Repos\opengl_engine\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_TGL_CLIENT;GLM_ENABLE_EXPERIMENTAL;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -126,13 +126,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\FastNoiseSIMD\FastNoiseSIMD.cpp" />
-    <ClCompile Include="..\FastNoiseSIMD\FastNoiseSIMD_avx2.cpp" />
-    <ClCompile Include="..\FastNoiseSIMD\FastNoiseSIMD_avx512.cpp" />
-    <ClCompile Include="..\FastNoiseSIMD\FastNoiseSIMD_internal.cpp" />
-    <ClCompile Include="..\FastNoiseSIMD\FastNoiseSIMD_neon.cpp" />
-    <ClCompile Include="..\FastNoiseSIMD\FastNoiseSIMD_sse2.cpp" />
-    <ClCompile Include="..\FastNoiseSIMD\FastNoiseSIMD_sse41.cpp" />
     <ClCompile Include="..\glad\glad.c" />
     <ClCompile Include="..\tgl\actor.cpp" />
     <ClCompile Include="..\tgl\base.cpp" />
@@ -176,8 +169,7 @@
     <ClCompile Include="..\tmc\white_noise.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\FastNoiseSIMD\FastNoiseSIMD.h" />
-    <ClInclude Include="..\FastNoiseSIMD\FastNoiseSIMD_internal.h" />
+    <ClInclude Include="..\glad\glad.h" />
     <ClInclude Include="..\tgl\actor.h" />
     <ClInclude Include="..\tgl\base.h" />
     <ClInclude Include="..\tgl\bounds.h" />

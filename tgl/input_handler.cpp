@@ -1,6 +1,22 @@
 #include "tgl/globals.h"
 #include "tgl/input_handler.h"
 
+#ifndef _TGL_CLIENT
+#define GLFW_KEY_W 0
+#define GLFW_KEY_S 0
+#define GLFW_KEY_D 0
+#define GLFW_KEY_A 0
+#define GLFW_KEY_E 0
+#define GLFW_KEY_SPACE 0
+#define GLFW_MOUSE_BUTTON_LEFT 0
+#define GLFW_MOUSE_BUTTON_RIGHT 0
+#define GLFW_KEY_1 0
+#define GLFW_KEY_2 0
+#define GLFW_KEY_3 0
+#define GLFW_KEY_4 0
+#define GLFW_KEY_5 0
+#endif  // _TGL_CLIENT
+
 namespace tgl
 {
 

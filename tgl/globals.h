@@ -11,9 +11,9 @@ namespace global
 
 #ifdef _TGL_CLIENT
 extern GLFWwindow * window;
+#endif
 extern int window_height;
 extern int window_width;
-#endif
 extern bool server_processing;
 
 }  // namespace global

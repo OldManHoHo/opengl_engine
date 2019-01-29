@@ -70,9 +70,9 @@ void InteractionManager::tick(double time_delta, std::vector<tgl::Actor*>& actor
                                                       intersect_point);
                 if (chunk_spawn != nullptr)
                 {
-					BlockState * block_state = nullptr;
-					block_state = chunk_spawn->get_block_state(hit_block);
-					if (block_state != nullptr)
+					//BlockState * block_state = nullptr;
+					//block_state = chunk_spawn->get_block_state(hit_block);
+					if (0)  //block_state != nullptr)
 					{
 
 					}

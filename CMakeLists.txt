@@ -26,7 +26,7 @@ set (SRC ${tmc}/main.cpp
 	${tgl}/camera.cpp
 	${tgl}/input_handler.cpp
 	${tgl}/component.cpp
-    ${tgl}/udp_interface.cpp
+        ${tgl}/udp_interface.cpp
 	${tmc}/dropped_item.cpp
 	${tgl}/library_queue.cpp
 	${tgl}/game_state.cpp

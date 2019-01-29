@@ -12,7 +12,7 @@
 #include "tgl/tgl_gl.h"
 #include "tgl/actor.h"
 #include "tgl/mesh.h"
-#include "tmc/block_state.h"
+//#include "tmc/block_state.h"
 #include "tmc/chunk.h"
 #include "tmc/mc_items.h"
 #include "tmc/block_generator.h"
@@ -47,8 +47,8 @@ class chunk_searcher
 class ChunkSpawn : public tgl::Actor
 {
     std::map <chunk_coord, tmc::Chunk*> chunks;
-	std::map <block_coord, BlockState> block_states;
-	std::map <e_block_type, BlockState> block_type_enum_to_state_proto;
+	//std::map <block_coord, BlockState> block_states;
+	//std::map <e_block_type, BlockState> block_type_enum_to_state_proto;
 
 	const int block_buffer_count = 20;
 	int block_buffer_pointer;
@@ -127,7 +127,7 @@ class ChunkSpawn : public tgl::Actor
     void clear_block_changes();
     void generate_chunk_request(std::vector <char> & chunk_mod_msg);
     std::unordered_map<block_coord, block_def>& get_mods(chunk_coord to_send);
-	BlockState * get_block_state(glm::vec3 in_block_loc);
+    //BlockState * get_block_state(glm::vec3 in_block_loc);
 };
 
 }  // namespace tmc

@@ -1285,11 +1285,13 @@ void ChunkSpawn::set_point(int x, int y, int z, e_block_type b_type)
 	{
 		block_generator->set_point(b_type, x, z, y);
 	}
+	/*
 	if (block_type_enum_to_state_proto.find(b_type) != 
 		block_type_enum_to_state_proto.end())
 	{
 		block_states[block_coord(x, y, z)] = block_type_enum_to_state_proto[b_type];
 	}
+	*/
 }
 
 e_block_type * ChunkSpawn::get_points(int x, int y, int division)
@@ -1670,6 +1672,7 @@ std::unordered_map<block_coord, block_def>& ChunkSpawn::get_mods(
 	return block_generator->world_mods[to_send];
 }
 
+/*
 BlockState * ChunkSpawn::get_block_state(glm::vec3 in_block_loc)
 {
 	if (block_states.find(block_coord(in_block_loc)) != block_states.end())
@@ -1678,5 +1681,6 @@ BlockState * ChunkSpawn::get_block_state(glm::vec3 in_block_loc)
 	}
 	return nullptr;
 }
+*/
 
 }  // namespace tmc

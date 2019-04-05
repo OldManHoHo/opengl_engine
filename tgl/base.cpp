@@ -34,13 +34,47 @@ Base::Base():
 #endif
     default_shader_program(0),
     game_state_buf(1460,0),
-    shadow_maps_enabled(true)
+    shadow_maps_enabled(true),
+    actor_id_count(0)
 {
     srand(0);
 }
 
 Base::~Base()
 {
+}
+
+bool tgl::Base::operator ==(const tgl::Base &b) const
+{
+    bool equal = true;
+    if (actors.size() != b.actors.size())
+    {
+        std::cout << "Not equal sizes" << "\n";
+        return false;
+    }
+    for (auto& actor : actors)
+    {
+        bool found = false;
+        for (auto& actor2 : b.actors)
+        {
+            if (actor->id == actor2->id)
+            {
+                found = true;
+                if (*actor != *actor2)
+                {
+                    std::cout << "Actor " << actor->id << " not equal" << "\n";
+                    std::cout << actor->get_pos().x << ", " << actor->get_pos().y << ", " << actor->get_pos().z << ", " << actor2->get_pos().x << ", " << actor2->get_pos().y << ", " << actor2->get_pos().z << "\n";
+                    return false;
+                }
+            }
+        }
+        if (found == false)
+        {
+            std::cout << "Actor " << actor->id << " not found in second" << "\n";
+            return false;
+        }
+    }
+    return true;
 }
 
 #ifdef _TGL_CLIENT
@@ -426,7 +460,7 @@ void Base::generate_game_state(bool full)
     short * num_actors = (short*)&game_state_buf[offset];
     *num_actors = 0;
     offset += sizeof(short);
-    for (auto actor : actors)
+    for (auto& actor : actors)
     {
         if (full)
         {
@@ -607,11 +641,11 @@ void Base::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
         {
             unsigned int input_actor_id = clients[client_addr].actor_id;
 
-            for (auto actor : actors)
+            for (auto& actor : actors)
             {
                 if (actor->id == input_actor_id)
                 {
-                    ((tgl::Player*)actor)->apply_input_msg(in_pair->second);
+                    //((tgl::Player*)actor)->apply_input_msg(in_pair->second);
                 }
             }
         }
@@ -947,7 +981,7 @@ void Base::debug_console_loop()
             {
                 int actor_num = std::stoi(arg, nullptr);
                 bool found = false;
-                for (auto actor : actors)
+                for (auto& actor : actors)
                 {
                     if (actor->id == actor_num)
                     {
@@ -1105,7 +1139,7 @@ void Base::update()
             {
                 //if (glm::length(glm::vec2(actors[i]->pos.x, actors[i]->pos.z) - glm::vec2(active_camera->pos.x, active_camera->pos.z)) < 50)
                 {
-                    draw_actor_to_shadow_map(actors[i]);
+                    draw_actor_to_shadow_map(actors[i].get());
                 }
             }
         }
@@ -1120,7 +1154,7 @@ void Base::update()
         {
             //if (glm::length(glm::vec2(actors[i]->pos.x, actors[i]->pos.z) - glm::vec2(active_camera->pos.x, active_camera->pos.z)) < 50)
             {
-                draw_actor(actors[i]);
+                draw_actor(actors[i].get());
                 actor_count += 1;
             }
         }
@@ -1163,9 +1197,9 @@ void Base::update()
         {
             if (actors[i]->delete_flag)
             {
-                Actor * to_delete = actors[i];
-                remove_actor(to_delete);
-                delete to_delete;
+                std::unique_ptr<Actor> to_delete = std::move(actors[i]);
+                remove_actor(i);
+                to_delete.reset();
             }
             else
             {
@@ -1227,7 +1261,9 @@ void Base::add_mesh(tgl::Mesh * in_mesh)
 
 void Base::add_actor(tgl::Actor * in_actor)
 {
-    actors.push_back(in_actor);
+    actors.push_back(std::unique_ptr<tgl::Actor>( new tgl::Actor( *in_actor ) ));
+    actors.back()->id = actor_id_count;
+    actor_id_count += 1;
     std::cout <<
         "Added actor " <<
         in_actor->id <<
@@ -1242,16 +1278,10 @@ void Base::add_actor(tgl::Actor * in_actor)
 
 // remove_actor currently only removes reference in base. Does not 
 // free memory
-void Base::remove_actor(tgl::Actor * in_actor)
+void Base::remove_actor(int actor_index)
 {
-    for (int i = 0; i < actors.size(); ++i)
-    {
-        if (actors[i] == in_actor)
-        {
-            actors[i] = actors[actors.size() - 1];
-            actors.resize(actors.size() - 1);
-        }
-    }
+    actors[actor_index] = std::move(actors[actors.size() - 1]);
+    actors.resize(actors.size() - 1);
 }
 
 tgl::Player * Base::get_player()
@@ -1272,7 +1302,7 @@ void Base::set_world_actor(tgl::Actor * in_actor)
 // TODO(Teddy Walsh): remove or implement
 void Base::get_game_state()
 {
-    for (auto actor : actors)
+    for (auto& actor : actors)
     {
         // actor->get_game_state();
     }

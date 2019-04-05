@@ -82,7 +82,7 @@ void Simplex::set_scales(int in_x, int in_y, int in_z)
     myNoise->SetAxisScales(in_x, in_y, in_z);
 }
 
-#ifdef _UNIT_TEST
+#ifdef _UNIT_TEST_HG
 #include <assert.h>
 #include <iostream>
 void Simplex_TEST()

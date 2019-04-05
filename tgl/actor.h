@@ -12,6 +12,8 @@
 #include "tgl/bounds.h"
 #include "tgl/component.h"
 
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/vector.hpp>
 
 
 namespace tgl
@@ -22,6 +24,7 @@ class Base;
 
 class Actor
 {
+ public:
     static int _id_counter;
 
  protected:
@@ -34,8 +37,10 @@ class Actor
     glm::vec3 scale;
     glm::mat4 transform;
     std::vector <std::shared_ptr<tgl::Component>> components;
+ public:
     int id;
     int type;
+ protected:
 
 // NETWORK
     std::vector <double*> double_props;
@@ -71,6 +76,8 @@ class Actor
     
     Actor();
     ~Actor() = default;
+    bool operator ==(const tgl::Actor &b) const;
+    bool operator!=(const tgl::Actor &b) const;
     Actor(const Actor& rhs) = default;
     Actor& operator=(const Actor& rhs) = default;
 
@@ -93,6 +100,29 @@ class Actor
     void set_on_ground(bool in_on_ground);
     bool get_on_ground();
 
+    friend class cereal::access;
+    
+    template<class Archive>
+    void save( Archive & archive ) const
+    {
+        archive( pos.x, pos.y, pos.z, id, mass ); // serialize things by passing them to the archive
+        archive( cereal::binary_data(glm::value_ptr(rot),16*sizeof(float)));
+    }
+    template<class Archive>
+    void load( Archive & archive )
+    {
+        archive( pos.x, pos.y, pos.z, id, mass ); // serialize things by passing them to the archive
+        archive( cereal::binary_data(glm::value_ptr(rot),16*sizeof(float)));
+    }
+    
+    /*
+    template<class Archive> 
+    void serialize(Archive & archive) 
+    { 
+        archive( pos.x, pos.y, pos.z, id, mass ); // serialize things by passing them to the archive
+        archive( cereal::binary_data(glm::value_ptr(rot),16*sizeof(float)));
+    }
+    */
     void register_network_property(double * in_prop);
     void register_network_property(float * in_prop);
     void register_network_property(char * in_prop);

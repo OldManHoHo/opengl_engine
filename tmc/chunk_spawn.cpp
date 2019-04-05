@@ -100,7 +100,7 @@ ChunkSpawn::ChunkSpawn():
     block_type_count(7),
     test_chunk(false)
 {
-    block_generator = new BlockGenerator(test_chunk);
+    block_generator = std::unique_ptr<BlockGenerator>(new BlockGenerator(test_chunk));
 #ifdef _TGL_CLIENT
     std::vector <GLfloat> dirt_with_grass;
     std::vector <GLfloat> dirt;

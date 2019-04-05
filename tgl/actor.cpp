@@ -27,6 +27,46 @@ Actor::Actor():
     _id_counter += 1;
 }
 
+bool Actor::operator ==(const tgl::Actor &b) const
+{
+    if (type != b.type)
+    {
+        std::cout << "type!" << "\n";
+        return false;
+    }
+    if (pos != b.pos)
+    {
+        std::cout << "pos!" << "\n";
+        return false;
+    }
+    if (rot != b.rot)
+    {
+        std::cout << "rot!" << "\n";
+        return false;
+    }
+    if (scale != b.scale)
+    {
+        std::cout << "scale!" << "\n";
+        return false;
+    }
+    if (id != b.id)
+    {
+        std::cout << "id!" << "\n";
+        return false;
+    }
+    if (mass != b.mass)
+    {
+        std::cout << "mass!" << "\n";
+        return false;
+    }
+    return true;
+}
+
+bool Actor::operator!=(const tgl::Actor &b) const
+{
+    return !(*this == b);
+}
+
 void Actor::set_transform(glm::mat4 in_transform)
 {
     transform = in_transform;

@@ -11,10 +11,6 @@
 #include "tmc/chunk_spawn.h"
 #include "tmc/mc_interaction_manager.h"
 
-#ifdef _UNIT_TEST
-#include "tmc/Simplex.h"
-#endif
-
 tgl::Base gl_base; // TODO: Either make tgl::Base object accessible to classes
 				 //
 tgl::Actor debug_actor;
@@ -36,12 +32,12 @@ class rot_actor : public tgl::Actor
 		set_transform(out_transform);
 	}
 };
-
+#ifndef _UNIT_TEST
 int main()
-{
-#ifdef _UNIT_TEST
-	Simplex_TEST();
+#else
+int main2()
 #endif
+{
 	
 	gl_base.init();
 #ifdef _TGL_CLIENT

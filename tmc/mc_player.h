@@ -21,8 +21,10 @@ class Player : public tgl::Player
     bool inventory_on;
     int inventory_slots;
     int quick_use_slots;
+#ifdef _TGL_CLIENT
 	tgl::HudElement * hud_dragging;
 	tmc::hud::CraftingTableHud * crafting_table_hud;
+#endif  // _TGL_CLIENT
 	bool crafting_table_on;
 	glm::vec2 orig_drag_pos;
 	glm::vec2 drag_mouse_diff;

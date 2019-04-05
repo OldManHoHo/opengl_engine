@@ -5,21 +5,21 @@
 namespace tmc
 {
 
-void InteractionManager::tick(double time_delta, std::vector<tgl::Actor*>& actors)
+void InteractionManager::tick(double time_delta, std::vector <std::unique_ptr<tgl::Actor>>& actors)
 {
-    for (auto actor : actors)
+    for (auto& actor : actors)
     {
-        if (dynamic_cast<tmc::ChunkSpawn*>(actor) != nullptr)
+        if (dynamic_cast<tmc::ChunkSpawn*>(actor.get()) != nullptr)
         {
-            chunk_spawn = dynamic_cast<tmc::ChunkSpawn*>(actor);
+            chunk_spawn = dynamic_cast<tmc::ChunkSpawn*>(actor.get());
         }
     }
-    for (auto actor : actors)
+    for (auto& actor : actors)
     {
-        if (dynamic_cast<tmc::Player*>(actor) != nullptr)
+        if (dynamic_cast<tmc::Player*>(actor.get()) != nullptr)
         {
             // Process block hits
-            tmc::Player * player = static_cast<tmc::Player*>(actor);
+            tmc::Player * player = static_cast<tmc::Player*>(actor.get());
             std::vector<glm::vec3> hits = player->fetch_hits();
             for (auto hit : hits)
             {

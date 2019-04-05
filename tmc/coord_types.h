@@ -29,6 +29,11 @@ struct chunk_coord
     const bool operator == (const chunk_coord &r) const {
         return x == r.x && y == r.y;
     }
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+        ar( x, y );
+    }
 };
 
 struct block_coord
@@ -60,6 +65,12 @@ struct block_coord
     int x;
     int y;
     int z;
+    
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+        ar( x, y, z );
+    }
 };
 
 struct block_def
@@ -74,6 +85,12 @@ struct block_def
     bool operator== (const block_def& in_def)
     {
         return loc == in_def.loc;
+    }
+    
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+        ar( loc, type );
     }
 };
 

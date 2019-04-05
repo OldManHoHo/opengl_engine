@@ -27,6 +27,11 @@
 #endif
 #include "tgl/udp_interface.h"
 
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/archives/xml.hpp>
+
 namespace tgl
 {
 
@@ -88,7 +93,10 @@ class Base
     std::chrono::steady_clock::time_point time_of_last_input_send;
 
     std::vector <tgl::Mesh*> meshes;
-    std::vector <tgl::Actor*> actors;
+public:
+    std::vector <std::unique_ptr<tgl::Actor>> actors;
+    int actor_id_count;
+private:
     std::vector <tgl::HudElement*> HUD_elements;
     HudElement * the;
     tgl::Player * active_camera;
@@ -167,6 +175,7 @@ class Base
  public:
     Base();
     ~Base();
+    bool operator ==(const tgl::Base &b) const;
 
 #ifdef _TGL_CLIENT
     tgl::RayBounce ray_bounce;
@@ -187,6 +196,13 @@ class Base
     void update_clients();
     void process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair);
 #endif
+    friend class cereal::access;
+    std::basic_stringstream<char> s;
+    template <class Archive>
+    void serialize( Archive & archive )
+    {
+        archive( actors ); // serialize things by passing them to the archive
+    }
 
     int init();
     bool set_conf_value(std::string conf_var_name,
@@ -198,7 +214,7 @@ class Base
     void update();
     void add_mesh(tgl::Mesh * in_mesh);
     void add_actor(tgl::Actor * in_actor);
-    void remove_actor(tgl::Actor * in_actor);
+    void remove_actor(int actor_index);
 
     tgl::Player * get_player();
     glm::vec3 get_player_pos();
@@ -210,6 +226,7 @@ class Base
     void draw_actor_to_shadow_map(Actor * actor);
     void draw_actor(Actor * actor);
     void draw_hud_element(HudElement * element, float offset_x = 0, float offset_y = 0);
+
 };
 
 }  // namespace tgl

@@ -19,7 +19,9 @@ Player::Player():
     quick_use_slots(tgl::Inventory::default_quick_use_size),
     tgl::Player(full_inventory_slot_width*full_inventory_slot_height
                 + tgl::Inventory::default_quick_use_size),
+#ifdef _TGL_CLIENT
 	crafting_table_hud(nullptr),
+#endif  // _TGL_CLIENT
 	crafting_table_on(false)
 {
     init_inventory(quick_use_slots);
@@ -84,6 +86,7 @@ void Player::tick(double time_delta)
 	glm::vec2 mouse_pos = glm::vec2(input_handler.mouse_x, input_handler.mouse_y);
 	mouse_pos.y = tgl::global::window_height - mouse_pos.y;
 
+#ifdef _TGL_CLIENT
 	if (crafting_table_on)
 	{
 		crafting_table_hud->visible = true;
@@ -140,6 +143,7 @@ void Player::tick(double time_delta)
 		hud_dragging->pos += mouse_pos - drag_mouse_diff;
 		drag_mouse_diff = mouse_pos;
 	}
+#endif  // _TGL_CLIENT
     if (input_handler.key_states[1])
     {
         std::cout << "MOUSE 1" << "\n";
@@ -327,6 +331,7 @@ std::vector<std::pair<glm::vec3, e_block_type>> Player::fetch_placements()
 int Player::screen_pos_to_inventory_index(int in_pos_x, int in_pos_y, 
 	int &inventory_index, tgl::HudElement *& out_hud_element)
 {
+#ifdef _TGL_CLIENT
 	int inventory_count = 0;
 	for (auto he : inventory_hud->sub_elements)
 	{
@@ -365,6 +370,7 @@ int Player::screen_pos_to_inventory_index(int in_pos_x, int in_pos_y,
 		inventory_count += 1;
 	}
 	inventory_index = -1;
+#endif  // _TGL_CLIENT
 	return -1;
 }
 

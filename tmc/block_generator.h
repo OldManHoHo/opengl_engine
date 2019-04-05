@@ -88,6 +88,12 @@ private:
                   int in_z,
                   int chunk_x = 0,
                   int chunk_y = 0);
+                  
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+        ar( world_mods, mod_flags );
+    }
 };
 
 #ifdef _UNIT_TEST

@@ -38,7 +38,7 @@ PhysicsEngine::~PhysicsEngine()
 }
 
 void PhysicsEngine::tick(double time_delta,
-                         std::vector <tgl::Actor*> const & actors,
+                         std::vector <std::unique_ptr<tgl::Actor>> const & actors,
                          tmc::ChunkSpawn * chunks_spawner,
                          bool gravity_enabled)
 {
@@ -79,8 +79,8 @@ void PhysicsEngine::tick(double time_delta,
                 }
 
                 std::vector <glm::vec3> collision_blocks =
-                    get_world_blocks((*it), chunks_spawner);
-                move(time_delta, (*it), collision_blocks, speed_mult);
+                    get_world_blocks((*it).get(), chunks_spawner);
+                move(time_delta, (*it).get(), collision_blocks, speed_mult);
                 /*
                 
                 for (auto block_it = collision_blocks.begin();

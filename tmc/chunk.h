@@ -26,6 +26,7 @@ class Chunk : public tgl::Actor
 
     bool remove_instance(int block_type, glm::vec3 loc);
     void add_instance(int block_type, glm::vec3 loc);
+
 };
 
 }  // namespace tmc

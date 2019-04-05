@@ -12,7 +12,7 @@ class InteractionManager
 {
     tmc::ChunkSpawn * chunk_spawn;
  public:
-    void tick(double time_delta, std::vector<tgl::Actor*>& actors);
+    void tick(double time_delta, std::vector <std::unique_ptr<tgl::Actor>>& actors);
 };
 
 }  // namespace tmc

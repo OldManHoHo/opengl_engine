@@ -18,7 +18,7 @@ class PhysicsEngine
     ~PhysicsEngine();
 
     void tick(double time_delta,
-              std::vector <std::unique_ptr<tgl::Actor>> const & actors,
+              std::vector <std::shared_ptr<tgl::Actor>> const & actors,
               tmc::ChunkSpawn * chunks_spawner,
               bool gravity_enabled = true);
     std::vector <glm::vec3> get_world_blocks(tgl::Actor * in_actor,

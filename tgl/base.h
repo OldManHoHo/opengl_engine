@@ -2,15 +2,22 @@
 #ifndef TGL_BASE_H_
 #define TGL_BASE_H_
 
+#include <stdarg.h>
 #include <chrono>
 #include <deque>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/archives/xml.hpp>
+#include <cereal/types/polymorphic.hpp>
 
 #include "tgl/tgl_gl.h"
 #include "tgl/TGL_USER_CLASSES.h"
@@ -26,11 +33,6 @@
 #include "tgl/ray_bounce.h"
 #endif
 #include "tgl/udp_interface.h"
-
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/vector.hpp>
-#include <cereal/types/memory.hpp>
-#include <cereal/archives/xml.hpp>
 
 namespace tgl
 {
@@ -93,10 +95,10 @@ class Base
     std::chrono::steady_clock::time_point time_of_last_input_send;
 
     std::vector <tgl::Mesh*> meshes;
-public:
-    std::vector <std::unique_ptr<tgl::Actor>> actors;
+ public:
+    std::vector <std::shared_ptr<tgl::Actor>> actors;
     int actor_id_count;
-private:
+ private:
     std::vector <tgl::HudElement*> HUD_elements;
     HudElement * the;
     tgl::Player * active_camera;
@@ -199,9 +201,9 @@ private:
     friend class cereal::access;
     std::basic_stringstream<char> s;
     template <class Archive>
-    void serialize( Archive & archive )
+    void serialize(Archive & archive)
     {
-        archive( actors ); // serialize things by passing them to the archive
+        archive(actors);
     }
 
     int init();
@@ -213,7 +215,16 @@ private:
     void start_tasks();
     void update();
     void add_mesh(tgl::Mesh * in_mesh);
-    void add_actor(tgl::Actor * in_actor);
+    template <class actor_type, typename... Targs>
+    std::shared_ptr<actor_type> add_actor(Targs... Fargs)
+    {
+        std::shared_ptr<tgl::Actor> new_actor =
+                std::make_shared<actor_type>(Fargs...);
+        actors.push_back(new_actor);
+        actors.back()->id = actor_id_count;
+        actor_id_count += 1;
+        return std::dynamic_pointer_cast<actor_type>(new_actor);
+    }
     void remove_actor(int actor_index);
 
     tgl::Player * get_player();
@@ -221,12 +232,13 @@ private:
     void set_world_actor(tgl::Actor * in_actor);
     void get_game_state();
     void update_sun(double time_delta);
-    
+
     // OpenGL call functions
     void draw_actor_to_shadow_map(Actor * actor);
     void draw_actor(Actor * actor);
-    void draw_hud_element(HudElement * element, float offset_x = 0, float offset_y = 0);
-
+    void draw_hud_element(HudElement * element,
+                          float offset_x = 0,
+                          float offset_y = 0);
 };
 
 }  // namespace tgl

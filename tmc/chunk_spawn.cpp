@@ -538,9 +538,12 @@ void ChunkSpawn::tick(double time_delta)
 
 #ifndef _EXCLUDE_TMC_DROPPED_ITEM
                     // TODO(Teddy Walsh): should not have this logic here.
-                    tmc::DroppedItem * added =
-                        new tmc::DroppedItem(
-                            tgl::block_type_to_item_id(type_to_remove));
+                    std::shared_ptr<tmc::DroppedItem> added = 
+                                gl_base.add_actor<tmc::DroppedItem>
+                                    (tgl::block_type_to_item_id(type_to_remove));
+                    //tmc::DroppedItem * added =
+                    //    new tmc::DroppedItem(
+                    //        tgl::block_type_to_item_id(type_to_remove));
 #ifdef _TGL_CLIENT
                     (std::dynamic_pointer_cast<tgl::Mesh>(
                         added->get_components()[0]))->
@@ -549,8 +552,8 @@ void ChunkSpawn::tick(double time_delta)
 #endif
                     added->set_pos(hit.loc);
                     // debug_actor.set_pos(hit_block);
-                    gl_base.add_actor((tgl::Actor*)added);
-                    dropped_items.add_item((tgl::Actor*)added,
+                    //gl_base.add_actor((tgl::Actor*)added);
+                    dropped_items.add_item((tgl::Actor*)added.get(),
                                            chunk_coord(chunk_x, chunk_y));
 #endif
                 }
@@ -911,17 +914,21 @@ void ChunkSpawn::spawn_chunk(int chunk_x, int chunk_y)
 		block_mesh_vertices[block_buffer_pointer];
 	block_buffer_pointer = (block_buffer_pointer + 1) % block_mesh_vertices.size();
 	//	new tgl::MeshVertices(tgl::useful_structures::vertex_data_block_small);
-
-    chunks[chunk_coord(chunk_x, chunk_y)] =
-        new tmc::Chunk(block_mesh_vertices_temp,
+    std::shared_ptr<tmc::Chunk> new_chunk = gl_base.add_actor<tmc::Chunk>(
+                       block_mesh_vertices_temp,
                        block_material,
                        block_type_count,
                        instances);
+    chunks[chunk_coord(chunk_x, chunk_y)] = new_chunk.get();
+        //new tmc::Chunk(block_mesh_vertices_temp,
+        //               block_material,
+        //               block_type_count,
+        //               instances);
     chunks[chunk_coord(chunk_x, chunk_y)]->translate(glm::vec3(16 * (chunk_x),
                                                      0,
                                                      16 * (chunk_y)));
 #endif
-    gl_base.add_actor(chunks[chunk_coord(chunk_x, chunk_y)]);
+    //gl_base.add_actor(chunks[chunk_coord(chunk_x, chunk_y)]);
 }
 
 // void ChunkSpawn::calculate_chunk_light(int chunk_x, int chunk_y)
@@ -1684,3 +1691,15 @@ BlockState * ChunkSpawn::get_block_state(glm::vec3 in_block_loc)
 */
 
 }  // namespace tmc
+
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/xml.hpp>
+#include <cereal/archives/json.hpp>
+
+// Register DerivedClassOne
+CEREAL_REGISTER_TYPE(tmc::ChunkSpawn)
+
+// Note that there is no need to register the base class, only derived classes
+//  However, since we did not use cereal::base_class, we need to clarify
+//  the relationship (more on this later)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(tgl::Actor, tmc::ChunkSpawn)

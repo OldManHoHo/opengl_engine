@@ -27,6 +27,26 @@ Actor::Actor():
     _id_counter += 1;
 }
 
+Actor::Actor(glm::vec3 in_pos):
+    id(_id_counter),
+    is_chunk(false),
+    delete_flag(false)
+{
+    transform = glm::mat4(1.0);
+    scale = glm::vec3(1.0, 1.0, 1.0);
+    pos = in_pos;
+    // rot = glm::quat(0.0, glm::vec3(0,1.0,0));
+    rot = glm::mat4(1.0);
+    mass = 20;
+
+    bounds = nullptr;
+    on_ground = false;
+    static_physics = false;
+    transform_calculated = false;
+
+    _id_counter += 1;
+}
+
 bool Actor::operator ==(const tgl::Actor &b) const
 {
     if (type != b.type)

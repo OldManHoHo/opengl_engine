@@ -20,7 +20,7 @@ enum e_block_type
 
 struct chunk_coord
 {
-    chunk_coord(int in_x, int in_y) { x = in_x; y = in_y; }
+    chunk_coord(int in_x=0, int in_y=0) { x = in_x; y = in_y; }
     int x;
     int y;
     const bool operator < (const chunk_coord &r) const {

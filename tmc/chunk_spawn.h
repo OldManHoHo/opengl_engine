@@ -130,27 +130,13 @@ class ChunkSpawn : public tgl::Actor
     std::unordered_map<block_coord, block_def>& get_mods(chunk_coord to_send);
     //BlockState * get_block_state(glm::vec3 in_block_loc);
     
-    
     template <class Archive>
     void serialize( Archive & ar )
     { 
-        // We pass this cast to the base type for each base type we
-        // need to serialize.  Do this instead of calling serialize functions
-        // directly
-        std::cout << "chunk_spawn ser" << "\n";
-        ar( cereal::base_class<tgl::Actor>( this ), block_generator ); 
+        ar(cereal::base_class<tgl::Actor>( this ), block_generator);
     }
 };
 
 }  // namespace tmc
-
-
-// Register DerivedClassOne
-CEREAL_REGISTER_TYPE(tmc::ChunkSpawn)
-
-// Note that there is no need to register the base class, only derived classes
-//  However, since we did not use cereal::base_class, we need to clarify
-//  the relationship (more on this later)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(tgl::Actor, tmc::ChunkSpawn)
 
 #endif  // TMC_CHUNK_SPAWN_H_

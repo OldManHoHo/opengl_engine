@@ -5,7 +5,7 @@
 namespace tmc
 {
 
-void InteractionManager::tick(double time_delta, std::vector <std::unique_ptr<tgl::Actor>>& actors)
+void InteractionManager::tick(double time_delta, std::vector <std::shared_ptr<tgl::Actor>>& actors)
 {
     for (auto& actor : actors)
     {

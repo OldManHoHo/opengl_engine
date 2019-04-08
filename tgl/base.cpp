@@ -33,7 +33,7 @@ Base::Base():
     shadow_map_interval(0.5),
 #endif
     default_shader_program(0),
-    game_state_buf(1460,0),
+    game_state_buf(1460, 0),
     shadow_maps_enabled(true),
     actor_id_count(0)
 {
@@ -63,7 +63,12 @@ bool tgl::Base::operator ==(const tgl::Base &b) const
                 if (*actor != *actor2)
                 {
                     std::cout << "Actor " << actor->id << " not equal" << "\n";
-                    std::cout << actor->get_pos().x << ", " << actor->get_pos().y << ", " << actor->get_pos().z << ", " << actor2->get_pos().x << ", " << actor2->get_pos().y << ", " << actor2->get_pos().z << "\n";
+                    std::cout << actor->get_pos().x <<
+                                 ", " << actor->get_pos().y <<
+                                 ", " << actor->get_pos().z <<
+                                 ", " << actor2->get_pos().x <<
+                                 ", " << actor2->get_pos().y <<
+                                 ", " << actor2->get_pos().z << "\n";
                     return false;
                 }
             }
@@ -89,7 +94,6 @@ bool Base::gl_init()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    
     global::window = gl_create_window(global::window_width, global::window_height);
     if (global::window == nullptr)
     {
@@ -134,9 +138,9 @@ bool Base::gl_init()
 
 GLFWwindow * Base::gl_create_window(int in_width, int in_height)
 {
-	global::window_height = in_height;
-	global::window_width = in_width;
-    GLFWwindow * window = glfwCreateWindow(in_width, in_height, 
+    global::window_height = in_height;
+    global::window_width = in_width;
+    GLFWwindow * window = glfwCreateWindow(in_width, in_height,
                                            "tmc", NULL, NULL);
     if (window == nullptr)
     {
@@ -521,65 +525,65 @@ void Base::update_clients()
         int pre_client_offset = 0;
         for (auto client : clients)
         {
-	    if (chunk_update_buf.size() < 1460)
-	    {
-	        chunk_update_buf.resize(1460);
+            if (chunk_update_buf.size() < 1460)
+            {
+                chunk_update_buf.resize(1460);
             }
             int offset = pre_client_offset;
-	    chunk_update_buf[offset] = 
-		static_cast<char>(tgl::NetMsgType::ChunkUpdate);
-	    offset += sizeof(char);
+            chunk_update_buf[offset] = 
+            static_cast<char>(tgl::NetMsgType::ChunkUpdate);
+            offset += sizeof(char);
             // printf("GLIENCTS %u\n", ntohs(client.first.addr.sin_port));
             *(uint32_t*)&chunk_update_buf[offset] = client.second.chunks_to_send.size();
             offset += sizeof(uint32_t);
-	    int previous_chunk_offset = offset;
+            int previous_chunk_offset = offset;
             for (auto chunk_coord_to_send : client.second.chunks_to_send)
-	    while (client.second.chunks_to_send.size())
+            while (client.second.chunks_to_send.size())
             {
-		auto chunk_coord_to_send = client.second.chunks_to_send.front();
+                auto chunk_coord_to_send = client.second.chunks_to_send.front();
                 std::unordered_map<block_coord, block_def>& block_defs =
-                    dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->
-                        get_mods(chunk_coord_to_send);
+                dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->
+                get_mods(chunk_coord_to_send);
                 *(int32_t*)&chunk_update_buf[offset] = chunk_coord_to_send.x;
                 offset += sizeof(int32_t);
                 *(int32_t*)&chunk_update_buf[offset] = chunk_coord_to_send.y;
                 offset += sizeof(int32_t);
                 *(int32_t*)&chunk_update_buf[offset] =
-                    static_cast<int32_t>(block_defs.size());
+                static_cast<int32_t>(block_defs.size());
                 offset += sizeof(int32_t);
                 for (auto block_def_to_send : block_defs)
                 {
                     *(char*)&chunk_update_buf[offset] =
-                        static_cast<char>(block_def_to_send.second.type);
+                    static_cast<char>(block_def_to_send.second.type);
                     offset += sizeof(char);
                     *(float*)&chunk_update_buf[offset] =
-				block_def_to_send.second.loc.x;
+                    block_def_to_send.second.loc.x;
                     offset += sizeof(float);
                     *(float*)&chunk_update_buf[offset] =
-				block_def_to_send.second.loc.y;
+                    block_def_to_send.second.loc.y;
                     offset += sizeof(float);
                     *(float*)&chunk_update_buf[offset] =
-				block_def_to_send.second.loc.z;
+                    block_def_to_send.second.loc.z;
                     offset += sizeof(float);
                 }
-		if (offset > 1460)
-		{
-		    offset = previous_chunk_offset;
-		    break;	
-		}
-		else
-		{
-		    client.second.chunks_to_send.pop_front(); 
-		    previous_chunk_offset = offset;
-		}
+                if (offset > 1460)
+                {
+                    offset = previous_chunk_offset;
+                    break;	
+                }
+                else
+                {
+                    client.second.chunks_to_send.pop_front(); 
+                    previous_chunk_offset = offset;
+                }
             }
-	    client.second.chunks_to_send.clear();
+            client.second.chunks_to_send.clear();
             udp_interface.s_send(game_state_buf, client.first.addr);
-	    chunk_update_buf.resize(offset);
-	    if (chunk_update_buf.size() > 5)
-	    {
-            	udp_interface.s_send(chunk_update_buf, client.first.addr);
-	    }
+            chunk_update_buf.resize(offset);
+            if (chunk_update_buf.size() > 5)
+            {
+                udp_interface.s_send(chunk_update_buf, client.first.addr);
+            }
         }
         time_of_last_send = std::chrono::steady_clock::now();
     }
@@ -603,19 +607,23 @@ void Base::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
         else
         {
 #ifdef USER_PLAYER_CLASS
-            USER_PLAYER_CLASS * new_player = new USER_PLAYER_CLASS;
+            std::shared_ptr<USER_PLAYER_CLASS> new_player = 
+                add_actor<USER_PLAYER_CLASS>();
+            //USER_PLAYER_CLASS * new_player = new USER_PLAYER_CLASS;
             new_player->set_pos(glm::vec3(player_start_pos_x,
                                 new_player->get_pos().y,
                                 player_start_pos_y));
             new_player->set_chunk_spawn((tmc::ChunkSpawn*)chunks_spawner);
 #else
-            tgl::Player * new_player = new tgl::Player;
+            std::shared_ptr<new tgl::Player> new_player = 
+                add_actor<new tgl::Player>();
+            //tgl::Player * new_player = new tgl::Player;
             new_player->set_pos(glm::vec3(player_start_pos_x,
                                 new_player->get_pos().y,
                                 player_start_pos_y));
             // new_player->set_chunk_spawn((tmc::ChunkSpawn*)chunks_spawner);
 #endif
-            add_actor((tgl::Actor*)new_player);
+            //add_actor((tgl::Actor*)new_player);
             clients[client_addr] = TGLClientStatus();
             clients[client_addr].actor_id = new_player->id;
             std::cout <<
@@ -1197,7 +1205,7 @@ void Base::update()
         {
             if (actors[i]->delete_flag)
             {
-                std::unique_ptr<Actor> to_delete = std::move(actors[i]);
+                std::shared_ptr<Actor> to_delete = std::move(actors[i]);
                 remove_actor(i);
                 to_delete.reset();
             }
@@ -1258,10 +1266,10 @@ void Base::add_mesh(tgl::Mesh * in_mesh)
 {
     meshes.push_back(in_mesh);
 }
-
-void Base::add_actor(tgl::Actor * in_actor)
+/*
+void Base::add_actor(std::shared_ptr<tgl::Actor>& in_actor)
 {
-    actors.push_back(std::unique_ptr<tgl::Actor>( new tgl::Actor( *in_actor ) ));
+    actors.push_back(in_actor);
     actors.back()->id = actor_id_count;
     actor_id_count += 1;
     std::cout <<
@@ -1275,7 +1283,7 @@ void Base::add_actor(tgl::Actor * in_actor)
         in_actor->pos.z <<
         "\n";
 }
-
+*/
 // remove_actor currently only removes reference in base. Does not 
 // free memory
 void Base::remove_actor(int actor_index)

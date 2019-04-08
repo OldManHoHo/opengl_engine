@@ -38,7 +38,7 @@ PhysicsEngine::~PhysicsEngine()
 }
 
 void PhysicsEngine::tick(double time_delta,
-                         std::vector <std::unique_ptr<tgl::Actor>> const & actors,
+                         std::vector <std::shared_ptr<tgl::Actor>> const & actors,
                          tmc::ChunkSpawn * chunks_spawner,
                          bool gravity_enabled)
 {

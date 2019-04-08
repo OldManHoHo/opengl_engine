@@ -375,3 +375,10 @@ int Player::screen_pos_to_inventory_index(int in_pos_x, int in_pos_y,
 }
 
 }  // namespace tmc
+
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/xml.hpp>
+#include <cereal/archives/json.hpp>
+
+CEREAL_REGISTER_TYPE(tmc::Player)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(tgl::Actor, tmc::Player)

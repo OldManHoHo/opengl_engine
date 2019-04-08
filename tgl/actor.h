@@ -75,6 +75,7 @@ class Actor
     bool delete_flag;
     
     Actor();
+    Actor(glm::vec3 in_pos);
     ~Actor() = default;
     bool operator ==(const tgl::Actor &b) const;
     bool operator!=(const tgl::Actor &b) const;
@@ -101,28 +102,17 @@ class Actor
     bool get_on_ground();
 
     friend class cereal::access;
-    
-    template<class Archive>
-    void save( Archive & archive ) const
-    {
-        archive( pos.x, pos.y, pos.z, id, mass ); // serialize things by passing them to the archive
-        archive( cereal::binary_data(glm::value_ptr(rot),16*sizeof(float)));
-    }
-    template<class Archive>
-    void load( Archive & archive )
-    {
-        archive( pos.x, pos.y, pos.z, id, mass ); // serialize things by passing them to the archive
-        archive( cereal::binary_data(glm::value_ptr(rot),16*sizeof(float)));
-    }
-    
-    /*
     template<class Archive> 
     void serialize(Archive & archive) 
     { 
-        archive( pos.x, pos.y, pos.z, id, mass ); // serialize things by passing them to the archive
-        archive( cereal::binary_data(glm::value_ptr(rot),16*sizeof(float)));
+        archive( pos.x, pos.y, pos.z, id, mass, type ); // serialize things by passing them to the archive
+        for (int i = 0; i < 16; ++i)
+        {
+            archive( *(glm::value_ptr(rot) + i) );
+        }
+        //archive( cereal::binary_data(glm::value_ptr(rot), 16*sizeof(float)));
     }
-    */
+    
     void register_network_property(double * in_prop);
     void register_network_property(float * in_prop);
     void register_network_property(char * in_prop);

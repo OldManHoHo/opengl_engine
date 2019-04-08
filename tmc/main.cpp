@@ -2,6 +2,7 @@
 #include "tgl/tgl_gl.h"
 
 #include <iostream>
+#include <gtest/gtest.h>
 
 #include "tgl/base.h"
 #include "tgl/camera.h"
@@ -32,13 +33,13 @@ class rot_actor : public tgl::Actor
 		set_transform(out_transform);
 	}
 };
-#ifndef _UNIT_TEST
-int main()
-#else
-int main2()
-#endif
+
+int main(int ac, char* av[])
 {
-	
+#ifdef _UNIT_TEST
+	testing::InitGoogleTest(&ac, av);
+    return RUN_ALL_TESTS();
+#endif
 	gl_base.init();
 #ifdef _TGL_CLIENT
 	tgl::HudElement inventory(600, 120, glm::vec2(100,100), glm::vec3(0.2, 0.2, 0.2));
@@ -73,11 +74,11 @@ int main2()
 #endif
 	debug_actor.set_scale(glm::vec3(0.1,0.1,0.1));
 
-	tmc::ChunkSpawn chunk_spawn;
-	gl_base.set_world_actor((tgl::Actor*)&chunk_spawn);
+	std::shared_ptr<tmc::ChunkSpawn> chunk_spawn = gl_base.add_actor<tmc::ChunkSpawn>();
+	gl_base.set_world_actor((tgl::Actor*)(chunk_spawn.get()));
 
 	//tgl::Player main_cam;
-	tmc::Player main_cam;
+	std::shared_ptr<tmc::Player> main_cam = gl_base.add_actor<tmc::Player>();
 	// TMCPlayer p1;
 	// TMCPlayer p2;
 	// TMCPlayer p3;
@@ -85,7 +86,7 @@ int main2()
 	// TMCPlayer p5;
 	// TMCPlayer p6;
 	
-	main_cam.set_chunk_spawn(&chunk_spawn);
+	main_cam->set_chunk_spawn(chunk_spawn.get());
 
 
 #ifdef _TGL_CLIENT
@@ -98,7 +99,7 @@ int main2()
     main_cam.add_hud(depth_buffer_display2);
     if (tgl::global::server_processing)
     {
-        gl_base.add_actor(&main_cam);
+        //gl_base.add_actor(&main_cam);
     }
     tgl::HudElement * the;
     tgl::HudElement * the2;
@@ -121,12 +122,12 @@ int main2()
 	// gl_base.add_actor(&p4);
 	// gl_base.add_actor(&p5);
 	// gl_base.add_actor(&p6);
-	gl_base.add_actor(&chunk_spawn);
-	gl_base.add_actor(&debug_actor);
+	//gl_base.add_actor(&chunk_spawn);
+	//gl_base.add_actor(&debug_actor);
 #ifdef _TGL_CLIENT
     if (tgl::global::server_processing)
     {
-        gl_base.add_camera(&main_cam);
+        gl_base.add_camera(main_cam.get());
     }
 	//main_cam.add_hud(&inventory);
 	//gl_base.add_hud_element(&inventory);

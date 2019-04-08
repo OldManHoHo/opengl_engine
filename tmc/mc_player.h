@@ -2,6 +2,7 @@
 #define TMC_PLAYER_H_
 
 #include <vector>
+#include <cereal/types/polymorphic.hpp>
 
 #include "tgl/player.h"
 #include "tmc/chunk_spawn.h"
@@ -52,6 +53,12 @@ class Player : public tgl::Player
     std::vector<std::pair<glm::vec3, e_block_type>> fetch_placements();
 	int screen_pos_to_inventory_index(int in_pos_x, int in_pos_y, 
 									  int &inventory_index, tgl::HudElement *& out_hud_element);
+									  
+    template<class Archive> 
+    void serialize(Archive & archive) 
+    {
+        archive(cereal::base_class<tgl::Actor>( this ), quick_use_slots);
+    }
 };
 
 } // namespace tmc

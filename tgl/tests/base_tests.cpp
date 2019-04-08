@@ -8,91 +8,86 @@
 #include "tmc/chunk_spawn.h"
 
 #include <cereal/archives/binary.hpp>
-#include <cereal/archives/xml.hpp>
 #include <cereal/archives/json.hpp>
+#include <cereal/types/polymorphic.hpp>
 
 #include <boost/serialization/export.hpp>
 
-BOOST_CLASS_EXPORT(tmc::ChunkSpawn)
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(tgl::Actor)
-//BOOST_CLASS_EXPORT(tmc::Player)
-
 struct BaseTest : testing::Test
 {
-  tgl::Base * base;
-  tgl::Base * base2;
-  tmc::ChunkSpawn * chunk_spawn;
-  tmc::ChunkSpawn * chunk_spawn2;
-  tmc::Player * mc_player;
-  tmc::Player * mc_player2;
+  std::unique_ptr<tgl::Base> base;
+  std::unique_ptr<tgl::Base> base2;
+  std::shared_ptr<tgl::Actor> chunk_spawn;
+  std::shared_ptr<tgl::Actor> chunk_spawn2;
+  std::shared_ptr<tgl::Actor> mc_player;
+  std::shared_ptr<tgl::Actor> mc_player2;
   //std::basic_stringstream<char> s;
   std::stringstream s;
   
   BaseTest()
   {
-    base = new tgl::Base();
-    chunk_spawn = new tmc::ChunkSpawn();
-    mc_player = new tmc::Player();
+    base = std::unique_ptr<tgl::Base>(new tgl::Base());
+    chunk_spawn = std::make_shared<tmc::ChunkSpawn>();
+    mc_player = std::make_shared<tmc::Player>();
     base->init();
     
-    base->add_actor(chunk_spawn);
-    base->add_actor(mc_player);
+    base->add_actor<tmc::ChunkSpawn>();
+    base->add_actor<tmc::Player>();
     tgl::Actor::_id_counter = 1;
-    base2 = new tgl::Base();
-    chunk_spawn2 = new tmc::ChunkSpawn();
-    mc_player2 = new tmc::Player();
+    base2 = std::unique_ptr<tgl::Base>(new tgl::Base());
+    chunk_spawn2 = std::make_shared<tmc::ChunkSpawn>();
+    mc_player2 = std::make_shared<tmc::Player>();
     base2->init();
     
-    base2->add_actor(chunk_spawn2);
-    base2->add_actor(mc_player2);
+    base2->add_actor<tmc::ChunkSpawn>();
+    base2->add_actor<tmc::Player>();
     
   }
   virtual ~BaseTest()
   {
-    delete base;
+    base.release();
   }
 };
 
 TEST_F(BaseTest, Serialize)
 {
+    std::vector<std::unique_ptr<tgl::Actor>> actors;
+    actors.push_back(std::unique_ptr<tgl::Actor>(new tmc::ChunkSpawn));
+    actors.push_back(std::unique_ptr<tgl::Actor>(new tmc::ChunkSpawn));
+    actors.push_back(std::unique_ptr<tgl::Actor>(new tmc::Player));
+  
     base->actors[0]->set_pos(glm::vec3(1,2,3));
     glm::mat4 init_mat;
     init_mat[1][3] = 2.134;
     init_mat[0][2] = -2.45;
     base->actors[1]->set_rot(init_mat);
-    
+    std::unique_ptr<tgl::Actor> cs1(new tmc::ChunkSpawn);
+    std::unique_ptr<tgl::Actor> cs2(new tmc::ChunkSpawn);
+    std::stringstream os;
     EXPECT_FALSE(*base == *base2);
-    std::ofstream ofs("filename");
+    {
+      //std::ofstream os( "polymorphism_test.Binary" );
+      
+      cereal::BinaryOutputArchive oarchive( os );
   
-    // save data to archive
-    {
-        boost::archive::text_oarchive oa(ofs);
-        // write class instance to archive
-        oa << *base;
-    	// archive and stream closed when destructors are called
+      oarchive( base );
     }
-
+  
     {
-        // create and open an archive for input
-        std::ifstream ifs("filename");
-        boost::archive::text_iarchive ia(ifs);
-        // read class state from archive
-        ia >> *base2;
-        // archive and stream closed when destructors are called
+      //std::ifstream is( "polymorphism_test.Binary" );
+      std::stringstream is(os.str());
+      cereal::BinaryInputArchive iarchive( is );
+  
+      iarchive( base2 );
     }
-    std::cout << "LENGTHS: " << base->actors.size() << ", " << base2->actors.size() << "\n";
-    std::cout << "IDs: " << base->actors[0]->id << ", " << base2->actors[0]->id << "\n";
-    std::cout << "IDs: " << base->actors[1]->id << ", " << base2->actors[1]->id << "\n";
     
     EXPECT_TRUE(*base == *base2);
 }
 
-#ifdef _UNIT_TEST
-int main(int ac, char* av[])
-#else
-int main2(int ac, char* av[])
-#endif
+TEST_F(BaseTest, AddActor)
 {
-  testing::InitGoogleTest(&ac, av);
-  return RUN_ALL_TESTS();
+    std::shared_ptr<tgl::Actor> new_actor = 
+              base->add_actor<tgl::Actor>(glm::vec3(5, 6, 7));
+    EXPECT_EQ(new_actor->get_pos(), base->actors.back()->get_pos());
+    EXPECT_EQ(new_actor->get_pos(), glm::vec3(5, 6, 7));
 }

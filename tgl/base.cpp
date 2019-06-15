@@ -185,17 +185,97 @@ void Base::add_hud_element(tgl::HudElement * in_element)
 
 void Base::apply_game_state(std::vector <char> * in_state)
 {
+	tmc::net_messages::GameState to_apply(*in_state);
+	tgl::Actor* cur_actor = nullptr;
+	bool found = false;
+	for (auto actor : actors)
+	{
+		if (actor->id == to_apply.header.active_actor_id)
+		{
+			cur_actor = actor;
+			found = true;
+			break;
+		}
+	}
+	if (found == false)
+	{
+#ifdef USER_PLAYER_CLASS
+		USER_PLAYER_CLASS* new_player = new USER_PLAYER_CLASS;
+		new_player->set_pos(glm::vec3(player_start_pos_x,
+			new_player->get_pos().y,
+			player_start_pos_y));
+		new_player->set_chunk_spawn((tmc::ChunkSpawn*)chunks_spawner);
+		new_player->id = to_apply.header.active_actor_id;
+#else
+		tgl::Player* new_player = new tgl::Player;
+		new_player->set_pos(glm::vec3(player_start_pos_x,
+			new_player->get_pos().y,
+			player_start_pos_y));
+		// new_player->set_chunk_spawn((tmc::ChunkSpawn*)chunks_spawner);
+		new_player->id = actor_id;
+#endif
+		add_actor((tgl::Actor*)new_player);
+		add_hud_element(new_player->inventory_hud);
+	}
+	if (active_camera == nullptr)
+	{
+		for (auto actor : actors)
+		{
+			if (actor->id == to_apply.header.active_actor_id)
+			{
+				active_camera = (tgl::Player*)actor;
+			}
+		}
+	}
+	else if (active_camera->id != to_apply.header.active_actor_id)
+	{
+		for (auto actor : actors)
+		{
+			if (actor->id == to_apply.header.active_actor_id)
+			{
+				active_camera = (tgl::Player*)actor;
+			}
+		}
+	}
+	for (auto &actor_info : to_apply.actor_infos)
+	{
+		for (auto actor : actors)
+		{
+			if (actor->id == actor_info.actor_header.actor_id)
+			{
+				cur_actor = actor;
+			}
+		}
+		glm::vec3 actor_pos;
+		memcpy(glm::value_ptr(actor_pos), actor_info.actor_header.actor_pos,
+			sizeof(GLfloat) * 3);
+		glm::mat4 actor_rot;
+		memcpy(glm::value_ptr(actor_rot),
+			actor_info.actor_header.actor_rot,
+			sizeof(GLfloat) * 16);
+		glm::vec3 actor_scale;
+		memcpy(glm::value_ptr(actor_scale),
+			actor_info.actor_header.actor_scale,
+			sizeof(GLfloat) * 3);
+		cur_actor->set_pos(actor_pos);
+		cur_actor->set_rot(actor_rot);
+		cur_actor->set_scale(actor_scale);
+		cur_actor->transform_calculated = true;
+	}
+
+	return;
     // TODO(Teddy Walsh): change all types to precise size
     int offset = 1;
     short actor_id = *reinterpret_cast<short*>(&(*in_state)[offset]);
-    tgl::Actor * cur_actor = nullptr;
-    bool found = false;
+    
+    
     for (auto actor : actors)
     {
         if (actor->id == actor_id)
         {
             cur_actor = actor;
             found = true;
+			break;
         }
     }
     if (found == false)
@@ -438,9 +518,9 @@ void Base::send_input_update()
         udp_interface.s_send(player_input_buf,
                              server_ip_address,
                              server_udp_receive_port);
-        udp_interface.s_send(chunk_request_buf,
-                             server_ip_address,
-                             server_udp_receive_port);
+        //udp_interface.s_send(chunk_request_buf,
+        //                     server_ip_address,
+        //                     server_udp_receive_port);
         time_of_last_input_send = std::chrono::steady_clock::now();
     }
 }
@@ -455,7 +535,32 @@ void Base::send_game_state_to_all()  // TODO(Teddy Walsh): implement or remove
 
 void Base::generate_game_state(bool full)
 {
-    game_state_buf.resize(1460);
+	game_state_buf.resize(1460);
+	tmc::net_messages::GameState out_state;
+
+	out_state.header.msg_type = (unsigned char)(tgl::NetMsgType::GameState);
+
+	for (auto actor : actors)
+	{
+		if (full)
+		{
+
+			out_state.actor_infos.push_back(tmc::net_messages::GameState::ActorInfo());
+			tmc::net_messages::GameState::ActorInfo& actor_info_end = out_state.actor_infos.back();
+			actor_info_end.actor_header.actor_id = (short)actor->id;
+			actor_info_end.actor_header.actor_type = 0;
+			auto pos_p = glm::value_ptr(actor->pos);
+			memcpy(&actor_info_end.actor_header.actor_pos, pos_p, 3 * sizeof(GLfloat));
+			auto rot_p = glm::value_ptr(actor->rot);
+			memcpy(&actor_info_end.actor_header.actor_rot, rot_p, 16 * sizeof(GLfloat));
+			auto scale_p = glm::value_ptr(actor->scale);
+			memcpy(&actor_info_end.actor_header.actor_scale, scale_p, 3 * sizeof(GLfloat));
+		}
+	}
+
+	out_state.gen(game_state_buf);
+	//tmc::net_messages::GameState in_state(game_state_buf);
+	return;
     int offset = 0;
     game_state_buf[offset] = (unsigned char)(tgl::NetMsgType::GameState);
     offset += sizeof(char);

@@ -54,8 +54,6 @@ add_compile_options(-D_UNIT_TEST)
 
 
 add_executable(tgl_server ${SRC})
-
-
 find_library(libprotobuf protobuf)
 find_library(libgtest gtest)
 target_link_libraries(tgl_server ${libprotobuf})

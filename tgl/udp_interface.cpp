@@ -123,7 +123,7 @@ void UDPInterface::receive_loop()
         buffer_queue.check_out_memory(recv_buffer);
         recv_buffer->second.resize(1460);
         s_recv((*recv_buffer).second, &(recv_buffer->first));
-        std::cout << "First char: " << int((*recv_buffer).second[0]) << "\n";
+        //std::cout << "First char: " << int((*recv_buffer).second[0]) << "\n";
         buffer_queue.push_front(recv_buffer);
     }
 }

@@ -259,14 +259,20 @@ void Player::tick(double time_delta)
                 tgl::useful_structures::
                     item_id_to_texture_coords[next_item->type] +
                     glm::vec2(16, 16));
-            text_element->set_text(std::to_string(next_item->quantity));
+			if (text_element->text != std::to_string(next_item->quantity))
+			{
+				text_element->set_text(std::to_string(next_item->quantity));
+			}
         }
         else
         {
             picture_element->set_offsets(
                 glm::vec2(16, 8 * 16),
                 glm::vec2(16, 8 * 16) + glm::vec2(16, 16));
-            text_element->set_text("");
+			if (text_element->text != "")
+			{
+				text_element->set_text("");
+			}
         }
     }
     for (int i = 0; i < inventory_slots - tgl::Inventory::default_quick_use_size; ++i)

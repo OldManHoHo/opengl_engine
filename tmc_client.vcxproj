@@ -151,6 +151,8 @@
     <ClCompile Include="tgl\player.cpp" />
     <ClCompile Include="tgl\ray_bounce.cpp" />
     <ClCompile Include="tgl\shader.cpp" />
+    <ClCompile Include="tgl\tests\base_tests.cpp" />
+    <ClCompile Include="tgl\tests\serialization_tests.cpp" />
     <ClCompile Include="tgl\texture.cpp" />
     <ClCompile Include="tgl\udp_interface.cpp" />
     <ClCompile Include="tgl\useful_structures.cpp" />

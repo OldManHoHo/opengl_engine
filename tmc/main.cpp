@@ -92,11 +92,11 @@ int main(int ac, char* av[])
 #ifdef _TGL_CLIENT
     tgl::HudElement * depth_buffer_display = new tgl::HudElement(500, 500, glm::vec2(100, 500), glm::vec3(0, 0, 0), "content/textures/mc.png");
     depth_buffer_display->tex->texture = gl_base.ray_bounce.depthTexture;
-    main_cam.add_hud(depth_buffer_display);
+    main_cam->add_hud(depth_buffer_display);
 
     tgl::HudElement * depth_buffer_display2 = new tgl::HudElement(500, 500, glm::vec2(100, 1050), glm::vec3(0, 0, 0), "content/textures/mc.png");
     depth_buffer_display2->tex->texture = gl_base.ray_bounce.depthTexture2;
-    main_cam.add_hud(depth_buffer_display2);
+    main_cam->add_hud(depth_buffer_display2);
     if (tgl::global::server_processing)
     {
         //gl_base.add_actor(&main_cam);

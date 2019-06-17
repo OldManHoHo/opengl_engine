@@ -18,9 +18,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "tgl/globals.h"
 #include "tgl/material.h"
-#include "tgl/net_messages.h"
 #include "tgl/shader.h"
-#include "tmc/net_msg_structures.h"
 
 namespace tgl
 {
@@ -35,7 +33,9 @@ Base::Base():
     default_shader_program(0),
     game_state_buf(1460, 0),
     shadow_maps_enabled(true),
-    actor_id_count(0)
+    actor_id_count(0),
+	os(),
+	oarchive(os)
 {
     srand(0);
 }
@@ -185,303 +185,15 @@ void Base::add_hud_element(tgl::HudElement * in_element)
 
 void Base::apply_game_state(std::vector <char> * in_state)
 {
-	tmc::net_messages::GameState to_apply(*in_state);
-	tgl::Actor* cur_actor = nullptr;
-	bool found = false;
-	for (auto actor : actors)
-	{
-		if (actor->id == to_apply.header.active_actor_id)
-		{
-			cur_actor = actor;
-			found = true;
-			break;
-		}
-	}
-	if (found == false)
-	{
-#ifdef USER_PLAYER_CLASS
-		USER_PLAYER_CLASS* new_player = new USER_PLAYER_CLASS;
-		new_player->set_pos(glm::vec3(player_start_pos_x,
-			new_player->get_pos().y,
-			player_start_pos_y));
-		new_player->set_chunk_spawn((tmc::ChunkSpawn*)chunks_spawner);
-		new_player->id = to_apply.header.active_actor_id;
-#else
-		tgl::Player* new_player = new tgl::Player;
-		new_player->set_pos(glm::vec3(player_start_pos_x,
-			new_player->get_pos().y,
-			player_start_pos_y));
-		// new_player->set_chunk_spawn((tmc::ChunkSpawn*)chunks_spawner);
-		new_player->id = actor_id;
-#endif
-		add_actor((tgl::Actor*)new_player);
-		add_hud_element(new_player->inventory_hud);
-	}
-	if (active_camera == nullptr)
-	{
-		for (auto actor : actors)
-		{
-			if (actor->id == to_apply.header.active_actor_id)
-			{
-				active_camera = (tgl::Player*)actor;
-			}
-		}
-	}
-	else if (active_camera->id != to_apply.header.active_actor_id)
-	{
-		for (auto actor : actors)
-		{
-			if (actor->id == to_apply.header.active_actor_id)
-			{
-				active_camera = (tgl::Player*)actor;
-			}
-		}
-	}
-	for (auto &actor_info : to_apply.actor_infos)
-	{
-		for (auto actor : actors)
-		{
-			if (actor->id == actor_info.actor_header.actor_id)
-			{
-				cur_actor = actor;
-			}
-		}
-		glm::vec3 actor_pos;
-		memcpy(glm::value_ptr(actor_pos), actor_info.actor_header.actor_pos,
-			sizeof(GLfloat) * 3);
-		glm::mat4 actor_rot;
-		memcpy(glm::value_ptr(actor_rot),
-			actor_info.actor_header.actor_rot,
-			sizeof(GLfloat) * 16);
-		glm::vec3 actor_scale;
-		memcpy(glm::value_ptr(actor_scale),
-			actor_info.actor_header.actor_scale,
-			sizeof(GLfloat) * 3);
-		cur_actor->set_pos(actor_pos);
-		cur_actor->set_rot(actor_rot);
-		cur_actor->set_scale(actor_scale);
-		cur_actor->transform_calculated = true;
-	}
-
-	return;
-    // TODO(Teddy Walsh): change all types to precise size
-    int offset = 1;
-    short actor_id = *reinterpret_cast<short*>(&(*in_state)[offset]);
-    
-    
-    for (auto actor : actors)
-    {
-        if (actor->id == actor_id)
-        {
-            cur_actor = actor;
-            found = true;
-			break;
-        }
-    }
-    if (found == false)
-    {
-#ifdef USER_PLAYER_CLASS
-        USER_PLAYER_CLASS * new_player = new USER_PLAYER_CLASS;
-        new_player->set_pos(glm::vec3(player_start_pos_x,
-                            new_player->get_pos().y,
-                            player_start_pos_y));
-        new_player->set_chunk_spawn((tmc::ChunkSpawn*)chunks_spawner);
-        new_player->id = actor_id;
-#else
-        tgl::Player * new_player = new tgl::Player;
-        new_player->set_pos(glm::vec3(player_start_pos_x,
-                            new_player->get_pos().y,
-                            player_start_pos_y));
-        // new_player->set_chunk_spawn((tmc::ChunkSpawn*)chunks_spawner);
-        new_player->id = actor_id;
-#endif
-        add_actor((tgl::Actor*)new_player);
-        add_hud_element(new_player->inventory_hud);
-    }
-    offset += sizeof(short);
-    if (active_camera == nullptr)
-    {
-        for (auto actor : actors)
-        {
-            if (actor->id == actor_id)
-            {
-                active_camera = (tgl::Player*)actor;
-            }
-        }
-    }
-    else if (active_camera->id != actor_id)
-    {
-        for (auto actor : actors)
-        {
-            if (actor->id == actor_id)
-            {
-                active_camera = (tgl::Player*)actor;
-            }
-        }
-    }
-    short num_actors = *reinterpret_cast<short*>(&(*in_state)[offset]);
-    offset += sizeof(short);
-    for (int i = 0; i < num_actors; ++i)
-    {
-        short actor_id = *reinterpret_cast<short*>(&(*in_state)[offset]);
-        offset += sizeof(short);
-        for (auto actor : actors)
-        {
-            if (actor->id == actor_id)
-            {
-                cur_actor = actor;
-            }
-        }
-        short actor_type = *reinterpret_cast<short*>(&(*in_state)[offset]);
-        offset += sizeof(short);
-
-        glm::vec3 actor_pos;
-        memcpy(glm::value_ptr(actor_pos), &(*in_state)[offset],
-               sizeof(GLfloat) * 3);
-        offset += sizeof(GLfloat) * 3;
-        glm::mat4 actor_rot;
-        memcpy(glm::value_ptr(actor_rot),
-               &(*in_state)[offset],
-               sizeof(GLfloat) * 16);
-        offset += sizeof(GLfloat) * 16;
-        glm::vec3 actor_scale;
-        memcpy(glm::value_ptr(actor_scale),
-               &(*in_state)[offset],
-               sizeof(GLfloat) * 3);
-        offset += sizeof(GLfloat) * 3;
-        cur_actor->set_pos(actor_pos);
-        cur_actor->set_rot(actor_rot);
-        cur_actor->set_scale(actor_scale);
-        cur_actor->transform_calculated = true;
-
-        short num_int_props = *reinterpret_cast<short*>(&(*in_state)[offset]);
-        offset += sizeof(short);
-        for (int i = 0; i < num_int_props; ++i)
-        {
-            short int_prop_id = *reinterpret_cast<short*>(&(*in_state)[offset]);
-            offset += sizeof(short);
-            int int_prop_val = *reinterpret_cast<int*>(&(*in_state)[offset]);
-            offset += sizeof(int);
-        }
-
-        short num_float_props = *reinterpret_cast<short*>(&(*in_state)[offset]);
-        offset += sizeof(short);
-        for (int i = 0; i < num_int_props; ++i)
-        {
-            short int_prop_id =
-                *reinterpret_cast<short*>(&(*in_state)[offset]);
-            offset += sizeof(short);
-            float int_prop_val =
-                *reinterpret_cast<float*>(&(*in_state)[offset]);
-            offset += sizeof(float);
-        }
-
-        short num_vec3_props = *reinterpret_cast<short*>(&(*in_state)[offset]);
-        offset += sizeof(short);
-        for (int i = 0; i < num_int_props; ++i)
-        {
-            short int_prop_id = *reinterpret_cast<short*>(&(*in_state)[offset]);
-            offset += sizeof(short);
-            glm::vec3 vec3_prop_val;
-            memcpy(glm::value_ptr(vec3_prop_val),
-                   &(*in_state)[offset],
-                   sizeof(GLfloat) * 3);
-            offset += sizeof(GLfloat)*3;
-        }
-        for (auto actor : actors)
-        {
-            if (actor_id == actor->id)
-            {
-                // actor->transform = actor_trans;
-            }
-        }
-    }
-    int num_block_changes = *reinterpret_cast<int*>(&(*in_state)[offset]);
-    offset += sizeof(int);
-    for (int i = 0; i < num_block_changes; ++i)
-    {
-        e_block_type block_type = (e_block_type)(*in_state)[offset];
-        offset += sizeof(char);
-        float x_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
-        offset += sizeof(float);
-        float y_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
-        offset += sizeof(float);
-        float z_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
-        offset += sizeof(float);
-        dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->set_point(x_pos, 
-                                                    y_pos, 
-                                                    z_pos, 
-                                                    block_type);
-    }
-    int num_chunk_loads = *reinterpret_cast<uint32_t*>(&(*in_state)[offset]);
-    offset += sizeof(uint32_t);
-    for (int i = 0; i < num_chunk_loads; ++i)
-    {
-        int chunk_coord_x = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
-        offset += sizeof(int32_t);
-        int chunk_coord_y = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
-        offset += sizeof(int32_t);
-        int block_num = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
-        offset += sizeof(int32_t);
-        for (int j = 0; j < block_num; ++i)
-        {
-            e_block_type block_type = (e_block_type)(*in_state)[offset];
-            offset += sizeof(char);
-            float x_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
-            offset += sizeof(float);
-            float y_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
-            offset += sizeof(float);
-            float z_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
-            offset += sizeof(float);
-            dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->set_point(x_pos,
-                y_pos,
-                z_pos,
-                block_type);
-        }
-    }
-    // for (auto as : last_received_game_state.actors())
-    // {
-    //  for (auto actor : actors)
-    //  {
-    //      if (as.id() == actor->id)
-    //      {
-    //              memcpy(glm::value_ptr(actor->transform),
-    //                     as.mutable_transform(),
-    //                     sizeof(GLfloat) * 16);
-    //          }
-    //      }
-    //  }
+	std::string temp_string(in_state->begin(), in_state->end());
+	std::stringstream is(temp_string);
+	cereal::BinaryInputArchive iarchive(is);
+	iarchive(shared_from_this());
 }
 
 void Base::apply_chunk_update(std::vector <char> * in_state)
 {
-    int offset = 1;
-    int num_chunk_loads = *reinterpret_cast<uint32_t*>(&(*in_state)[offset]);
-    offset += sizeof(uint32_t);
-    for (int i = 0; i < num_chunk_loads; ++i)
-    {
-        int chunk_coord_x = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
-        offset += sizeof(int32_t);
-        int chunk_coord_y = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
-        offset += sizeof(int32_t);
-        int block_num = *reinterpret_cast<int32_t*>(&(*in_state)[offset]);
-        offset += sizeof(int32_t);
-        for (int j = 0; j < block_num; ++i)
-        {
-            e_block_type block_type = (e_block_type)(*in_state)[offset];
-            offset += sizeof(char);
-            float x_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
-            offset += sizeof(float);
-            float y_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
-            offset += sizeof(float);
-            float z_pos = *reinterpret_cast<float*>(&(*in_state)[offset]);
-            offset += sizeof(float);
-            dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->set_point(x_pos,
-                y_pos,
-                z_pos,
-                block_type);
-        }
-    }
+
 }
 
 void Base::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
@@ -535,87 +247,9 @@ void Base::send_game_state_to_all()  // TODO(Teddy Walsh): implement or remove
 
 void Base::generate_game_state(bool full)
 {
-	game_state_buf.resize(1460);
-	tmc::net_messages::GameState out_state;
-
-	out_state.header.msg_type = (unsigned char)(tgl::NetMsgType::GameState);
-
-	for (auto actor : actors)
-	{
-		if (full)
-		{
-
-			out_state.actor_infos.push_back(tmc::net_messages::GameState::ActorInfo());
-			tmc::net_messages::GameState::ActorInfo& actor_info_end = out_state.actor_infos.back();
-			actor_info_end.actor_header.actor_id = (short)actor->id;
-			actor_info_end.actor_header.actor_type = 0;
-			auto pos_p = glm::value_ptr(actor->pos);
-			memcpy(&actor_info_end.actor_header.actor_pos, pos_p, 3 * sizeof(GLfloat));
-			auto rot_p = glm::value_ptr(actor->rot);
-			memcpy(&actor_info_end.actor_header.actor_rot, rot_p, 16 * sizeof(GLfloat));
-			auto scale_p = glm::value_ptr(actor->scale);
-			memcpy(&actor_info_end.actor_header.actor_scale, scale_p, 3 * sizeof(GLfloat));
-		}
-	}
-
-	out_state.gen(game_state_buf);
-	//tmc::net_messages::GameState in_state(game_state_buf);
-	return;
-    int offset = 0;
-    game_state_buf[offset] = (unsigned char)(tgl::NetMsgType::GameState);
-    offset += sizeof(char);
-    *(short*)&game_state_buf[offset] = 0;
-    offset += sizeof(short);
-    short * num_actors = (short*)&game_state_buf[offset];
-    *num_actors = 0;
-    offset += sizeof(short);
-    for (auto& actor : actors)
-    {
-        if (full)
-        {
-            *num_actors += 1;
-            *(short*)&game_state_buf[offset] = (short)actor->id;
-            offset += sizeof(short);
-            *(short*)&game_state_buf[offset] = (short)actor->type;
-            offset += sizeof(short);
-            auto pos_p = glm::value_ptr(actor->pos);
-            memcpy(&game_state_buf[offset], pos_p, 3*sizeof(GLfloat));
-            offset += 3*sizeof(GLfloat);
-            auto rot_p = glm::value_ptr(actor->rot);
-            memcpy(&game_state_buf[offset], rot_p, 16*sizeof(GLfloat));
-            offset += 16*sizeof(GLfloat);
-            auto scale_p = glm::value_ptr(actor->scale);
-            memcpy(&game_state_buf[offset], scale_p, 3*sizeof(GLfloat));
-            offset += 3*sizeof(GLfloat);
-            // # int props
-            *(short*)&game_state_buf[offset] = 0;
-            offset += sizeof(short);
-            // # float props
-            *(short*)&game_state_buf[offset] = 0;
-            offset += sizeof(short);
-            // # vec3 props
-            *(short*)&game_state_buf[offset] = 0;
-            offset += sizeof(short);
-        }
-    }
-    std::vector <block_def>& changes =
-        ((tmc::ChunkSpawn*)chunks_spawner)->get_block_changes();
-
-    *(int*)&game_state_buf[offset] = (int)changes.size();
-    offset += sizeof(int);
-    for (auto change : changes)
-    {
-        game_state_buf[offset] = (char)change.type;
-        offset += sizeof(char);
-        *(float*)&game_state_buf[offset] = (float)change.loc.x;
-        offset += sizeof(float);
-        *(float*)&game_state_buf[offset] = (float)change.loc.y;
-        offset += sizeof(float);
-        *(float*)&game_state_buf[offset] = (float)change.loc.z;
-        offset += sizeof(float);
-    }
-    ((tmc::ChunkSpawn*)chunks_spawner)->clear_block_changes();
-    game_state_buf.resize(offset);
+	oarchive(shared_from_this());
+	game_state_buf[0] = tgl::NetMsgType::GameState;
+	std::copy(os.str().begin(), os.str().end(), game_state_buf.begin() + 1);
 }
 
 void Base::update_clients()
@@ -777,22 +411,7 @@ void Base::process_msg(std::pair<sockaddr_in, std::vector<char>>* in_pair)
         tgl::NetMsgType::ChunkRequest)
     {
 	std::cout << "CHUNK REQUEST" << "\n";
-        int offset = 1;
-        uint32_t chunk_count = 
-            *reinterpret_cast<uint32_t*>(&in_pair->second[offset]);
-        offset += sizeof(uint32_t);
-        for (int i = 0; i < chunk_count; ++i)
-        {
-            chunk_coord coord_to_load(0, 0);
-            coord_to_load.x =
-                *reinterpret_cast<uint32_t*>(&in_pair->second[offset]);
-            offset += sizeof(uint32_t);
-            coord_to_load.y =
-                *reinterpret_cast<uint32_t*>(&in_pair->second[offset]);
-            offset += sizeof(uint32_t);
-            clients[client_addr].chunks_to_send.push_back(coord_to_load);
-        }
-        // dynamic_cast<tmc::ChunkSpawn*>(chunks_spawner)->
+ 
 	std::cout << "END CHUNK REQUEST" << "\n";
     }
     else if (in_pair->second[0] == 'x')
@@ -1395,6 +1014,17 @@ void Base::remove_actor(int actor_index)
 {
     actors[actor_index] = std::move(actors[actors.size() - 1]);
     actors.resize(actors.size() - 1);
+}
+
+void Base::remove_actor(tgl::Actor * in_actor)
+{
+	for (int i = 0; i < actors.size(); ++i)
+	{
+		if (in_actor == actors[i].get())
+		{
+			remove_actor(i);
+		}
+	}
 }
 
 tgl::Player * Base::get_player()

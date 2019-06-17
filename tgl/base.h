@@ -27,6 +27,7 @@
 #include "tgl/hud_element.h"
 #endif  // _TGL_CLIENT
 #include "tgl/mesh.h"
+#include "tgl/net_messages.h"
 #include "tgl/physics_engine.h"
 #include "tgl/player.h"
 #ifdef _TGL_CLIENT
@@ -53,7 +54,9 @@ enum TGLObjectType
     player_object
 };
 
-class Base
+class Base;
+
+class Base: public std::enable_shared_from_this<Base>
 {
     std::map <std::string, float*> conf_float_values;
     std::map <std::string, double*> conf_double_values;
@@ -174,6 +177,10 @@ class Base
 
     int actor_count;
 
+	// Serialization data
+	std::stringstream os;
+	cereal::BinaryOutputArchive oarchive;
+
  public:
     Base();
     ~Base();
@@ -226,6 +233,7 @@ class Base
         return std::dynamic_pointer_cast<actor_type>(new_actor);
     }
     void remove_actor(int actor_index);
+	void remove_actor(tgl::Actor* in_actor);
 
     tgl::Player * get_player();
     glm::vec3 get_player_pos();

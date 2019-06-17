@@ -11,7 +11,7 @@
 #include <cereal/archives/json.hpp>
 #include <cereal/types/polymorphic.hpp>
 
-#include <boost/serialization/export.hpp>
+//#include <boost/serialization/export.hpp>
 
 struct BaseTest : testing::Test
 {

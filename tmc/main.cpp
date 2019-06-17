@@ -2,7 +2,9 @@
 #include "tgl/tgl_gl.h"
 
 #include <iostream>
+#ifdef _UNIT_TEST
 #include <gtest/gtest.h>
+#endif  // _UNIT_TEST
 
 #include "tgl/base.h"
 #include "tgl/camera.h"
@@ -41,6 +43,7 @@ int main(int ac, char* av[])
     return RUN_ALL_TESTS();
 #endif
 	gl_base.init();
+	std::shared_ptr<tgl::Base> test_ptr(&gl_base);
 #ifdef _TGL_CLIENT
 	tgl::HudElement inventory(600, 120, glm::vec2(100,100), glm::vec3(0.2, 0.2, 0.2));
 	int offset = 10;

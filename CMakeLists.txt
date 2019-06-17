@@ -40,7 +40,6 @@ set (SRC ${tmc}/main.cpp
 	${tmc}/mc_items.cpp
 	${tmc}/mc_interaction_manager.cpp
 	${tgl}/globals.cpp
-	${tgl}/tests/base_tests.cpp
 	)
 
 #	${tgl}/FastNoiseSIMD/FastNoiseSIMD_avx2.cpp
@@ -49,15 +48,15 @@ set (SRC ${tmc}/main.cpp
 add_compile_options(-std=c++11 -ggdb)
 add_compile_options(-D_TGL_SERVER)
 add_compile_options(-DGLM_ENABLE_EXPERIMENTAL)
-add_compile_options(-D_UNIT_TEST)
+#add_compile_options(-D_UNIT_TEST)
 #add_compile_options(-D_EXCLUDE_TMC_DROPPED_ITEM)
 
 
 add_executable(tgl_server ${SRC})
-find_library(libprotobuf protobuf)
-find_library(libgtest gtest)
-target_link_libraries(tgl_server ${libprotobuf})
-target_link_libraries(tgl_server ${libgtest})
+#find_library(libprotobuf protobuf)
+#find_library(libgtest gtest)
+#target_link_libraries(tgl_server ${libprotobuf})
+#target_link_libraries(tgl_server ${libgtest})
 find_package(Threads REQUIRED)
 if(THREADS_HAVE_PTHREAD_ARG)
   target_compile_options(tgl_server PUBLIC "-pthread")
